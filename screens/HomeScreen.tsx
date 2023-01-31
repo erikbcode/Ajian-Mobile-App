@@ -4,6 +4,7 @@ import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View} from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
+import RedirectButton from '../components/RedirectButton';
 import navButtonStyles from '../styles/NavButtonStyle';
 import { usePreventRemoveContext } from '@react-navigation/native';
 import { PROPERTY_TYPES } from '@babel/types';
@@ -22,14 +23,7 @@ export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Text style={styles.title}>Come Visit</Text>
         <Text style={styles.body}>Hello Tuscaloosa! We're here! Come for a fresh new take on the sushi roll!</Text>
-        <Pressable style={({pressed}) => [
-            pressed ? navButtonStyles.buttonPressed : navButtonStyles.buttonUnpressed,
-          ]}
-          onPress={() => navigation.navigate('Hours')}>
-          {({pressed}) => (
-            <Text style={navButtonStyles.text}>Find Us</Text>
-        )}
-        </Pressable>
+        <RedirectButton navigation={navigation} screen="Hours" buttonText="Find Us" />
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <Text style={styles.title}>Check Our Menu</Text>
         <Text style={styles.body}>You pick the rice, you pick the wrap, you pick the ingredients, the sauces and the toppings to create a roll that yours! When you're all done, “You’re on a Roll!”</Text>
