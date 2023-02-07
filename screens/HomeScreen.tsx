@@ -1,65 +1,123 @@
-import {useState} from 'react';
+import {useState, useEffect } from 'react';
 import React from 'react';
-import { View, Image, Text } from 'react-native';
+import { View, Image, Text, Animated } from 'react-native';
+import { StyleSheet } from 'react-native';
 import MobileOrderButton from '../components/MobileOrderButton';
-import * as Font from 'expo-font'
-import * as SplashScreen from 'expo-splash-screen'
+import * as Font from 'expo-font';
 
+const HomeScreen = () => {
+  const [selectedTab, setSelectedTab] = useState('Home')
+  const [fontsLoaded, setFontsLoaded] = useState(false)
 
-const HomePage = () => {
-  const [fontLoaded, setFontLoaded] = useState(false)
+  const loadFont = async () => {
 
-  async function loadFont() {
     try {
       await Font.loadAsync({
         'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
         'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
         'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
       });
-      setFontLoaded(true);
-    } catch (error) {
+      setFontsLoaded(true);
+    }
+    catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  React.useEffect(() => {
+
+  const [fadeAnim] = useState(new Animated.Value(0));  // Initial value for opacity: 0
+
+
+  useEffect(() => {
     loadFont();
+
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true
+    }).start();
   }, []);
 
+
+  if (fontsLoaded) {
+    return (
+      <View style={styles.container}>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <View style={styles.logoSymbol}>
+              <Image
+                source={require('../images/ajian-logo-small.jpg')}
+                style={styles.logoStyle}
+              />
+            </View>
+          </View>
+        </Animated.View>
+        <Text style={styles.welcomeText}>Ajian</Text>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <MobileOrderButton />
+          </View>
+        </Animated.View>
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1, height: '100%', width: '100%', backgroundColor: 'white'}}>
-      <Image
-        source={require('../images/marble-background.jpg')}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          resizeMode: 'cover',
-        }}
-      />
-      <View style={{ aspectRatio: 1280/854 }}>
-        <Image
-          style={{ flex: 1, alignSelf: 'center' }}
-          source={
-            require('../images/sushi2.jpg')}
-          resizeMode='contain'
-        />
-      </View>
-      <View style={{ flex: 1, padding: 16, alignContent: 'center', alignItems: 'center', }}>
-        <Text style={{ fontSize: 36, fontWeight: 'bold', color: 'rgb(135, 31, 31)', fontFamily: 'Aboreto' }}>
-          Welcome to Ajian
-        </Text>
-        <Text style={{ fontSize: 16, fontFamily: 'Ubuntu', textAlign: 'center', marginTop: 20}}>
-        You pick the rice, you pick the wrap, you pick the ingredients, the sauces and the toppings to create a roll that yours! When you're all done, “You’re on a Roll!”
-        </Text>
-      </View>
-      <View style={{ flex: 1, padding: 16, alignContent: 'center', alignItems: 'center'}}>
-        <MobileOrderButton />
-      </View>
+    <View>
+      <Text>Test</Text>
     </View>
-  );
+
+  )
+
 };
 
-export default HomePage;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexBasis: 'auto',
+    backgroundColor: 'rgb(135, 31, 31)',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    flexDirection: 'column',
+    spaceEvenly: 'true'
+    
+  },
+  logoStyle: {
+    width: 175,
+    height: 175,
+    backgroundColor: 'white',
+  },
+  logoSymbol: {
+    top: 50,
+    width: 225,
+    height: 225,
+    borderRadius: 225/2,
+    overflow: 'hidden',
+    backgroundColor: 'white',
+    alignContent: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  shadow: {
+    shadowOffset: { width: -2, height: 5 },
+    shadowColor: 'black',
+    shadowOpacity: 0.5,
+    elevation: 3,
+    // background color must be set
+    backgroundColor : "#0000" // invisible color
+  },
+  welcomeText: {
+    fontFamily: 'Aboreto',
+    fontSize: 60,
+  },
+});
+
+export default HomeScreen;
