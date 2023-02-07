@@ -1,37 +1,131 @@
-import { StyleSheet, ScrollView } from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import {useState, useEffect } from 'react';
+import React from 'react';
+import { View, Image, Text, Animated } from 'react-native';
+import { StyleSheet } from 'react-native';
 import MobileOrderButton from '../components/MobileOrderButton';
-import { usePreventRemoveContext } from '@react-navigation/native';
+import * as Font from 'expo-font';
 
-export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
-  return (
-    <ScrollView>
+const HomeScreen = () => {
+  const [selectedTab, setSelectedTab] = useState('Home')
+  const [fontsLoaded, setFontsLoaded] = useState(false)
+
+  const loadFont = async () => {
+
+    try {
+      await Font.loadAsync({
+        'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+        'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+        'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+      });
+      setFontsLoaded(true);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  const [fadeAnim] = useState(new Animated.Value(0));  // Initial value for opacity: 0
+
+
+  useEffect(() => {
+    loadFont();
+
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true
+    }).start();
+  }, []);
+
+
+  if (fontsLoaded) {
+    return (
       <View style={styles.container}>
-        <Text style={styles.title}>Welcome to Ajian</Text>
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <MobileOrderButton/>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <View style={styles.logoSymbol}>
+              <Image
+                source={require('../images/ajian-logo-small.jpg')}
+                style={styles.logoStyle}
+              />
+            </View>
+          </View>
+        </Animated.View>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <Text style={styles.welcomeText}>Ajian</Text>
+          </View>
+        </Animated.View>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <MobileOrderButton />
+          </View>
+        </Animated.View>
       </View>
-    </ScrollView>
-  );
-}
+    );
+  }
+
+  return (
+    <View>
+      <Text>Test</Text>
+    </View>
+
+  )
+
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexBasis: 'auto',
+    backgroundColor: 'rgb(135, 31, 31)',
+    justifyContent: 'space-around',
     alignItems: 'center',
+    flexDirection: 'column',
+    spaceEvenly: 'true'
+    
+  },
+  logoStyle: {
+    width: 175,
+    height: 175,
+    backgroundColor: 'white',
+  },
+  logoSymbol: {
+    top: 50,
+    width: 225,
+    height: 225,
+    borderRadius: 225/2,
+    overflow: 'hidden',
+    backgroundColor: 'white',
+    alignContent: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  shadow: {
+    shadowOffset: { width: -2, height: 5 },
+    shadowColor: 'black',
+    shadowOpacity: 0.5,
+    elevation: 3,
+    // background color must be set
+    backgroundColor : "#0000" // invisible color
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  welcomeText: {
+    fontFamily: 'Aboreto',
+    fontSize: 60,
   },
 });
+
+export default HomeScreen;

@@ -1,4 +1,7 @@
 {
+  "assets": [
+    "./styles/fonts/"
+  ],
   "expo": {
     "name": "ajian-mobile-app",
     "slug": "ajian-mobile-app",
