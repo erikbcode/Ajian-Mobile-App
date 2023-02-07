@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         borderRadius: 35,
         elevation: 3,
         borderWidth: 0,
-        backgroundColor: 'rgb(135, 31, 31)',
+        backgroundColor: 'white',
         width: 300,
         height: 60,
     },
@@ -52,8 +52,7 @@ const styles = StyleSheet.create({
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: 'white',
-        fontFamily: 'UbuntuBold'
+        color: 'rgb(135, 31, 31)'
     },
 });
 
