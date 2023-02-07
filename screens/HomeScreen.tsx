@@ -56,7 +56,15 @@ const HomeScreen = () => {
             </View>
           </View>
         </Animated.View>
-        <Text style={styles.welcomeText}>Ajian</Text>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <Text style={styles.welcomeText}>Ajian</Text>
+          </View>
+        </Animated.View>
         <Animated.View 
           style={{
             opacity: fadeAnim,
