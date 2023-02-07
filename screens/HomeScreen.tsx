@@ -5,11 +5,9 @@ import MobileOrderButton from '../components/MobileOrderButton';
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 
-const ubuntu = require('../styles/fonts/Ubuntu-Regular.ttf');
-const aboreto = require('../styles/fonts/Aboreto-Regular.ttf');
 
 const HomePage = () => {
-  const [fontLoaded, setFontLoaded] = useState(false);
+  const [fontLoaded, setFontLoaded] = useState(false)
 
   async function loadFont() {
     try {

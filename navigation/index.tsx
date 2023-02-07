@@ -3,7 +3,7 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { FontAwesome, AntDesign } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -16,7 +16,6 @@ import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import HomeScreen from '../screens/HomeScreen';
 import MenuScreen from '../screens/MenuScreen';
-import HoursScreen from '../screens/HoursScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -69,6 +68,7 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<'Home'>) => ({
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name='home' color={color} />,
+          headerShown: false,
           headerRight: () => (
             <Pressable
               onPress={() => navigation.navigate('Modal')}
@@ -91,14 +91,6 @@ function BottomTabNavigator() {
         options={{
           title: 'Menu',
           tabBarIcon: ({ color }) => <TabBarIcon name="bars" color={color} />,
-        }}
-      />
-      <BottomTab.Screen
-        name="Hours"
-        component={HoursScreen}
-        options={{
-          title: 'Hours & Location',
-          tabBarIcon: ({ color }) => <AntDesign name="clockcircle" size={24} color={color} />,
         }}
       />
     </BottomTab.Navigator>

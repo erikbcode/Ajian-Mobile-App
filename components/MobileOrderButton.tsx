@@ -28,24 +28,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 12,
         paddingHorizontal: 32,
-        borderRadius: 4,
+        borderRadius: 35,
         elevation: 3,
-        borderColor: 'black',
-        borderWidth: 2,
+        borderWidth: 0,
         backgroundColor: 'rgb(135, 31, 31)',
-        width: 200
+        width: 300,
+        height: 60,
     },
     buttonPressed: {
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 12,
         paddingHorizontal: 32,
-        borderRadius: 4,
+        borderRadius: 25,
         elevation: 3,
-        borderColor: 'black',
-        borderWidth: 2,
+        borderWidth: 0,
         backgroundColor: 'rgb(82, 3, 3)',
-        width: 200
+        width: 300,
+        height: 60
     },
     text: {
         fontSize: 16,
