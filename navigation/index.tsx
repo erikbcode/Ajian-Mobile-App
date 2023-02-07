@@ -97,6 +97,7 @@ function BottomTabNavigator() {
         options={{
           title: 'Menu',
           tabBarIcon: ({ color }) => <TabBarIcon name="bars" color={color} />,
+          headerShown: false,
         }}
       />
       <BottomTab.Screen
@@ -105,6 +106,7 @@ function BottomTabNavigator() {
         options={{
           title: 'Hours & Locations',
           tabBarIcon: ({ color }) => <TabBarIcon name="clock-o" color={color} />,
+          headerShown: false,
         }}
       />
       <BottomTab.Screen
@@ -113,6 +115,7 @@ function BottomTabNavigator() {
         options={{
           title: 'Follow Us',
           tabBarIcon: ({ color }) => <TabBarIcon name="share" color={color} />,
+          headerShown: false,
         }}
       />
     </BottomTab.Navigator>
