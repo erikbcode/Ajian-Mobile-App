@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         borderWidth: 2,
         backgroundColor: 'rgb(135, 31, 31)',
+        width: 200
     },
     buttonPressed: {
         alignItems: 'center',
@@ -44,6 +45,7 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         borderWidth: 2,
         backgroundColor: 'rgb(82, 3, 3)',
+        width: 200
     },
     text: {
         fontSize: 16,
@@ -51,6 +53,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: 'white',
+        fontFamily: 'UbuntuBold'
     },
 });
 

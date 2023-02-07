@@ -1,67 +1,67 @@
-import { StyleSheet, ScrollView, Button, Pressable} from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View} from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import {useState} from 'react';
+import React from 'react';
+import { View, Image, Text } from 'react-native';
 import MobileOrderButton from '../components/MobileOrderButton';
-import RedirectButton from '../components/RedirectButton';
-import navButtonStyles from '../styles/NavButtonStyle';
-import { usePreventRemoveContext } from '@react-navigation/native';
-import { PROPERTY_TYPES } from '@babel/types';
+import * as Font from 'expo-font'
+import * as SplashScreen from 'expo-splash-screen'
 
-export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
+const ubuntu = require('../styles/fonts/Ubuntu-Regular.ttf');
+const aboreto = require('../styles/fonts/Aboreto-Regular.ttf');
+
+const HomePage = () => {
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  async function loadFont() {
+    try {
+      await Font.loadAsync({
+        'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+        'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+        'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+      });
+      setFontLoaded(true);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  React.useEffect(() => {
+    loadFont();
+  }, []);
+
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome to Ajian</Text>
-        <MobileOrderButton></MobileOrderButton>
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text style={styles.title}>What is Sushi?</Text>
-        <Text style={styles.body}>Sushi is the Japanese preparation and serving of specially prepared vinegared rice combined with varied ingredients.</Text>
-        <Text style={styles.body}>Sushi can be prepared with either brown or white rice. It is often prepared with raw seafood, but some common varieties of sushi use cooked ingredients, and many other sorts are vegetarian.</Text>
-        <Text style={styles.body}>Sushi is often confused with sashimi, a related Japanese dish consisting of thinly sliced raw fish or occasionally meat, and an optional serving of rice. Sashimi is served as slices, unlike sushi, which is served as oval-shaped rolls. The Japanese word for this roll is Maki. Which is why, at Ajian, we like to say “Maki Tide”</Text> 
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text style={styles.title}>Come Visit</Text>
-        <Text style={styles.body}>Hello Tuscaloosa! We're here! Come for a fresh new take on the sushi roll!</Text>
-        <RedirectButton navigation={navigation} screen="Hours" buttonText="Find Us" />
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text style={styles.title}>Check Our Menu</Text>
-        <Text style={styles.body}>You pick the rice, you pick the wrap, you pick the ingredients, the sauces and the toppings to create a roll that yours! When you're all done, “You’re on a Roll!”</Text>
-        <Pressable style={({pressed}) => [
-            pressed ? navButtonStyles.buttonPressed : navButtonStyles.buttonUnpressed,
-          ]}
-          onPress={() => navigation.navigate('Menu')}>
-          {({pressed}) => (
-            <Text style={navButtonStyles.text}>Menu</Text>
-        )}
-        </Pressable>
+    <View style={{ flex: 1, height: '100%', width: '100%', backgroundColor: 'white'}}>
+      <Image
+        source={require('../images/marble-background.jpg')}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          resizeMode: 'cover',
+        }}
+      />
+      <View style={{ aspectRatio: 1280/854 }}>
+        <Image
+          style={{ flex: 1, alignSelf: 'center' }}
+          source={
+            require('../images/sushi2.jpg')}
+          resizeMode='contain'
+        />
       </View>
-    </ScrollView>
+      <View style={{ flex: 1, padding: 16, alignContent: 'center', alignItems: 'center', }}>
+        <Text style={{ fontSize: 36, fontWeight: 'bold', color: 'rgb(135, 31, 31)', fontFamily: 'Aboreto' }}>
+          Welcome to Ajian
+        </Text>
+        <Text style={{ fontSize: 16, fontFamily: 'Ubuntu', textAlign: 'center', marginTop: 20}}>
+        You pick the rice, you pick the wrap, you pick the ingredients, the sauces and the toppings to create a roll that yours! When you're all done, “You’re on a Roll!”
+        </Text>
+      </View>
+      <View style={{ flex: 1, padding: 16, alignContent: 'center', alignItems: 'center'}}>
+        <MobileOrderButton />
+      </View>
+    </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  body: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-
-});
+export default HomePage;
