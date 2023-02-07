@@ -3,12 +3,12 @@
  * https://reactnavigation.org/docs/getting-started
  *
  */
-import { FontAwesome, AntDesign } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { ColorSchemeName, Pressable } from 'react-native';
+import { ColorSchemeName, Pressable, StyleSheet } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -17,6 +17,7 @@ import NotFoundScreen from '../screens/NotFoundScreen';
 import HomeScreen from '../screens/HomeScreen';
 import MenuScreen from '../screens/MenuScreen';
 import HoursScreen from '../screens/HoursScreen';
+import SocialScreen from '../screens/SocialScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -24,7 +25,7 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      theme={colorScheme === 'dark' ? DefaultTheme : DefaultTheme}>
       <RootNavigator />
     </NavigationContainer>
   );
@@ -54,14 +55,18 @@ function RootNavigator() {
  */
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
+
 function BottomTabNavigator() {
   const colorScheme = useColorScheme();
+
 
   return (
     <BottomTab.Navigator
       initialRouteName="Home"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarActiveTintColor: 'rgb(135, 31, 31)',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {height: 90},
       }}>
       <BottomTab.Screen
         name="Home"
@@ -69,6 +74,7 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<'Home'>) => ({
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name='home' color={color} />,
+          headerShown: false,
           headerRight: () => (
             <Pressable
               onPress={() => navigation.navigate('Modal')}
@@ -91,17 +97,29 @@ function BottomTabNavigator() {
         options={{
           title: 'Menu',
           tabBarIcon: ({ color }) => <TabBarIcon name="bars" color={color} />,
+          headerShown: false,
         }}
       />
       <BottomTab.Screen
         name="Hours"
         component={HoursScreen}
         options={{
-          title: 'Hours & Location',
-          tabBarIcon: ({ color }) => <AntDesign name="clockcircle" size={24} color={color} />,
+          title: 'Hours & Locations',
+          tabBarIcon: ({ color }) => <TabBarIcon name="clock-o" color={color} />,
+          headerShown: false,
+        }}
+      />
+      <BottomTab.Screen
+        name="Social"
+        component={SocialScreen}
+        options={{
+          title: 'Follow Us',
+          tabBarIcon: ({ color }) => <TabBarIcon name="share" color={color} />,
+          headerShown: false,
         }}
       />
     </BottomTab.Navigator>
+    
   );
 }
 

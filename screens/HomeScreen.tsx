@@ -1,73 +1,131 @@
-import { StyleSheet, ScrollView, Button, Pressable} from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View} from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import {useState, useEffect } from 'react';
+import React from 'react';
+import { View, Image, Text, Animated } from 'react-native';
+import { StyleSheet } from 'react-native';
 import MobileOrderButton from '../components/MobileOrderButton';
-import navButtonStyles from '../styles/NavButtonStyle';
-import { usePreventRemoveContext } from '@react-navigation/native';
-import { PROPERTY_TYPES } from '@babel/types';
+import * as Font from 'expo-font';
 
-export default function HomeScreen({ navigation }: RootTabScreenProps<'Home'>) {
-  return (
-    <ScrollView>
+const HomeScreen = () => {
+  const [selectedTab, setSelectedTab] = useState('Home')
+  const [fontsLoaded, setFontsLoaded] = useState(false)
+
+  const loadFont = async () => {
+
+    try {
+      await Font.loadAsync({
+        'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+        'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+        'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+      });
+      setFontsLoaded(true);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  const [fadeAnim] = useState(new Animated.Value(0));  // Initial value for opacity: 0
+
+
+  useEffect(() => {
+    loadFont();
+
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true
+    }).start();
+  }, []);
+
+
+  if (fontsLoaded) {
+    return (
       <View style={styles.container}>
-        <Text style={styles.title}>Welcome to Ajian</Text>
-        <MobileOrderButton></MobileOrderButton>
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text style={styles.title}>What is Sushi?</Text>
-        <Text style={styles.body}>Sushi is the Japanese preparation and serving of specially prepared vinegared rice combined with varied ingredients.</Text>
-        <Text style={styles.body}>Sushi can be prepared with either brown or white rice. It is often prepared with raw seafood, but some common varieties of sushi use cooked ingredients, and many other sorts are vegetarian.</Text>
-        <Text style={styles.body}>Sushi is often confused with sashimi, a related Japanese dish consisting of thinly sliced raw fish or occasionally meat, and an optional serving of rice. Sashimi is served as slices, unlike sushi, which is served as oval-shaped rolls. The Japanese word for this roll is Maki. Which is why, at Ajian, we like to say “Maki Tide”</Text> 
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text style={styles.title}>Come Visit</Text>
-        <Text style={styles.body}>Hello Tuscaloosa! We're here! Come for a fresh new take on the sushi roll!</Text>
-        <Pressable style={({pressed}) => [
-            pressed ? navButtonStyles.buttonPressed : navButtonStyles.buttonUnpressed,
-          ]}
-          onPress={() => navigation.navigate('Hours')}>
-          {({pressed}) => (
-            <Text style={navButtonStyles.text}>Find Us</Text>
-        )}
-        </Pressable>
-        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text style={styles.title}>Check Our Menu</Text>
-        <Text style={styles.body}>You pick the rice, you pick the wrap, you pick the ingredients, the sauces and the toppings to create a roll that yours! When you're all done, “You’re on a Roll!”</Text>
-        <Pressable style={({pressed}) => [
-            pressed ? navButtonStyles.buttonPressed : navButtonStyles.buttonUnpressed,
-          ]}
-          onPress={() => navigation.navigate('Menu')}>
-          {({pressed}) => (
-            <Text style={navButtonStyles.text}>Menu</Text>
-        )}
-        </Pressable>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <View style={styles.logoSymbol}>
+              <Image
+                source={require('../images/ajian-logo-small.jpg')}
+                style={styles.logoStyle}
+              />
+            </View>
+          </View>
+        </Animated.View>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <Text style={styles.welcomeText}>Ajian</Text>
+          </View>
+        </Animated.View>
+        <Animated.View 
+          style={{
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.shadow}>
+            <MobileOrderButton />
+          </View>
+        </Animated.View>
       </View>
-    </ScrollView>
-  );
-}
+    );
+  }
+
+  return (
+    <View>
+      <Text>Test</Text>
+    </View>
+
+  )
+
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexBasis: 'auto',
+    backgroundColor: 'rgb(135, 31, 31)',
+    justifyContent: 'space-around',
     alignItems: 'center',
+    flexDirection: 'column',
+    spaceEvenly: 'true'
+    
+  },
+  logoStyle: {
+    width: 175,
+    height: 175,
+    backgroundColor: 'white',
+  },
+  logoSymbol: {
+    top: 50,
+    width: 225,
+    height: 225,
+    borderRadius: 225/2,
+    overflow: 'hidden',
+    backgroundColor: 'white',
+    alignContent: 'center',
     justifyContent: 'center',
-    marginTop: 20,
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  shadow: {
+    shadowOffset: { width: -2, height: 5 },
+    shadowColor: 'black',
+    shadowOpacity: 0.5,
+    elevation: 3,
+    // background color must be set
+    backgroundColor : "#0000" // invisible color
   },
-  body: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    textAlign: 'center',
-    marginBottom: 20,
+  welcomeText: {
+    fontFamily: 'Aboreto',
+    fontSize: 60,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-
 });
+
+export default HomeScreen;
