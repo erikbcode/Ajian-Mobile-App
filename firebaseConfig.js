@@ -1,24 +1,25 @@
-import { initializeApp } from 'firebase/app';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database"
 
-// Optionally import the services that you want to use
-// import {...} from "firebase/auth";
-// import {...} from "firebase/database";
-// import {...} from "firebase/firestore";
-// import {...} from "firebase/functions";
-// import {...} from "firebase/storage";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Initialize Firebase
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: 'api-key',
-  authDomain: 'project-id.firebaseapp.com',
-  databaseURL: 'https://project-id.firebaseio.com',
-  projectId: 'project-id',
-  storageBucket: 'project-id.appspot.com',
-  messagingSenderId: 'sender-id',
-  appId: '1:837255087515:web:6bb081c2c64aaea2224d3e',
-  measurementId: 'G-measurement-id',
+  apiKey: "AIzaSyBjmPaaN_M907U2nwjppXy6xd5PNqFh2AA",
+  authDomain: "ajian-mobile-app.firebaseapp.com",
+  databaseURL: "https://ajian-mobile-app-default-rtdb.firebaseio.com",
+  projectId: "ajian-mobile-app",
+  storageBucket: "ajian-mobile-app.appspot.com",
+  messagingSenderId: "837255087515",
+  appId: "1:837255087515:web:6bb081c2c64aaea2224d3e",
+  measurementId: "G-PJT3RNSX6C"
 };
 
 const app = initializeApp(firebaseConfig);
-// For more information on how to access Firebase in your project,
-// see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
+
+export const auth = getAuth(app);
+export const database = getDatabase(app)
