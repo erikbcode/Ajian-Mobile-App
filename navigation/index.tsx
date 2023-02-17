@@ -44,6 +44,8 @@ function RootNavigator() {
       <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Screen name="Home" component={HomeScreen} options={{}} />
+      <Stack.Screen name="SignUp" component={AccountScreen} options={{}} />
+      <Stack.Screen name="SignIn" component={AccountScreen} options={{}} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>

@@ -4,7 +4,153 @@ import { auth } from '../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
+const SignInForm = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const navigation = useNavigation();
+
+  const handleSignIn = async () => {
+    try {
+      // Sign in with Firebase Authentication
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Navigate to the Home screen
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSignUp = () => {
+    navigation.navigate('SignUp');
+  };
+
+  return (
+    <>
+      <Text style={styles.title}>Sign In</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <View style={styles.buttonContainer}>
+        <Button title="Sign In" onPress={handleSignIn} />
+        <Text> or </Text>
+        <Button title="Create an Account" onPress={handleSignUp} />
+      </View>
+    </>
+  );
+};
+
+const SignUpForm = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const navigation = useNavigation();
+
+  const handleSignUp = async () => {
+    try {
+      // Sign in with Firebase Authentication
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      // Navigate to the Home screen
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSignIn = () => {
+    navigation.navigate('SignIn')
+  }
+
+  return (
+    <>
+      <Text style={styles.title}>Create an Account</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <View style={styles.buttonContainer}>
+        <Button title="Sign Up" onPress={handleSignUp} />
+        <Text>or</Text>
+        <Button title="Sign In" onPress={handleSignIn}/>
+      </View>
+    </>
+  );
+};
+
 const AccountScreen = () => {
+
+  const [isSignInForm, setIsSignInForm] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    // Check if a user is already signed in
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+            setIsLoggedIn(true)
+            navigation.navigate('Home')
+        }
+    });
+
+    return unsubscribe
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+        // Sign out with Firebase Authentication
+        await signOut(auth);
+
+        setIsLoggedIn(false);
+        setIsSignInForm(true);
+
+        navigation.navigate('Home')
+    } catch (error) {
+        console.error(error);
+    }
+  }
+
+
+  if (isLoggedIn) {
+    return (
+      <View style={styles.container}>
+        <Button title="Sign Out" onPress={handleSignOut} />
+      </View>
+    )
+  }
+  return (
+    <View style={styles.container}>
+      {isSignInForm ? (
+        <SignInForm />
+      ) : (
+        <SignUpForm />
+      )}
+    </View>
+  );
+  /*
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -91,6 +237,7 @@ const AccountScreen = () => {
         <Button title="Sign Out" onPress={handleSignOut} />
     </View>
     );
+    */
 };
 
 const styles = StyleSheet.create({
@@ -120,7 +267,3 @@ const styles = StyleSheet.create({
 });
 
 export default AccountScreen;
-
-function componentDidMount() {
-    throw new Error('Function not implemented.');
-}
