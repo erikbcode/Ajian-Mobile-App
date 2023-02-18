@@ -1,268 +1,227 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, Text, Button } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Button, Alert, Pressable } from 'react-native';
 import { auth } from '../firebaseConfig';
-import { useNavigation } from '@react-navigation/native';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import * as Font from 'expo-font';
 
-const SignInForm = () => {
+const AccountScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [user, setUser] = useState<User | null>(null)
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  const isFocused = useIsFocused();
 
   const navigation = useNavigation();
 
-  const handleSignIn = async () => {
+  const loadFont = async () => {
     try {
-      // Sign in with Firebase Authentication
-      await signInWithEmailAndPassword(auth, email, password);
-
-      // Navigate to the Home screen
-      navigation.navigate('Home');
-    } catch (error) {
+      await Font.loadAsync({
+        'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+        'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+        'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+      });
+      setFontsLoaded(true);
+    }
+    catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    loadFont();
+    // Load the current Firebase auth user when the screen comes into focus
+    if (isFocused) {
+      const currentUser = auth.currentUser
+      setUser(currentUser)
+    }
+  }, [isFocused]);
+
+  const handleSignIn = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        setUser(userCredential.user);
+      })
+      .catch((error) => {
+        if (error.code == 'auth/user-not-found') {
+          Alert.alert('Log in Failed', 'Please enter valid credentials or create an account.')
+        } else if (error.code == 'auth/wrong-password') {
+          Alert.alert('Invalid Password', 'Please enter the correct password associated with your account') 
+        } else if (error.code == 'auth/invalid-email') {
+          Alert.alert('Invalid Email', 'Please enter a valid email associated with an Ajian account.')
+        }
+        console.log(error);
+      });
+  };
+
+  const handleSignOut = async () => {
+        // Sign out with Firebase Authentication
+        signOut(auth)
+          .then(() => {
+            setUser(null)
+            setEmail('')
+            setPassword('')
+          })
+          .catch((error) => {
+            console.log(error)
+          });
+  }
 
   const handleSignUp = () => {
     navigation.navigate('SignUp');
   };
 
-  return (
-    <>
-      <Text style={styles.title}>Sign In</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <View style={styles.buttonContainer}>
-        <Button title="Sign In" onPress={handleSignIn} />
-        <Text> or </Text>
-        <Button title="Create an Account" onPress={handleSignUp} />
-      </View>
-    </>
-  );
-};
 
-const SignUpForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const navigation = useNavigation();
-
-  const handleSignUp = async () => {
-    try {
-      // Sign in with Firebase Authentication
-      await createUserWithEmailAndPassword(auth, email, password);
-
-      // Navigate to the Home screen
-      navigation.navigate('Home');
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleSignIn = () => {
-    navigation.navigate('SignIn')
-  }
-
-  return (
-    <>
-      <Text style={styles.title}>Create an Account</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <View style={styles.buttonContainer}>
-        <Button title="Sign Up" onPress={handleSignUp} />
-        <Text>or</Text>
-        <Button title="Sign In" onPress={handleSignIn}/>
-      </View>
-    </>
-  );
-};
-
-const AccountScreen = () => {
-
-  const [isSignInForm, setIsSignInForm] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    // Check if a user is already signed in
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-            setIsLoggedIn(true)
-            navigation.navigate('Home')
-        }
-    });
-
-    return unsubscribe
-  }, []);
-
-  const handleSignOut = async () => {
-    try {
-        // Sign out with Firebase Authentication
-        await signOut(auth);
-
-        setIsLoggedIn(false);
-        setIsSignInForm(true);
-
-        navigation.navigate('Home')
-    } catch (error) {
-        console.error(error);
-    }
-  }
-
-
-  if (isLoggedIn) {
+  if (user) {
     return (
       <View style={styles.container}>
-        <Button title="Sign Out" onPress={handleSignOut} />
+        <Text style={styles.titleText}>Hello, {user.displayName?.split(' ')[0]}!</Text>
+        <Pressable style={({pressed}) => [
+              pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
+          ]}
+          onPress={handleSignOut}>
+          {({pressed}) => (
+              <Text style={styles.text}>Log Out</Text>
+          )}
+          </Pressable>
       </View>
-    )
-  }
-  return (
-    <View style={styles.container}>
-      {isSignInForm ? (
-        <SignInForm />
-      ) : (
-        <SignUpForm />
-      )}
-    </View>
-  );
-  /*
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoggedIn, setLoggedIn] = useState(false);
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    // Check if a user is already signed in
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-            setLoggedIn(true)
-            navigation.navigate('Home')
-        }
-    });
-
-    return unsubscribe
-  }, []);
-
-  const handleSignUp = async () => {
-    try {
-      // Sign up with Firebase Authentication
-      await createUserWithEmailAndPassword(auth, email, password);
-
-      // Navigate to the Modal screen
-      navigation.navigate('Home');
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleSignIn = async () => {
-    try {
-      // Sign in with Firebase Authentication
-      await signInWithEmailAndPassword(auth, email, password);
-
-      // Navigate to the Home screen
-      navigation.navigate('Home');
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-        // Sign out with Firebase Authentication
-        await signOut(auth);
-
-        setLoggedIn(false);
-
-        navigation.navigate('Home')
-    } catch (error) {
-        console.error(error);
-    }
-  }
-
-  if (isLoggedIn == false) {
-    return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create an Account or Sign In</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <View style={styles.buttonContainer}>
-        <Button title="Sign Up" onPress={handleSignUp} />
-        <Text> or </Text>
-        <Button title="Sign In" onPress={handleSignIn} />
-      </View>
-    </View>
-    )
-  }
-    return (
-    <View style={styles.container}>
-        <Text style={styles.title}>Welcome, User</Text>
-        <Button title="Sign Out" onPress={handleSignOut} />
-    </View>
     );
-    */
+  } else {
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.titleText, styles.shadow]}>Welcome to Ajian</Text>
+        <View style={styles.logInContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="grey"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="grey"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <Pressable style={({pressed}) => [
+              pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
+          ]}
+          onPress={handleSignIn}>
+          {({pressed}) => (
+              <Text style={styles.text}>Log In</Text>
+          )}
+          </Pressable>
+        </View>
+        <View style={styles.signUpContainer}>
+          <Text style={[styles.shadow, styles.bodyText]}>First Time?</Text>
+          <Pressable style={({pressed}) => [
+              pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
+          ]}
+          onPress={handleSignUp}>
+          {({pressed}) => (
+              <Text style={styles.text}>Create an Account</Text>
+          )}
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexBasis: 'auto',
+    backgroundColor: 'rgb(135, 31, 31)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+  logInContainer: {
+    backgroundColor: 'rgb(135, 31, 31)',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '80%',
+    marginBottom: 80,
+  },
+  signUpContainer: {
+    backgroundColor: 'rgb(135, 31, 31)',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '80%',
+    marginBottom: 20,
   },
   input: {
-    borderWidth: 1,
+    height: 40,
     borderColor: 'gray',
-    padding: 8,
-    margin: 8,
-    width: '80%',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    width: '100%',
+    backgroundColor: 'white',
+  },
+  buttonUnpressed: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 35,
+    elevation: 3,
+    borderWidth: 0,
+    backgroundColor: 'white',
+    width: 300,
+    height: 60,
+    marginBottom: 20,
+  },
+buttonPressed: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 35,
+    elevation: 3,
+    borderWidth: 0,
+    backgroundColor: 'rgb(145, 145, 145)',
+    width: 300,
+    height: 60,
+    marginBottom: 20
+  },
+  titleText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    fontFamily: 'Ubuntu',
+  },
+  bodyText: {
+    fontSize: 24,
+    fontFamily: 'Ubuntu',
+    marginBottom: 30,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 16,
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+    color: 'rgb(135, 31, 31)',
+    fontFamily: 'UbuntuBold'
+  },
+  shadow: {
+    shadowOffset: { width: -2, height: 5 },
+    shadowColor: 'black',
+    shadowOpacity: 0.5,
+    elevation: 3,
+    // background color must be set
+    backgroundColor : "#0000" // invisible color
   },
 });
 

@@ -18,6 +18,7 @@ import HomeScreen from '../screens/HomeScreen';
 import MenuScreen from '../screens/MenuScreen';
 import HoursScreen from '../screens/HoursScreen';
 import SocialScreen from '../screens/SocialScreen';
+import SignUpScreen from '../screens/SignUpScreen';
 import AccountScreen from '../screens/AccountScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -44,8 +45,8 @@ function RootNavigator() {
       <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Screen name="Home" component={HomeScreen} options={{}} />
-      <Stack.Screen name="SignUp" component={AccountScreen} options={{}} />
-      <Stack.Screen name="SignIn" component={AccountScreen} options={{}} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: 'Create Account', headerTitleStyle: {fontFamily: 'Ubuntu'}, headerStyle: {backgroundColor: 'white'}}} />
+      <Stack.Screen name="Account" component={AccountScreen} options={{}} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>
