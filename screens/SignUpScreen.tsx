@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Button, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
-import { auth } from '../firebaseConfig';
+import { auth, database } from '../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, signOut, User, AuthError} from 'firebase/auth';
+import { ref, update} from 'firebase/database';
+import {} from 'firebase/database'
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState('');
@@ -21,6 +23,7 @@ const SignUpScreen = () => {
             await updateProfile(user, {
                 displayName: name
             })
+            update(ref(database, `users/${user.uid}`), {fullName: name, rewardsPoints: 0, signUpRewardUsed: false, userEmail: email})
             navigation.goBack();
         } else {
             Alert.alert('Invalid Info', 'Please fill out all information to sign up.')
