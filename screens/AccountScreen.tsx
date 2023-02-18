@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, Text, Button, Alert, Pressable } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Button, Alert, Pressable, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { auth } from '../firebaseConfig';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
@@ -89,45 +89,47 @@ const AccountScreen = () => {
     );
   } else {
     return (
-      <View style={styles.container}>
-        <Text style={[styles.titleText, styles.shadow]}>Welcome to Ajian</Text>
-        <View style={styles.logInContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="grey"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="grey"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-          <Pressable style={({pressed}) => [
-              pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
-          ]}
-          onPress={handleSignIn}>
-          {({pressed}) => (
-              <Text style={styles.text}>Log In</Text>
-          )}
-          </Pressable>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <Text style={[styles.titleText, styles.shadow]}>Welcome to Ajian</Text>
+          <View style={styles.logInContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="grey"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="grey"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+            <Pressable style={({pressed}) => [
+                pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
+            ]}
+            onPress={handleSignIn}>
+            {({pressed}) => (
+                <Text style={styles.text}>Log In</Text>
+            )}
+            </Pressable>
+          </View>
+          <View style={styles.signUpContainer}>
+            <Text style={[styles.shadow, styles.bodyText]}>First Time?</Text>
+            <Pressable style={({pressed}) => [
+                pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
+            ]}
+            onPress={handleSignUp}>
+            {({pressed}) => (
+                <Text style={styles.text}>Create an Account</Text>
+            )}
+            </Pressable>
+          </View>
         </View>
-        <View style={styles.signUpContainer}>
-          <Text style={[styles.shadow, styles.bodyText]}>First Time?</Text>
-          <Pressable style={({pressed}) => [
-              pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
-          ]}
-          onPress={handleSignUp}>
-          {({pressed}) => (
-              <Text style={styles.text}>Create an Account</Text>
-          )}
-          </Pressable>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 };
