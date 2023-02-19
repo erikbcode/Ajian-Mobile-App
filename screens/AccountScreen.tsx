@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, Text, Button, Alert, Pressable, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Alert, Pressable, TouchableWithoutFeedback, Keyboard, Button, Modal } from 'react-native';
 import { auth } from '../firebaseConfig';
+import { database } from '../firebaseConfig';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { ref, get, update } from 'firebase/database';
 import * as Font from 'expo-font';
 
 const AccountScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState<User | null>(null)
+  const [userPoints, setUserPoints] = useState(0);
+  const [hasSignUpReward, setHasSignUpReward] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   const isFocused = useIsFocused();
@@ -35,6 +40,18 @@ const AccountScreen = () => {
     if (isFocused) {
       const currentUser = auth.currentUser
       setUser(currentUser)
+
+      get(ref(database, `users/${currentUser?.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          setUserPoints(userData.rewardsPoints);
+          if (userData.signUpRewardUsed == false) {
+            setHasSignUpReward(true)
+          } else {
+            setHasSignUpReward(false)
+          }
+        }
+      })
     }
   }, [isFocused]);
 
@@ -46,10 +63,12 @@ const AccountScreen = () => {
       .catch((error) => {
         if (error.code == 'auth/user-not-found') {
           Alert.alert('Log in Failed', 'Please enter valid credentials or create an account.')
+        } else if (error.code == 'auth/invalid-email') {
+            Alert.alert('Invalid Email', 'Please enter a valid email associated with an Ajian account.') 
         } else if (error.code == 'auth/wrong-password') {
           Alert.alert('Invalid Password', 'Please enter the correct password associated with your account') 
-        } else if (error.code == 'auth/invalid-email') {
-          Alert.alert('Invalid Email', 'Please enter a valid email associated with an Ajian account.')
+        } else if (error.code == 'auth/internal-error') {
+          Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later.')
         }
         console.log(error);
       });
@@ -72,11 +91,41 @@ const AccountScreen = () => {
     navigation.navigate('SignUp');
   };
 
+  const handleRedeemReward = () => {
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmRedeem = () => {
+    // Update database to reflect that the reward has been used
+    update(ref(database, `users/${user?.uid}`), {
+      signUpRewardUsed: true,
+    });
+    setHasSignUpReward(false);
+    setShowConfirmation(false);
+  };
 
   if (user) {
     return (
       <View style={styles.container}>
         <Text style={styles.titleText}>Hello, {user.displayName?.split(' ')[0]}!</Text>
+        <Text style={styles.titleText}>Rewards points: {userPoints}</Text>
+        {hasSignUpReward && (
+          <Pressable style={({pressed}) => [
+            pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
+          ]}
+          onPress={handleRedeemReward}>
+          {({pressed}) => (
+              <Text style={styles.text}>Redeem your free roll!</Text>
+          )}
+          </Pressable>
+        )}
+        <Modal visible={showConfirmation}>
+          <View style={styles.container}>
+            <Text>Are you sure you want to redeem your sign-up reward?</Text>
+            <Button title="Confirm" onPress={handleConfirmRedeem} />
+            <Button title="Cancel" onPress={() => setShowConfirmation(false)} />
+          </View>
+        </Modal>
         <Pressable style={({pressed}) => [
               pressed ? [styles.shadow, styles.buttonPressed] : [styles.shadow, styles.buttonUnpressed],
           ]}
@@ -179,7 +228,7 @@ const styles = StyleSheet.create({
     height: 60,
     marginBottom: 20,
   },
-buttonPressed: {
+  buttonPressed: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
