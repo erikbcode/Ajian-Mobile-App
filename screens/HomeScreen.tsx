@@ -50,7 +50,7 @@ const HomeScreen = () => {
           <View style={styles.shadow}>
             <View style={styles.logoSymbol}>
               <Image
-                source={require('../images/ajian-logo-small.jpg')}
+                source={require('../assets/images/ajian-logo-small.jpg')}
                 style={styles.logoStyle}
               />
             </View>
