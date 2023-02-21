@@ -83,13 +83,13 @@ const SignUpScreen = () => {
                 </Pressable>
         </View>
         <Pressable style={({pressed}) => [
-                pressed ? [styles.shadow, styles.altButton, styles.buttonPressed] : [styles.shadow, styles.altButton, styles.buttonUnpressed],
-                ]}
-                onPress={() => navigation.goBack()}>
-                {({pressed}) => (
-                    <Text style={styles.altButtonText}>Back to Sign In</Text>
-                )}
-            </Pressable>
+            pressed ? [styles.shadow, styles.altButton, styles.buttonPressed] : [styles.shadow, styles.altButton, styles.buttonUnpressed],
+            ]}
+            onPress={() => navigation.goBack()}>
+            {({pressed}) => (
+                <Text style={styles.altButtonText}>Back to Sign In</Text>
+            )}
+        </Pressable>
         </View>
     </TouchableWithoutFeedback>
   );
@@ -185,11 +185,13 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       marginBottom: 30,
       fontFamily: 'Ubuntu',
+      color: 'white'
     },
     bodyText: {
       fontSize: 24,
       fontFamily: 'Ubuntu',
       marginBottom: 30,
+      color: 'white'
     },
     buttonContainer: {
       flexDirection: 'row',
