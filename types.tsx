@@ -20,6 +20,7 @@ export type RootStackParamList = {
   Home: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  PasswordReset: undefined;
   Account: undefined;
 };
 
