@@ -11,7 +11,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/logo-small-transparent.png",
+      "image": "./assets/images/ajian-logo-small-transparent.png",
       "resizeMode": "contain",
       "backgroundColor": "#871F1F"
     },
