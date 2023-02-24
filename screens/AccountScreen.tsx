@@ -102,14 +102,17 @@ const AccountScreen = () => {
     navigation.navigate('SignUp');
   };
   
+  // Navigate to the password reset screen
   const handlePasswordReset = () => {
     navigation.navigate('PasswordReset');
   };
 
+  // When reward is redeemed, show the confirmation modal
   const handleRedeemReward = () => {
     setShowConfirmation(true);
   };
 
+  // Function to update the user's data in the realtime db upon confirmation of redemption
   const handleConfirmRedeem = () => {
     // Update database to reflect that the reward has been used
     update(ref(database, `users/${user?.uid}`), {
@@ -119,6 +122,7 @@ const AccountScreen = () => {
     setShowConfirmation(false);
   };
 
+  // If a user is logged in, display account info. Otherwise, display sign-in/sign-up
   if (user) {
     return (
       <View style={styles.container}>

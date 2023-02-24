@@ -6,9 +6,10 @@ import MobileOrderButton from '../components/MobileOrderButton';
 import * as Font from 'expo-font';
 
 const HomeScreen = () => {
-  const [selectedTab, setSelectedTab] = useState('Home')
   const [fontsLoaded, setFontsLoaded] = useState(false)
+  const [fadeAnim] = useState(new Animated.Value(0));  // Initial value for opacity: 0
 
+  // Function to load in custom fonts 
   const loadFont = async () => {
 
     try {
@@ -24,10 +25,7 @@ const HomeScreen = () => {
     }
   };
 
-
-  const [fadeAnim] = useState(new Animated.Value(0));  // Initial value for opacity: 0
-
-
+  // Load in fonts and fade in content when page renders
   useEffect(() => {
     loadFont();
 
@@ -38,7 +36,7 @@ const HomeScreen = () => {
     }).start();
   }, []);
 
-
+  // If fonts are loaded properly, display the home screen 
   if (fontsLoaded) {
     return (
       <View style={styles.container}>
@@ -78,11 +76,11 @@ const HomeScreen = () => {
     );
   }
 
+  // TODO what should we return if fonts are not loaded? 
   return (
     <View>
       <Text>Test</Text>
     </View>
-
   )
 
 };

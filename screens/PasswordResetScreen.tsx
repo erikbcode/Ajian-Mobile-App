@@ -11,6 +11,7 @@ const PasswordResetScreen = () => {
 
   const navigation = useNavigation();
 
+  // Function for handling password reset using Firebase function
   const handlePasswordReset = async () => {
     try {
         await sendPasswordResetEmail(auth, email);

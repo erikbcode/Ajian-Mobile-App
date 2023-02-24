@@ -15,6 +15,7 @@ const SignUpScreen = () => {
 
   const navigation = useNavigation();
 
+  // Async function to sign a user in. Checks for valid inputs and then creates the user and updates the realtime data base with their info. 
   async function handleSignUp() {
     try {
         if (firstName && lastName && email && password) {
