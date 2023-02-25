@@ -1,40 +1,35 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Button, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
-import { auth, database } from '../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
-import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, signOut, User, AuthError} from 'firebase/auth';
-import { ref, update} from 'firebase/database';
-import {} from 'firebase/database'
+import { useFirebase } from '../context/FirebaseContext';
 
 const SignUpScreen = () => {
+  const firebaseContext = useFirebase();
+  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [error, setError] = useState('')
 
   const navigation = useNavigation();
 
   // Async function to sign a user in. Checks for valid inputs and then creates the user and updates the realtime data base with their info. 
   async function handleSignUp() {
     try {
-        if (firstName && lastName && email && password) {
-            const { user } = await createUserWithEmailAndPassword(auth, email, password)
-            let name = firstName.trim() + ' ' + lastName.trim();
-            await updateProfile(user, {
-                displayName: name
-            })
-            update(ref(database, `users/${user.uid}`), {fullName: name, rewardsPoints: 0, signUpRewardUsed: false, userEmail: email})
-            navigation.goBack();
-        } else {
-            Alert.alert('Invalid Info', 'Please fill out all information to sign up.')
-        }
+      let name = firstName.trim().concat(' ', lastName.trim())
+      firebaseContext.signUp(email, password, name)
+        .then(() => {
+          navigation.goBack();
+        })
+      
     } catch (error: any) {
-        if (error.code == 'auth/email-already-in-use') {
-            Alert.alert('Email Already in Use', 'The email address you entered is already in use.');
-        } else {
-            Alert.alert('Error', 'Sign up failed. Please enter valid info and try again.')
-        }
+      if (error.code == 'auth/email-already-in-use') {
+        Alert.alert('Email Already in Use', 'The email address you entered is already in use.');
+      } else {
+          Alert.alert('Error', 'Sign up failed. Please enter valid info and try again.')
+      }
+      console.log(error)
     }
   };
 

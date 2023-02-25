@@ -1,20 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, StyleSheet, Text, Alert, Pressable, TouchableWithoutFeedback, Keyboard, Button, Modal } from 'react-native';
-import { auth } from '../firebaseConfig';
-import { database } from '../firebaseConfig';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
-import { ref, get, update } from 'firebase/database';
 import * as Font from 'expo-font';
+import { useFirebase } from '../context/FirebaseContext';
 
 const AccountScreen = () => {
+  const firebaseContext = useFirebase();
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState<User | null>(null) // User variable from Auth 
-  const [userPoints, setUserPoints] = useState(0); // User's rewards points to be displayed when logged in
-  const [hasSignUpReward, setHasSignUpReward] = useState(false); // State for whether the user has redeemed their one-time sign-up reward
+  const [userPoints, setUserPoints] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false); // State for whether the user is trying to redeem their one-time reward, and a confirmation should therefore be dispalyed
-  const [fontsLoaded, setFontsLoaded] = useState(false); // Unused rn
 
   const isFocused = useIsFocused();
   const navigation = useNavigation();
@@ -27,74 +23,52 @@ const AccountScreen = () => {
         'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
         'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
       });
-      setFontsLoaded(true);
     }
     catch (error) {
       console.error(error);
     }
   };
 
+
   // Will trigger when screen comes into focus, setting the current user, and grabbing their data from the Realtime Database
   useEffect(() => {
     loadFont();
     // Load the current Firebase auth user when the screen comes into focus
-    if (isFocused) {
-      const currentUser = auth.currentUser
-      setUser(currentUser)
-
-      get(ref(database, `users/${currentUser?.uid}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          setUserPoints(userData.rewardsPoints);
-          if (userData.signUpRewardUsed == false) {
-            setHasSignUpReward(true)
-          } else {
-            setHasSignUpReward(false)
-          }
-        }
-      })
-    }
+    /*if (isFocused) {
+      setUserData(firebaseContext.getUserData());
+    }*/
   }, [isFocused]);
 
-  // Function for handling user sign-in with Firebase Authentication
-  const handleSignIn = () => {
 
-    if (email && password) {
-      signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        setUser(userCredential.user);
-        setEmail('')
-        setPassword('')
-      })
-      .catch((error) => {
-        if (error.code == 'auth/user-not-found') {
-          Alert.alert('Log in Failed', 'Please enter valid credentials or create an account.')
-        } else if (error.code == 'auth/invalid-email') {
-            Alert.alert('Invalid Email', 'Please enter a valid email associated with an Ajian account.') 
-        } else if (error.code == 'auth/wrong-password') {
-          Alert.alert('Invalid Password', 'Please enter the correct password associated with your account') 
-        } else if (error.code == 'auth/internal-error') {
-          Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later.')
-        }
-        console.log(error);
-      });
-    } else {
-      Alert.alert("Invalid Credentials", "Email or Password are invalid.");
+  // Function for handling user sign-in with Firebase Authentication
+  async function handleSignIn() {
+
+    try {
+      await firebaseContext.logIn(email, password);
+      setEmail('')
+      setPassword('')
+    } catch (error: any) {
+      if (error.code == 'auth/user-not-found') {
+        Alert.alert('Log in Failed', 'Please enter valid credentials or create an account.')
+      } else if (error.code == 'auth/invalid-email') {
+          Alert.alert('Invalid Email', 'Please enter a valid email associated with an Ajian account.') 
+      } else if (error.code == 'auth/wrong-password') {
+        Alert.alert('Invalid Password', 'Please enter the correct password associated with your account') 
+      } else if (error.code == 'auth/internal-error') {
+        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later.')
+      }
+      console.log(error);
     }
   };
 
   // Function for handling user sign-out with Firebase Authentication
   const handleSignOut = async () => {
-        // Sign out with Firebase Authentication
-        signOut(auth)
-          .then(() => {
-            setUser(null)
-            setEmail('')
-            setPassword('')
-          })
-          .catch((error) => {
-            console.log(error)
-          });
+    try {
+      await firebaseContext.logOut();
+    } catch (error: any) {
+      Alert.alert('Failed to log out', 'Error when logging out. Please try again.');
+      console.log(error);
+    }
   }
 
   // Sign-up handler for AccountScreen takes the user to the SignUpScreen.
@@ -115,20 +89,17 @@ const AccountScreen = () => {
   // Function to update the user's data in the realtime db upon confirmation of redemption
   const handleConfirmRedeem = () => {
     // Update database to reflect that the reward has been used
-    update(ref(database, `users/${user?.uid}`), {
-      signUpRewardUsed: true,
-    });
-    setHasSignUpReward(false);
+    firebaseContext.redeemReward();
     setShowConfirmation(false);
   };
 
   // If a user is logged in, display account info. Otherwise, display sign-in/sign-up
-  if (user) {
+  if (firebaseContext.user) {
     return (
       <View style={styles.container}>
-        <Text style={[styles.titleText, styles.shadow]}>Hello, {user.displayName?.split(' ')[0]}!</Text>
+        <Text style={[styles.titleText, styles.shadow]}>Hello, {firebaseContext.user.displayName?.split(' ')[0]}!</Text>
         <Text style={[styles.titleText, styles.shadow]}>Rewards points: {userPoints}</Text>
-        {hasSignUpReward && (
+        {firebaseContext.userData.hasSignUpReward && (
           <Pressable style={({pressed}) => [
             pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
           ]}

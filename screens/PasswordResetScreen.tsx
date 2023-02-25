@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Button, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback, Touchable} from 'react-native';
-import { auth, database } from '../firebaseConfig';
+import { View, TextInput, StyleSheet, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback, Touchable} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail} from 'firebase/auth';
-import { ref, update} from 'firebase/database';
 import {} from 'firebase/database'
+import { useFirebase } from '../context/FirebaseContext';
 
 const PasswordResetScreen = () => {
+  const firebaseContext = useFirebase();
+
   const [email, setEmail] = useState('');
 
   const navigation = useNavigation();
@@ -14,10 +14,15 @@ const PasswordResetScreen = () => {
   // Function for handling password reset using Firebase function
   const handlePasswordReset = async () => {
     try {
-        await sendPasswordResetEmail(auth, email);
-        alert('Password reset email sent');
-    } catch (error) {
-        Alert.alert('Error', 'Error resetting password');
+        await firebaseContext.resetPassword(email);
+        Alert.alert('Check your email', 'Password reset email sent');
+    } catch (error: any) {
+        if (error.code == 'auth/missing-email') {
+          Alert.alert('Error', 'Please enter a valid email associated with an Ajian account.');
+        } else {
+          Alert.alert('Error', 'Error resetting password');
+        }
+        console.log(error);
     }
   }
 
