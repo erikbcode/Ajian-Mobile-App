@@ -10,16 +10,17 @@ export function useFirebase() {
 }
 
 export function FirebaseProvider({children}) {
-    const [user, setUser] = useState(null);
-    const [userData, setUserData] = useState(null);
+    const [user, setUser] = useState(null); // Contains auth user object
+    const [userData, setUserData] = useState(null); // Contains data for user in object format {fullName: string, rewardsPoints: int, hasSignUpReward: boolean, userEmail: string}
     const [hoursData, setHoursData] = useState(null);
 
+    // Function to sign a user up. Calls firebase method to create auth user, and then uses this new user to update the database and local state data.
     function signUp(email, password, name) {
         return createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const newUser = userCredential.user;
                 const userRef = ref(database, `users/${newUser.uid}`);
-                updateProfile(newUser, {displayName: name})
+                updateUserName(name)
                 .then(() => {
                     update(userRef, {fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email})
                     .then(() => {
@@ -32,15 +33,17 @@ export function FirebaseProvider({children}) {
             });
     }
 
+    // Logs a user into the platform. Calls firebase method to sign in, and then accesses the database to update local data. 
     function logIn(email, password) {
         return signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const loggedUser = userCredential.user;
-                const userDataRef = ref(database)
+                setUser(loggedUser);
+                const userDataRef = ref(database);
                 get(child(userDataRef, `users/${loggedUser.uid}`)).then((snapshot) => {
                     if (snapshot.exists()) {
                         setUserData(snapshot.val());
-                        console.log(snapshot.val(), 'here');
+                        console.log(snapshot.val());
                     } else {
                         console.log('No data available')
                     }
@@ -50,18 +53,22 @@ export function FirebaseProvider({children}) {
             });
     }
 
+    // Logs a user out by calling the signOut() firebase method
     function logOut() {
         return signOut(auth);
     }
 
+    // Updates the user's auth profile displayName field
     function updateUserName(name) {
         return updateProfile(user, {displayName: name});
     }
 
+    // Sends a password reset email associated with the email 
     function resetPassword(email) {
         return sendPasswordResetEmail(auth, email);
     }
 
+    // Redeems a user's sign-up reward by updating their database field to false 
     function redeemReward() {
         // Update database to reflect that the reward has been used
         if (user) {
@@ -72,20 +79,29 @@ export function FirebaseProvider({children}) {
         };
     }
 
+    // Queries the database for the current user, sets their data in state, 
     function getUserData() {
-        if (user) {
-            get(ref(database, `users/${user.uid}`)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    setUserData(snapshot.val())
-                    console.log('snap: ', snapshot.val())
-                    return userData
-                } else {
-                    console.log('no snapshot')
-                }
-            })
+        try {
+            if (user) {
+                get(ref(database, `users/${user.uid}`)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        setUserData(snapshot.val());
+                        console.log(snapshot.val());
+                        return userData
+                    } else {
+                        console.log('No data');
+                    }
+                })
+            } else {
+                console.log('getUserData() failed due to no user.');
+            }
+        } catch (error) {
+            console.log(error);
+            Alert.alert('Error', error.code);
         }
     }
     
+    // Event listener to check for change in user state
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             if (authUser) {
