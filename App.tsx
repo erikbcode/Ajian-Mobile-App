@@ -6,6 +6,7 @@ import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
 import { FirebaseProvider } from './context/FirebaseContext';
+import { FontProvider } from './context/FontContext';
 
 
 export default function App() {
@@ -19,10 +20,12 @@ export default function App() {
 
     return (
         <SafeAreaProvider>
-          <FirebaseProvider>
-            <Navigation colorScheme={colorScheme} />
-            <StatusBar />
-          </FirebaseProvider>
+          <FontProvider>
+            <FirebaseProvider>
+              <Navigation colorScheme={colorScheme} />
+              <StatusBar />
+            </FirebaseProvider>
+          </FontProvider>
         </SafeAreaProvider>
     );
   };
