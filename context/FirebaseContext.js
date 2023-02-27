@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile} from 'firebase/auth';
-import { ref, update, get, set, child} from 'firebase/database';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, deleteUser} from 'firebase/auth';
+import { ref, update, get, set, child, remove} from 'firebase/database';
 import { auth, database } from '../firebaseConfig';
 
 const FirebaseContext = React.createContext();
@@ -108,6 +108,24 @@ export function FirebaseProvider({children}) {
             Alert.alert('Error', error.code);
         }
     }
+
+    function deleteAccount() {
+        const userRef = ref(database, `users/${user.uid}`);
+        remove(userRef)
+            .then(() => {
+                console.log('User data deleted successfully.')
+                user.delete()
+                    .then(() => {
+                        console.log('User deleted successfully')
+                    })
+                    .catch((error) => {
+                        console.log('User not deleted');
+                    });
+            })
+            .catch((error) => {
+                console.log('User data not deleted.');
+            });
+    }
     
     // Event listener to check for change in user state
     useEffect(() => {
@@ -126,7 +144,7 @@ export function FirebaseProvider({children}) {
     }, []);
 
     return (
-        <FirebaseContext.Provider value={{loading, user, userData, hoursData, signUp, logIn, logOut, updateUserName, resetPassword, redeemReward, getUserData}}>
+        <FirebaseContext.Provider value={{loading, user, userData, hoursData, signUp, logIn, logOut, updateUserName, resetPassword, redeemReward, getUserData, deleteAccount}}>
             {children}
         </FirebaseContext.Provider>
     )

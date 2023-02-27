@@ -5,7 +5,7 @@ import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 
 const AccountScreen = () => {
-  const { user, userData, loading, logIn, logOut, redeemReward } = useFirebase();
+  const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount} = useFirebase();
   const accountStyles = useAccountStyles();
 
   const [email, setEmail] = useState('');
@@ -68,6 +68,11 @@ const AccountScreen = () => {
     setShowConfirmation(false);
   };
 
+  // Function to delete a user's account and info associated with it
+  const handleDeleteAccount = () => {
+    deleteAccount() 
+  }
+
 
   // If a user is logged in, display account info. Otherwise, display sign-in/sigrn-up
   if (user) {
@@ -113,7 +118,15 @@ const AccountScreen = () => {
           {({pressed}) => (
               <Text style={accountStyles.text}>Log Out</Text>
           )}
-          </Pressable>
+        </Pressable>
+        <Pressable style={({pressed}) => [
+              pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
+          ]}
+          onPress={handleDeleteAccount}>
+          {({pressed}) => (
+              <Text style={accountStyles.text}>Delete Account</Text>
+          )}
+        </Pressable>
       </View>
     );
   } else {
