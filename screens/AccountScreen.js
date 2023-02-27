@@ -11,7 +11,8 @@ const AccountScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userPoints, setUserPoints] = useState(0);
-  const [showConfirmation, setShowConfirmation] = useState(false); // State for whether the user is trying to redeem their one-time reward, and a confirmation should therefore be dispalyed
+  const [showRedeemConfirmation, setShowRedeemConfirmation] = useState(false); // State for whether the user is trying to redeem their one-time reward, and a confirmation should therefore be dispalyed
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); // State for whether account deletion confirmation 
 
   const navigation = useNavigation();
 
@@ -58,19 +59,25 @@ const AccountScreen = () => {
 
   // When reward is redeemed, show the confirmation modal
   const handleRedeemReward = () => {
-    setShowConfirmation(true);
+    setShowRedeemConfirmation(true);
   };
 
   // Function to update the user's data in the realtime db upon confirmation of redemption
   const handleConfirmRedeem = () => {
     // Update database to reflect that the reward has been used
     redeemReward();
-    setShowConfirmation(false);
+    setShowRedeemConfirmation(false);
   };
 
-  // Function to delete a user's account and info associated with it
+  // Function to toggle confirmation for user account deletion
   const handleDeleteAccount = () => {
-    deleteAccount() 
+    setShowDeleteConfirmation(true);
+  }
+
+  // Wrapper function to delete a user's account and info associated with it 
+  const handleConfirmDelete = () => {
+    deleteAccount();
+    setShowDeleteConfirmation(false);
   }
 
 
@@ -90,7 +97,7 @@ const AccountScreen = () => {
           )}
           </Pressable>
         )}
-        <Modal visible={showConfirmation}>
+        <Modal visible={showRedeemConfirmation}>
           <View style={accountStyles.container}>
             <Text style={[accountStyles.bodyText, accountStyles.shadow]}>Are you sure you want to redeem your sign-up reward? This cannot be undone.</Text>
             <Pressable style={({pressed}) => [
@@ -104,7 +111,28 @@ const AccountScreen = () => {
             <Pressable style={({pressed}) => [
                 pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
               ]}
-                onPress={() => setShowConfirmation(false)}>
+                onPress={() => setShowRedeemConfirmation(false)}>
+              {({pressed}) => (
+                  <Text style={accountStyles.altButtonText}>Cancel</Text>
+              )}
+            </Pressable>
+          </View>
+        </Modal>
+        <Modal visible={showDeleteConfirmation}>
+          <View style={accountStyles.container}>
+            <Text style={[accountStyles.bodyText, accountStyles.shadow]}>Are you sure you want to delete your account and all of your rewards? This cannot be undone.</Text>
+            <Pressable style={({pressed}) => [
+                pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+              ]}
+                onPress={handleConfirmDelete}>
+              {({pressed}) => (
+                  <Text style={accountStyles.altButtonText}>Confirm</Text>
+              )}
+            </Pressable>
+            <Pressable style={({pressed}) => [
+                pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+              ]}
+                onPress={() => setShowDeleteConfirmation(false)}>
               {({pressed}) => (
                   <Text style={accountStyles.altButtonText}>Cancel</Text>
               )}
