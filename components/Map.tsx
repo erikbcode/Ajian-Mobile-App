@@ -2,6 +2,8 @@ import React from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, ScrollView, StatusBar } from 'react-native';
 
+// https://github.com/react-native-maps/react-native-maps#my-map-is-blank
+
 type coordinate = {
   latitude: number,
   longitude: number,
