@@ -125,6 +125,17 @@ function BottomTabNavigator() {
           headerShown: false,
         }}
       />
+
+      <BottomTab.Screen
+        name="Social"
+        component={SocialScreen}
+        options={{
+          title: 'Announcements',
+          tabBarIcon: ({ color }) => <TabBarIcon name="retweet" color={color} />,
+          headerShown: false,
+        }}
+      />
+
     </BottomTab.Navigator>
     
   );
