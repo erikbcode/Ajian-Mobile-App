@@ -125,7 +125,6 @@ function BottomTabNavigator() {
           headerShown: false,
         }}
       />
-
       <BottomTab.Screen
         name="Social"
         component={SocialScreen}
