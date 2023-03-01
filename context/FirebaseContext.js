@@ -43,7 +43,8 @@ export function FirebaseProvider({children}) {
                     createUserWithEmailAndPassword(auth, email, password)
                         .then((userCredential) => {
                             const newUser = userCredential.user;
-                            updateProfile(newUser, {phoneNumber: phoneNumber}).then(() => {
+                            updateProfile(newUser, {displayName: name, phoneNumber: phoneNumber}).then(() => {
+                                setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email, phoneNumber: phoneNumber})
                                 const userRef = ref(database, `users/${newUser.uid}`)
                                 set(userRef, {
                                     fullName: name,
@@ -54,7 +55,6 @@ export function FirebaseProvider({children}) {
                                 }).then(() => {
                                     const phoneUserRef = ref(database, `phoneNumbers/${phoneNumber}`)
                                     set(phoneUserRef, { fullName: name, userEmail: email, indexOn: 'value'}).then(() => {
-                                        setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email, phoneNumber: phoneNumber})
                                         return(newUser);
                                     })
                                 })
@@ -148,6 +148,15 @@ export function FirebaseProvider({children}) {
                 user.delete()
                     .then(() => {
                         console.log('User deleted successfully')
+                        const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
+                        remove(phoneRef)
+                            .then(() => {
+                                console.log('Phone number deleted successfully.');
+
+                        })
+                        .catch((error) => {
+                            console.log('Phone number not deleted');
+                        })
                     })
                     .catch((error) => {
                         console.log('User not deleted');
@@ -157,15 +166,6 @@ export function FirebaseProvider({children}) {
                 console.log('User data not deleted.');
             });
             
-        const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
-        remove(phoneRef)
-            .then(() => {
-                console.log('Phone number deleted successfully.');
-
-        })
-        .catch((error) => {
-            console.log('Phone number not deleted');
-        })
     }
     
     // Event listener to check for change in user state
