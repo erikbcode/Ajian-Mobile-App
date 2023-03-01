@@ -83,6 +83,7 @@ const AccountScreen = () => {
 
   // If a user is logged in, display account info. Otherwise, display sign-in/sigrn-up
   if (user) {
+    console.log('data: ', userData);
     return (
       <View style={accountStyles.container}>
         <Text style={[accountStyles.titleText, accountStyles.shadow]}>Hello, {user.displayName?.split(' ')[0]}</Text>
