@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useContext} from 'react';
+import { Alert } from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, deleteUser} from 'firebase/auth';
-import { ref, update, get, set, child, remove} from 'firebase/database';
+import { ref, update, get, set, child, remove, onValue, off, query, orderByValue, equalTo} from 'firebase/database';
 import { auth, database } from '../firebaseConfig';
 
 const FirebaseContext = React.createContext();
@@ -16,29 +17,59 @@ export function FirebaseProvider({children}) {
     const [hoursData, setHoursData] = useState(null);
 
     // Function to sign a user up. Calls firebase method to create auth user, and then uses this new user to update the database and local state data.
-    async function signUp(email, password, name) {
+    async function signUp(email, password, name, phoneNumber) {
         try {
-            setLoading(true)
-            // Create a new user with email and password
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const newUser = userCredential.user;
-                    updateProfile(newUser, {displayName: name}).then(() => {
-                        const userRef = ref(database, `users/${newUser.uid}`)
-                        set(userRef, {
-                            fullName: name,
-                            rewardsPoints: 0,
-                            hasSignUpReward: true,
-                            userEmail: email,
-                        }).then(() => {
-                            setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email})
-                            return newUser;
-                        })
-                    });
-                });
+            if (!phoneNumber) {
+                Alert.alert('no phone', 'No phone number');
+                return;
+            }
+
+            const phoneRef = ref(database, `phoneNumbers/${phoneNumber}`);
             
+
+
+            get(phoneRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    console.log(snapshot.val())
+                    Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use.')
+                    console.log('not null');
+                    console.log('returning');
+                    return;
+                } else {
+                    console.log(snapshot.val())
+                    console.log('null')
+                    setLoading(true)
+                    // Create a new user with email and password
+                    createUserWithEmailAndPassword(auth, email, password)
+                        .then((userCredential) => {
+                            const newUser = userCredential.user;
+                            updateProfile(newUser, {phoneNumber: phoneNumber}).then(() => {
+                                const userRef = ref(database, `users/${newUser.uid}`)
+                                set(userRef, {
+                                    fullName: name,
+                                    rewardsPoints: 0,
+                                    hasSignUpReward: true,
+                                    userEmail: email,
+                                    phoneNumber: phoneNumber
+                                }).then(() => {
+                                    const phoneUserRef = ref(database, `phoneNumbers/${phoneNumber}`)
+                                    set(phoneUserRef, { fullName: name, userEmail: email, indexOn: 'value'}).then(() => {
+                                        setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email, phoneNumber: phoneNumber})
+                                        return(newUser);
+                                    })
+                                })
+                            })
+                        })
+                        .catch((error) => {
+                            if (error.code == 'auth/email-already-in-use') {
+                                Alert.alert('Error', 'The specified email is already associated with an account.');
+                            }
+                            console.log(error);
+                        });
+                }
+            })            
         } catch (error) {
-            console.error('failed, '+  error);
+            console.error('failed, ' +  error);
         }
     }
 
@@ -125,6 +156,16 @@ export function FirebaseProvider({children}) {
             .catch((error) => {
                 console.log('User data not deleted.');
             });
+            
+        const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
+        remove(phoneRef)
+            .then(() => {
+                console.log('Phone number deleted successfully.');
+
+        })
+        .catch((error) => {
+            console.log('Phone number not deleted');
+        })
     }
     
     // Event listener to check for change in user state

@@ -9,6 +9,7 @@ const SignUpScreen = () => {
   const styles = useAccountStyles();
 
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -18,8 +19,14 @@ const SignUpScreen = () => {
   // Async function to sign a user in. Checks for valid inputs and then creates the user and updates the realtime data base with their info. 
   async function handleSignUp() {
     try {
+
+      if (!validatePhoneNumber(phoneNumber)) {
+        Alert.alert('Error', 'Please enter a valid phone number')
+        return;
+      }
+
       let name = firstName.trim().concat(' ', lastName.trim())
-      firebaseContext.signUp(email, password, name)
+      firebaseContext.signUp(email, password, name, phoneNumber)
         .then(() => {
           navigation.goBack();
         })
@@ -33,6 +40,10 @@ const SignUpScreen = () => {
       console.log(error)
     }
   };
+
+  const validatePhoneNumber = (phoneNumber: string) => {
+    return /^\d{10}$/.test(phoneNumber);
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -61,6 +72,14 @@ const SignUpScreen = () => {
                     placeholderTextColor="grey" 
                     value={email}
                     onChangeText={setEmail}
+                />
+                <TextInput
+                    style={styles.longInput}
+                    placeholder="Phone Number"
+                    keyboardType="phone-pad"
+                    placeholderTextColor="grey" 
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
                 />
                 <TextInput
                     style={styles.longInput}
