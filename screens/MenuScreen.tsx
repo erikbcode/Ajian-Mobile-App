@@ -22,14 +22,14 @@ function Tabs() {
   }; 
 
   return (
-    <View style={styles.container}>
+    <View style={styles.tab_container}>
       <View style={styles.tab_style}>
-        <TouchableOpacity key={1} onPress={() => handleTabClick(0)}><Text>Roll Addons</Text></TouchableOpacity>
-        <TouchableOpacity key={2} onPress={() => handleTabClick(1)}><Text>Rolls</Text></TouchableOpacity>
-        <TouchableOpacity key={3} onPress={() => handleTabClick(2)}><Text>Sides</Text></TouchableOpacity>
-        <TouchableOpacity key={4} onPress={() => handleTabClick(3)}><Text>Rice</Text></TouchableOpacity>
-        <TouchableOpacity key={5} onPress={() => handleTabClick(4)}><Text>Drinks</Text></TouchableOpacity>
-        <TouchableOpacity key={6} onPress={() => handleTabClick(5)}><Text>Nutrition</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={1} onPress={() => handleTabClick(0)}><Text style={styles.tab_text}>Roll Addons</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={2} onPress={() => handleTabClick(1)}><Text style={styles.tab_text}>Rolls</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={3} onPress={() => handleTabClick(2)}><Text style={styles.tab_text}>Sides</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={4} onPress={() => handleTabClick(3)}><Text style={styles.tab_text}>Rice</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={5} onPress={() => handleTabClick(4)}><Text style={styles.tab_text}>Drinks</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button } key={6} onPress={() => handleTabClick(5)}><Text style={styles.tab_text}>Nutrition</Text></TouchableOpacity>
       </View>
       <View style={styles.tab_content}>
         {activeTab === 0 && youreOnARollTab()}
@@ -62,7 +62,7 @@ function MenuItems(section_title: string, items: Array<MenuEntry>) {
   // firebase call for current hours / specific day hours here
   return (
     <View style={styles.menu_container}>
-      <View style={styles.small_separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      {/* <View style={styles.small_separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
       <Text style={styles.title}>{section_title}</Text>
       {items.map((item, index) => (
         <View key={index} style={styles.small_margin}>        
@@ -81,31 +81,30 @@ interface Props {
 
 const youreOnARollTab = () => {
   return (
-      <View style={styles.container}>
-          <SectionSeparator />
-          {MenuItems('Start with Rice', startWithRice)}
-          <SectionSeparator />
-          {MenuItems('Pick your Wrap', pickYourWrap)}
-          <SectionSeparator />
-          {MenuItems('Pick your Protein', pickYourProtein)}
-          <SectionSeparator />
-          {MenuItems('Make it your Own', makeItYourOwn)}
-          <SectionSeparator />
-          {MenuItems('Finish It', finishIt)}
-          <HorizontalBanner text='**1: asterisks' />
-      </View>
+    <View style={styles.container}>
+      <SectionSeparator />
+      {MenuItems('Start with Rice', startWithRice)}
+      <SectionSeparator />
+      {MenuItems('Pick your Wrap', pickYourWrap)}
+      <SectionSeparator />
+      {MenuItems('Pick your Protein', pickYourProtein)}
+      <SectionSeparator />
+      {MenuItems('Make it your Own', makeItYourOwn)}
+      <SectionSeparator />
+      {MenuItems('Finish It', finishIt)}
+      <HorizontalBanner text='**1: asterisks' />
+    </View>
   );
 };
 
 const suggestedRollsTab = () => {
   return (
-      <View style={styles.container}>
-        <View style={styles.container}>
-          <SectionSeparator />
-          {MenuItems('Suggested Rolls', suggestedRolls)}
-          <HorizontalBanner text='**2: asterisks' />
-        </View>
-      </View>
+    <View style={styles.container}>
+      <SectionSeparator />
+      {MenuItems('Suggested Rolls', suggestedRolls)}
+      <SectionSeparator />
+      <HorizontalBanner text='**2: asterisks' />
+    </View>
   );
 };
 
@@ -114,6 +113,7 @@ const sidesTab = () => {
     <View style={styles.container}>
       <SectionSeparator />
       {MenuItems('Sides', sides)}
+      <SectionSeparator />
       <HorizontalBanner text='**3: asterisks' />
     </View>
   );
@@ -134,6 +134,7 @@ const drinksTab = () => {
     <View style={styles.container}>
       <SectionSeparator />
       {MenuItems('Drinks', drinks)}
+      <SectionSeparator />
       <HorizontalBanner text='**5: asterisks' />
     </View>
   );
@@ -148,8 +149,6 @@ const nutritionTab = () => {
     </View>
   );
 };
-
-
 
 const HorizontalBanner: React.FC<Props> = ({ text }) => {
   return (
@@ -167,7 +166,7 @@ const SectionSeparator = () => {
         borderBottomWidth: 1,
         width: '75%',
         alignSelf: 'center',
-        paddingVertical: 10,
+        // paddingVertical: 10,
       }}
     />
   );
@@ -179,11 +178,11 @@ const banner_styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 2,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.5,
+    // shadowRadius: 2,
+    // elevation: 2,
     backgroundColor: 'rgb(135, 31, 31)',
 
     // fontSize: 30,
@@ -200,21 +199,42 @@ const banner_styles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
+  tab_container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 10,
+    paddingBottom: 30,
+    columnGap: 20,
+  },
   tab_style: {
-    flexDirection: 'row',
-    width: '100%',
+    alignItems: 'center',
+    flexDirection: 'column',
+    width: '50%',
     borderRadius: 10,
-    backgroundColor: 'lightgray',
+    borderWidth: 2,
+    backgroundColor: 'rgb(135, 31, 31)',
     borderColor: 'black',
-    // padding: 20,
-    marginBottom: 20,
-    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+    marginTop: 140,
+    marginBottom: 0,
+    // boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+  },
+  tab_button: {
+    paddingTop: 2,
+    paddingBottom: 2,
+  },
+  tab_text: {
+    fontWeight: 'bold',
+    color: 'white',
+    // justifyContent: 'center',
+    // textAlign: 'center',
   },
   tab_content: {
+    // justifyContent: 'center',
+    // textAlign: 'center',
     margin: 'auto',
     fontSize: 12,
     fontWeight: 'bold',
-    textAlign: 'center',
     paddingBottom: 10,
   },
   scroll_view: {
