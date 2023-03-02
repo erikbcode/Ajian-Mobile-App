@@ -20,6 +20,7 @@ import HoursScreen from '../screens/HoursScreen';
 import SocialScreen from '../screens/SocialScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import AccountScreen from '../screens/AccountScreen';
+import PasswordResetScreen from '../screens/PasswordResetScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -46,6 +47,7 @@ function RootNavigator() {
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Screen name="Home" component={HomeScreen} options={{}} />
       <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: 'Create Account', headerTitleStyle: {fontFamily: 'Ubuntu'}, headerStyle: {backgroundColor: 'white'}}} />
+      <Stack.Screen name="PasswordReset" component={PasswordResetScreen} options={{title: 'Reset Password', headerTitleStyle: {fontFamily: 'Ubuntu'}, headerStyle: {backgroundColor: 'white'}}} />
       <Stack.Screen name="Account" component={AccountScreen} options={{}} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
@@ -123,6 +125,16 @@ function BottomTabNavigator() {
           headerShown: false,
         }}
       />
+       <BottomTab.Screen
+        name="Social"
+        component={SocialScreen}
+        options={{
+          title: 'Twitter Feed',
+          tabBarIcon: ({ color }) => <TabBarIcon name="retweet" color={color} />,
+          headerShown: false,
+        }}
+      />
+
     </BottomTab.Navigator>
     
   );
