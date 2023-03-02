@@ -1,18 +1,27 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
+import { StyleSheet, ScrollView, StatusBar } from 'react-native';
+import React from 'react';
+// import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 
 export default function MenuScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Menu</Text>
-      {MenuItems('Start with Rice', startWithRice)}
-      {MenuItems('Pick your Wrap', pickYourWrap)}
-      {MenuItems('Pick your Protein', pickYourProtein)}
-      {MenuItems('Make it your Own', makeItYourOwn)}
-      {MenuItems('Finish It', makeItYourOwn)}
-    </View>
+    <ScrollView style={styles.scroll_view}>
+      <Text style={styles.header_title}>Menu</Text>
+      {/* <HorizontalBanner text='Menu' /> */}
+      <View style={styles.container}>
+        <SectionSeparator />
+        {MenuItems('Start with Rice', startWithRice)}
+        <SectionSeparator />
+        {MenuItems('Pick your Wrap', pickYourWrap)}
+        <SectionSeparator />
+        {MenuItems('Pick your Protein', pickYourProtein)}
+        <SectionSeparator />
+        {MenuItems('Make it your Own', makeItYourOwn)}
+        <SectionSeparator />
+        {MenuItems('Finish It', makeItYourOwn)}
+        <HorizontalBanner text='**: asterisks' />
+      </View>
+    </ScrollView>
   );
 }
 
@@ -66,44 +75,130 @@ const finishIt: MenuEntry[] = [
 function MenuItems(section_title: string, items: Array<MenuEntry>) {
   // firebase call for current hours / specific day hours here
   return (
-    <View style={styles.container}>
+    <View style={styles.menu_container}>
       <View style={styles.small_separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <Text style={styles.title}>{section_title}</Text>
       {items.map((item, index) => (
-        <View key={index} style={styles.small_margin}>
-          <Text style={styles.item_item}>{item.item}</Text>
-          <Text style={styles.item_description}>{item.description}</Text>
-          <Text style={styles.item_price}>{item.price}</Text>
+        <View key={index} style={styles.small_margin}>        
+          {item.item ? <Text style={styles.item_item}>{item.item}</Text> : null}
+          {item.description ? <Text style={styles.item_description}>{item.description}</Text> : null}
+          {item.price ? <Text style={styles.item_price}>{item.price}</Text> : null}
         </View>
       ))}
     </View>
   );
 }
 
+interface Props {
+  text: string;
+}
+
+const HorizontalBanner: React.FC<Props> = ({ text }) => {
+  return (
+    <View style={banner_styles.container}>
+      <Text style={banner_styles.text}>{text}</Text>
+    </View>
+  );
+};
+
+const SectionSeparator = () => {
+  return (
+    <View
+      style={{
+        borderBottomColor: 'gray',
+        borderBottomWidth: 1,
+        width: '75%',
+        alignSelf: 'center',
+        paddingVertical: 10,
+      }}
+    />
+  );
+};
+
+const banner_styles = StyleSheet.create({
+  container: {
+    height: 50,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 2,
+    backgroundColor: 'rgb(135, 31, 31)',
+
+    // fontSize: 30,
+    // fontWeight: 'bold',
+    paddingTop: StatusBar.currentHeight + 50,
+    // paddingBottom: 40,
+    // textAlign: 'center',
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+});
+
 const styles = StyleSheet.create({
+  scroll_view: {
+    paddingTop: StatusBar.currentHeight,
+  },
+  header_title: {
+    // fontFamily: 'georgia',
+    fontSize: 40,
+    fontWeight: 'bold',
+    paddingTop: StatusBar.currentHeight + 50,
+    paddingBottom: 40,
+    textAlign: 'center',
+    backgroundColor: 'rgb(135, 31, 31)',
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 30,
+    paddingBottom: 30,
+  },
+  menu_container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 20,
+    paddingBottom: 10,
   },
   small_margin: {
     marginBottom: 2,
   },
   title: {
-    fontSize: 20,
+    margin: 'auto',
+    fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center',
+    paddingBottom: 10,
   },
   item_item: {
+    margin: 'auto',
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   item_description: {
+    margin: 'auto',
     fontSize: 12,
     fontWeight: 'normal',
+    textAlign: 'center',
   },
   item_price: {
+    margin: 'auto',
     fontSize: 12,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   separator: {
     marginVertical: 30,

@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Button, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
+import { useAccountStyles } from '../styles/AccountScreenStyles';
 
 const SignUpScreen = () => {
   const firebaseContext = useFirebase();
-  
+  const styles = useAccountStyles();
 
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -17,8 +19,14 @@ const SignUpScreen = () => {
   // Async function to sign a user in. Checks for valid inputs and then creates the user and updates the realtime data base with their info. 
   async function handleSignUp() {
     try {
+
+      if (!validatePhoneNumber(phoneNumber)) {
+        Alert.alert('Error', 'Please enter a valid phone number')
+        return;
+      }
+
       let name = firstName.trim().concat(' ', lastName.trim())
-      firebaseContext.signUp(email, password, name)
+      firebaseContext.signUp(email, password, name, phoneNumber)
         .then(() => {
           navigation.goBack();
         })
@@ -32,6 +40,10 @@ const SignUpScreen = () => {
       console.log(error)
     }
   };
+
+  const validatePhoneNumber = (phoneNumber: string) => {
+    return /^\d{10}$/.test(phoneNumber);
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -63,6 +75,14 @@ const SignUpScreen = () => {
                 />
                 <TextInput
                     style={styles.longInput}
+                    placeholder="Phone Number"
+                    keyboardType="phone-pad"
+                    placeholderTextColor="grey" 
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                />
+                <TextInput
+                    style={styles.longInput}
                     placeholder="Password"
                     placeholderTextColor="grey"
                     value={password}
@@ -91,126 +111,5 @@ const SignUpScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      flexBasis: 'auto',
-      backgroundColor: 'rgb(135, 31, 31)',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    logInContainer: {
-      backgroundColor: 'rgb(135, 31, 31)',
-      flexDirection: 'column',
-      alignItems: 'center',
-      width: '80%',
-      marginBottom: 80,
-    },
-    signUpContainer: {
-      backgroundColor: 'rgb(135, 31, 31)',
-      flexDirection: 'column',
-      alignItems: 'center',
-      width: '80%',
-      marginBottom: 20,
-    },
-    sideBySide: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-    },
-    shortInput: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
-        width: '49%',
-        backgroundColor: 'white',
-      },
-    longInput: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
-        width: '100%',
-        backgroundColor: 'white',
-    },
-    button: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 35,
-        elevation: 3,
-        borderWidth: 0,
-        width: 300,
-        height: 60,
-        marginBottom: 20,
-    },
-    altButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 35,
-        elevation: 3,
-        borderWidth: 0,
-        width: 200,
-        height: 40,
-        marginBottom: 20,
-    },
-    altButtonText: {
-        fontSize: 13,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: 'rgb(135, 31, 31)',
-        fontFamily: 'UbuntuBold'
-    },
-    buttonUnpressed: {
-      backgroundColor: 'white',
-    },
-    buttonPressed: {
-        backgroundColor: 'rgb(145, 145, 145)',
-    },
-    titleText: {
-      fontSize: 30,
-      fontWeight: 'bold',
-      marginBottom: 30,
-      fontFamily: 'Ubuntu',
-      color: 'white'
-    },
-    bodyText: {
-      fontSize: 24,
-      fontFamily: 'Ubuntu',
-      marginBottom: 30,
-      color: 'white'
-    },
-    buttonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 16,
-    },
-    text: {
-      fontSize: 16,
-      lineHeight: 21,
-      fontWeight: 'bold',
-      letterSpacing: 0.25,
-      color: 'rgb(135, 31, 31)',
-      fontFamily: 'UbuntuBold'
-    },
-    shadow: {
-      shadowOffset: { width: -2, height: 5 },
-      shadowColor: 'black',
-      shadowOpacity: 0.5,
-      elevation: 3,
-      // background color must be set
-      backgroundColor : "#0000" // invisible color
-    },
-  });
 
 export default SignUpScreen;

@@ -1,4 +1,4 @@
-import {Button, Pressable, Alert, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Alert, StyleSheet, Text, View } from 'react-native';
 import * as WebBrowser from 'expo-web-browser'
 
 export default function MobileOrderButton() {
@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: 'rgb(135, 31, 31)'
+        color: 'rgb(135, 31, 31)',
+        fontFamily: 'UbuntuBold',
     },
 });
 
