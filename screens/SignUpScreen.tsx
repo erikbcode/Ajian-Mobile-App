@@ -11,6 +11,7 @@ const SignUpScreen = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
@@ -19,6 +20,11 @@ const SignUpScreen = () => {
   // Async function to sign a user in. Checks for valid inputs and then creates the user and updates the realtime data base with their info. 
   async function handleSignUp() {
     try {
+
+      if (password !== passwordConfirm) {
+        Alert.alert('Error', 'Passwords do not match.');
+        return;
+      }
 
       if (!validatePhoneNumber(phoneNumber)) {
         Alert.alert('Error', 'Please enter a valid phone number')
@@ -87,6 +93,14 @@ const SignUpScreen = () => {
                     placeholderTextColor="grey"
                     value={password}
                     onChangeText={setPassword}
+                    secureTextEntry
+                />
+                <TextInput
+                    style={styles.longInput}
+                    placeholder="Confirm Password"
+                    placeholderTextColor="grey"
+                    value={passwordConfirm}
+                    onChangeText={setPasswordConfirm}
                     secureTextEntry
                 />
                 <Pressable style={({pressed}) => [
