@@ -45,11 +45,11 @@ const SocialScreen = () => {
 
   return(
 
-    <View style = {{borderColor: 'rgb(135, 31, 31)', borderWidth: 5}}>
+    <View style = {styles.container}>
     <ScrollView>
       {posts.map((post) => (
 
-          <View key={post.id} style = {{borderColor: 'rgb(135, 31, 31)', borderWidth: 20}}>
+          <View key={post.id} style = {styles.tweetBox}>
               <Text style = {styles.title}>{post.title + '\n'}</Text>
               <Text style = {styles.text}>{post.body + '\n'}</Text>
             </View>
@@ -66,8 +66,9 @@ const SocialScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: 'rgb(135, 31, 31)',
+    borderColor: 'rgb(135, 31, 31)', 
+    borderWidth: 5, 
+    backgroundColor: 'rgb(135, 31, 31)'  
   },
 
   text: {
@@ -83,7 +84,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     backgroundColor: 'rgb(254, 251, 234)'
-    }
+    },
+
+  tweetBox: {
+    borderColor: 'rgb(135, 31, 31)', 
+    borderWidth: 20
+  }
 });
 
 export default SocialScreen;
