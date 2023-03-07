@@ -64,20 +64,11 @@ function Tabs() {
   );
 };
 
-// function TabText() {
-//   const [activeTab, setActiveTab] = useState(0);
-
-//   return (
-    
-//   );
-// };
-
-
 type MenuEntry = {
   item: string;
   description: string;
   price: string;
-}
+};
 
 function MenuItems(section_title: string, items: Array<MenuEntry>) {
   // firebase call for current hours / specific day hours here
@@ -204,20 +195,10 @@ const banner_styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.5,
-    // shadowRadius: 2,
-    // elevation: 2,
     backgroundColor: 'rgb(135, 31, 31)',
-
-    // fontSize: 30,
-    // fontWeight: 'bold',
     marginTop: 34,
     paddingTop: 10,
     zIndex: 2,
-    // paddingBottom: 40,
-    // textAlign: 'center',
   },
   text: {
     fontFamily: 'Ubuntu',
@@ -235,7 +216,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 10,
-    // paddingBottom: 10,
     columnGap: 20,
   },
   tab_style: {
@@ -250,7 +230,6 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     marginTop: 30,
     marginBottom: 0,
-    // boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
   },
   tab_button: {
     flexBasis: '32%',
@@ -263,20 +242,14 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     color: 'white',
     fontSize: 18,
-    // justifyContent: 'center',
-    // textAlign: 'center',
   },
   tab_text_selected: {
     fontFamily: 'Ubuntu',
     fontWeight: 'normal',
     color: '#a7aaad',
     fontSize: 18,
-    // justifyContent: 'center',
-    // textAlign: 'center',
   },
   tab_content: {
-    // justifyContent: 'center',
-    // textAlign: 'center',
     margin: 'auto',
     fontFamily: 'Ubuntu',
     fontSize: 12,
@@ -285,12 +258,9 @@ const styles = StyleSheet.create({
   },
   scroll_view: {
     paddingTop: StatusBar.currentHeight,
-    // width: '100%',
-    // minHeight: Dimensions.get('window').height,
     backgroundColor: 'rgb(135, 31, 31)',
   },
   header_title: {
-    // fontFamily: 'georgia',
     fontFamily: 'UbuntuBold',
     color: 'white',
     fontSize: 40,
@@ -299,11 +269,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     textAlign: 'center',
     backgroundColor: 'rgb(135, 31, 31)',
-    // shadowColor: 'black',
-    // shadowOffset: { width: 0, height: -10 },
-    // shadowOpacity: 0.5,
-    // shadowRadius: 10,
-    // width: '100%',
   },
   container: {
     flex: 1,
@@ -319,11 +284,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 20,
     paddingBottom: 10,
-    // width: '100%',
   },
-  // small_margin: {
-  //   marginBottom: 2,
-  // },
   title: {
     fontFamily: 'UbuntuBold',
     margin: 'auto',

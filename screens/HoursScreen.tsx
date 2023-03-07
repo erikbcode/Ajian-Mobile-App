@@ -7,22 +7,22 @@ import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
 import { database } from '../firebaseConfig';
 import { onValue, ref, update} from 'firebase/database';
-import * as Font from 'expo-font';
+// import * as Font from 'expo-font';
 
-const loadFont = async () => {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-  try {
-    await Font.loadAsync({
-      'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
-      'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
-      'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
-    });
-    setFontsLoaded(true);
-  }
-  catch (error) {
-    console.error(error);
-  }
-};
+// const loadFont = async () => {
+//   const [fontsLoaded, setFontsLoaded] = useState(false);
+//   try {
+//     await Font.loadAsync({
+//       'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+//       'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+//       'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+//     });
+//     setFontsLoaded(true);
+//   }
+//   catch (error) {
+//     console.error(error);
+//   }
+// };
 
 export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>) {
   return (
@@ -97,11 +97,10 @@ function Hours() {
     </View>
   );
 }
-// Function to add two numbers in 
 
 const styles = StyleSheet.create({
   address: {
-    // fontFamily: 'Ubuntu',
+    fontFamily: 'Ubuntu',
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
@@ -112,13 +111,11 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   header_title: {
-    // fontFamily: 'georgia',
     fontFamily: 'Ubuntu',
     color: 'white',
     fontSize: 40,
     fontWeight: 'bold',
     paddingTop: StatusBar.currentHeight + 50,
-    // paddingBottom: 40,
     textAlign: 'center',
     // borderBottomWidth: StyleSheet.hairlineWidth,
     marginBottom: 400,
@@ -129,7 +126,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 3,
     zIndex: 1,
-
   },
   hours_container: {
     flex: 1,
