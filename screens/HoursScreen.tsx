@@ -7,6 +7,22 @@ import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
 import { database } from '../firebaseConfig';
 import { onValue, ref, update} from 'firebase/database';
+import * as Font from 'expo-font';
+
+const loadFont = async () => {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+  try {
+    await Font.loadAsync({
+      'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+      'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+      'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+    });
+    setFontsLoaded(true);
+  }
+  catch (error) {
+    console.error(error);
+  }
+};
 
 export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>) {
   return (
@@ -85,9 +101,10 @@ function Hours() {
 
 const styles = StyleSheet.create({
   address: {
+    // fontFamily: 'Ubuntu',
+    color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
-    color: 'black',
     paddingTop: 50,
   },
   scroll_background: {
@@ -96,22 +113,23 @@ const styles = StyleSheet.create({
   },
   header_title: {
     // fontFamily: 'georgia',
+    fontFamily: 'Ubuntu',
+    color: 'white',
     fontSize: 40,
     fontWeight: 'bold',
     paddingTop: StatusBar.currentHeight + 50,
-    paddingBottom: 40,
+    // paddingBottom: 40,
     textAlign: 'center',
-    backgroundColor: 'rgb(135, 31, 31)',
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
+    // borderBottomWidth: StyleSheet.hairlineWidth,
     marginBottom: 400,
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 3,
+    zIndex: 1,
+
   },
   hours_container: {
     flex: 1,
@@ -121,6 +139,8 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   title: {
+    fontFamily: 'Ubuntu',
+    color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
     paddingBottom: 15,
@@ -129,12 +149,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   day_title: {
-    fontSize: 12,
+    fontFamily: 'Ubuntu',
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   hours: {
-    fontSize: 10,
+    fontFamily: 'Ubuntu',
+    fontSize: 16,
     fontWeight: 'normal',
     textAlign: 'center',
   },

@@ -1,9 +1,30 @@
-import { StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
 import React, { useState } from 'react';
 // import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
+import { useFonts } from 'expo-font';
 
 export default function MenuScreen() {
+  // const [fontsLoaded, setFontsLoaded] = useState(false);
+  // const loadFont = async () => {
+  //   try {
+  //     await Font.loadAsync({
+  //       'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+  //       'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+  //       'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+  //     });
+  //     setFontsLoaded(true);
+  //   }
+  //   catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  // loadFont();
+  const [fontsLoaded] = useFonts({
+    'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+    'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+  });
+
   return (
     <ScrollView style={styles.scroll_view}>
       <Text style={styles.header_title}>Menu</Text>
@@ -24,12 +45,12 @@ function Tabs() {
   return (
     <View style={styles.tab_container}>
       <View style={styles.tab_style}>
-        <TouchableOpacity style={styles.tab_button} key={1} onPress={() => handleTabClick(0)}><Text style={styles.tab_text}>Roll Addons</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={2} onPress={() => handleTabClick(1)}><Text style={styles.tab_text}>Rolls</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={3} onPress={() => handleTabClick(2)}><Text style={styles.tab_text}>Sides</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={4} onPress={() => handleTabClick(3)}><Text style={styles.tab_text}>Rice</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={5} onPress={() => handleTabClick(4)}><Text style={styles.tab_text}>Drinks</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button } key={6} onPress={() => handleTabClick(5)}><Text style={styles.tab_text}>Nutrition</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={1} onPress={() => handleTabClick(0)}><Text style={activeTab === 0 ? styles.tab_text : styles.tab_text_selected}>Roll Options</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={2} onPress={() => handleTabClick(1)}><Text style={activeTab === 1 ? styles.tab_text : styles.tab_text_selected}>Rolls</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={3} onPress={() => handleTabClick(2)}><Text style={activeTab === 2 ? styles.tab_text : styles.tab_text_selected}>Sides</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={4} onPress={() => handleTabClick(3)}><Text style={activeTab === 3 ? styles.tab_text : styles.tab_text_selected}>Rice</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={5} onPress={() => handleTabClick(4)}><Text style={activeTab === 4 ? styles.tab_text : styles.tab_text_selected}>Drinks</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={6} onPress={() => handleTabClick(5)}><Text style={activeTab === 5 ? styles.tab_text : styles.tab_text_selected}>Nutrition</Text></TouchableOpacity>
       </View>
       <View style={styles.tab_content}>
         {activeTab === 0 && youreOnARollTab()}
@@ -92,7 +113,8 @@ const youreOnARollTab = () => {
       {MenuItems('Make it your Own', makeItYourOwn)}
       <SectionSeparator />
       {MenuItems('Finish It', finishIt)}
-      <HorizontalBanner text='**1: asterisks' />
+      <SectionSeparator />
+      <HorizontalBanner text='Double Up: +$3 | *Raw Protein | **Vegan Option'/>
     </View>
   );
 };
@@ -103,7 +125,7 @@ const suggestedRollsTab = () => {
       <SectionSeparator />
       {MenuItems('Suggested Rolls', suggestedRolls)}
       <SectionSeparator />
-      <HorizontalBanner text='**2: asterisks' />
+      <HorizontalBanner text='*Consuming raw or undercooked meats, poultry, seafood, shellfish, eggs or unpasteurized milk may increase your risk of foodborne illness' />
     </View>
   );
 };
@@ -114,7 +136,7 @@ const sidesTab = () => {
       <SectionSeparator />
       {MenuItems('Sides', sides)}
       <SectionSeparator />
-      <HorizontalBanner text='**3: asterisks' />
+      <HorizontalBanner text='' />
     </View>
   );
 };
@@ -124,7 +146,8 @@ const friedRiceTab = () => {
     <View style={styles.container}>
       <SectionSeparator />
       {MenuItems('Fried Rice', friedRice)}
-      <HorizontalBanner text='**4: asterisks' />
+      <SectionSeparator />
+      <HorizontalBanner text='All fried rice comes with carrot, jalapeno, green onion, asparagus, cabbage, edamame and egg' />
     </View>
   );
 };
@@ -135,7 +158,7 @@ const drinksTab = () => {
       <SectionSeparator />
       {MenuItems('Drinks', drinks)}
       <SectionSeparator />
-      <HorizontalBanner text='**5: asterisks' />
+      <HorizontalBanner text='' />
     </View>
   );
 };
@@ -145,7 +168,8 @@ const nutritionTab = () => {
     <View style={styles.container}>
       <SectionSeparator />
       {MenuItems('Nutrition', nutrition)}
-      <HorizontalBanner text='**6: asterisks' />
+      <SectionSeparator />
+      <HorizontalBanner text='All nutritional information is estimated based on desired portions and is subject to variation' />
     </View>
   );
 };
@@ -174,9 +198,11 @@ const SectionSeparator = () => {
 
 const banner_styles = StyleSheet.create({
   container: {
-    height: 50,
+    flex: 1,
+    minHeight: 110,
+    maxHeight: '100%',
     width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     // shadowColor: '#000',
     // shadowOffset: { width: 0, height: 2 },
@@ -187,14 +213,19 @@ const banner_styles = StyleSheet.create({
 
     // fontSize: 30,
     // fontWeight: 'bold',
-    paddingTop: StatusBar.currentHeight + 50,
+    marginTop: 34,
+    paddingTop: 10,
+    zIndex: 2,
     // paddingBottom: 40,
     // textAlign: 'center',
   },
   text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
+    fontFamily: 'Ubuntu',
+    fontSize: 16,
+    fontWeight: 'normal',
+    color: 'white',
+    zIndex: 1,
+    marginLeft: 10,
   },
 });
 
@@ -204,28 +235,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 10,
-    paddingBottom: 30,
+    // paddingBottom: 10,
     columnGap: 20,
   },
   tab_style: {
     alignItems: 'center',
-    flexDirection: 'column',
-    width: '50%',
-    borderRadius: 10,
-    borderWidth: 2,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    width: '100%',
+    borderRadius: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     backgroundColor: 'rgb(135, 31, 31)',
     borderColor: 'black',
-    marginTop: 140,
+    marginTop: 30,
     marginBottom: 0,
     // boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
   },
   tab_button: {
+    flexBasis: '32%',
+    alignItems: 'center',
     paddingTop: 2,
     paddingBottom: 2,
   },
   tab_text: {
-    fontWeight: 'bold',
+    fontFamily: 'Ubuntu',
+    fontWeight: 'normal',
     color: 'white',
+    fontSize: 18,
+    // justifyContent: 'center',
+    // textAlign: 'center',
+  },
+  tab_text_selected: {
+    fontFamily: 'Ubuntu',
+    fontWeight: 'normal',
+    color: '#a7aaad',
+    fontSize: 18,
     // justifyContent: 'center',
     // textAlign: 'center',
   },
@@ -233,25 +278,32 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     // textAlign: 'center',
     margin: 'auto',
+    fontFamily: 'Ubuntu',
     fontSize: 12,
     fontWeight: 'bold',
     paddingBottom: 10,
   },
   scroll_view: {
     paddingTop: StatusBar.currentHeight,
+    // width: '100%',
+    // minHeight: Dimensions.get('window').height,
+    backgroundColor: 'rgb(135, 31, 31)',
   },
   header_title: {
     // fontFamily: 'georgia',
+    fontFamily: 'UbuntuBold',
+    color: 'white',
     fontSize: 40,
     fontWeight: 'bold',
-    paddingTop: StatusBar.currentHeight + 50,
-    paddingBottom: 40,
+    paddingTop: StatusBar.currentHeight + 20,
+    paddingBottom: 20,
     textAlign: 'center',
     backgroundColor: 'rgb(135, 31, 31)',
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
+    // shadowColor: 'black',
+    // shadowOffset: { width: 0, height: -10 },
+    // shadowOpacity: 0.5,
+    // shadowRadius: 10,
+    // width: '100%',
   },
   container: {
     flex: 1,
@@ -259,6 +311,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 30,
     paddingBottom: 30,
+    width: Dimensions.get('window').width,
   },
   menu_container: {
     flex: 1,
@@ -266,11 +319,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 20,
     paddingBottom: 10,
+    // width: '100%',
   },
-  small_margin: {
-    marginBottom: 2,
-  },
+  // small_margin: {
+  //   marginBottom: 2,
+  // },
   title: {
+    fontFamily: 'UbuntuBold',
     margin: 'auto',
     fontSize: 24,
     fontWeight: 'bold',
@@ -278,18 +333,21 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   item_item: {
+    fontFamily: 'Ubuntu',
     margin: 'auto',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   item_description: {
+    fontFamily: 'Ubuntu',
     margin: 'auto',
     fontSize: 12,
     fontWeight: 'normal',
     textAlign: 'center',
   },
   item_price: {
+    fontFamily: 'Ubuntu',
     margin: 'auto',
     fontSize: 12,
     fontWeight: 'bold',
