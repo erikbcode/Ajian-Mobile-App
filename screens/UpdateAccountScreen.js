@@ -104,16 +104,41 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
     );
   };
 
-  const UpdatePhoneModal = ({ onClose, currentPhone }) => {
+  const UpdatePhoneModal = ({ onClose, currentPhone, updatePhone}) => {
     const accountStyles = useAccountStyles();
 
     const [phone, setPhone] = useState(currentPhone);
-  
+    
+    onSubmit = async () => {
+      await updatePhone(phone, currentPhone);
+    }
   
     return (
-        <Modal visible={true}>
+      <Modal visible={true}>
         <View style={accountStyles.container}>
-          <Text>Phone</Text>
+          <TextInput
+                style={accountStyles.longInput}
+                placeholder={phone}
+                placeholderTextColor="grey"
+                onChangeText = {setPhone}
+                value={phone}
+            />
+          <Pressable style={({pressed}) => [
+                      pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+                  ]}
+                  onPress={onSubmit}>
+                  {({pressed}) => (
+                      <Text style={accountStyles.altButtonText}>Update</Text>
+                  )}
+            </Pressable>
+            <Pressable style={({pressed}) => [
+                      pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+                  ]}
+                  onPress={onClose}>
+                  {({pressed}) => (
+                      <Text style={accountStyles.altButtonText}>Cancel</Text>
+                  )}
+            </Pressable>
         </View>
       </Modal>
     );
@@ -121,7 +146,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
 
 const UpdateAccountScreen = () => {
-  const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount, updateUserName, updateUserEmail} = useFirebase();
+  const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount, updateUserName, updateUserEmail, updateUserPhone} = useFirebase();
   const accountStyles = useAccountStyles();
 
   const [firstName, setFirstName] = useState(userData.fullName.split(' ').slice(0, -1).join(' '));
@@ -171,6 +196,12 @@ const UpdateAccountScreen = () => {
       });
   }
 
+  const updatePhone = async (phone, currentPhone) => {
+    updateUserPhone(phone, currentPhone).then(() => {
+      handleCloseModal();
+    })
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={accountStyles.container}>
@@ -194,14 +225,14 @@ const UpdateAccountScreen = () => {
         <Pressable style={({pressed}) => [
                     pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
                 ]}
-                onPress={null}>
+                onPress={handleShowPhoneModal}>
                 {({pressed}) => (
                     <Text style={accountStyles.altButtonText}>Phone Number</Text>
                 )}
         </Pressable>
         {modalType === 'name' && <UpdateNameModal onClose={handleCloseModal} updateName={updateName} currentFirstName={firstName} currentLastName={lastName}/>}
         {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateEmail} currentEmail={email}/>}
-        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal}/>}
+        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updatePhone} currentPhone={phoneNumber}/>}
       </View>
     </TouchableWithoutFeedback>
   );
