@@ -8,6 +8,8 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
     const accountStyles = useAccountStyles();
 
+    const navigation = useNavigation();
+
     const [firstName, setFirstName] = useState(currentFirstName);
     const [lastName, setLastName] = useState(currentLastName);
 
@@ -17,7 +19,8 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
           Alert.alert('Invalid Name', 'Please enter a valid name.');
           onClose();
         } else {
-          await updateName(firstName, lastName);
+          updateName(firstName, lastName).then(() => {
+          });
         }
       } catch (error) {
         console.log(error);
@@ -65,11 +68,13 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
   const UpdateEmailModal = ({ onClose, currentEmail, updateEmail }) => {
     const accountStyles = useAccountStyles();
+    const navigation = useNavigation();
 
     const [email, setEmail] = useState(currentEmail);
 
     const onSubmit = async () => {
-      await updateEmail(email);
+      updateEmail(email.trim()).then(() => {
+      });
     }
   
   
@@ -106,6 +111,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
   const UpdatePhoneModal = ({ onClose, currentPhone, updatePhone}) => {
     const accountStyles = useAccountStyles();
+    const navigation = useNavigation();
 
     const [phone, setPhone] = useState(currentPhone);
     
@@ -114,9 +120,9 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
         Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number');
         onClose();
       } else {
-        await updatePhone(phone, currentPhone);
+        updatePhone(phone, currentPhone).then(() => {
+        });
       }
-      
     }
   
     return (
@@ -165,10 +171,8 @@ const UpdateAccountScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log('modalVisible changed:', modalVisible);
-
+    console.log('userData:', userData);
   }, [modalVisible])
-
 
   const handleShowNameModal = () => {
     setModalType('name');
@@ -191,22 +195,39 @@ const UpdateAccountScreen = () => {
   };
 
   const updateName = async (firstName, lastName) => {
-      updateUserName(firstName, lastName).then(() => {
-        handleCloseModal();
-      });
+    updateUserName(firstName, lastName).then(() => {
+      setFirstName(firstName);
+      setLastName(lastName);
+      handleCloseModal();
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
   const updateEmail = async (email) => {
-      updateUserEmail(email).then(() => {
-        handleCloseModal();
-      });
+    updateUserEmail(email).then(() => {
+      setEmail(email);
+      handleCloseModal();
+    }).catch((error) => {
+      console.log(error.message);
+    });
   }
 
   const updatePhone = async (phone, currentPhone) => {
     updateUserPhone(phone, currentPhone).then(() => {
+      console.log('in then');
+      setPhoneNumber(phone);
       handleCloseModal();
+    }).catch((error) => {
+      console.log('here');
+      console.log(error.message); 
+      return;
     })
   }
+
+  useEffect(() => {
+    console.log('userData:', userData);
+  }, [modalVisible])
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

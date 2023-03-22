@@ -132,6 +132,7 @@ export function FirebaseProvider({children}) {
             set(phoneRef, email).then(() => {
                 const userRef = ref(database, `users/${user.uid}/userEmail`)
                 set(userRef, email).then(() => {
+                    refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
                     Alert.alert('Email successfully updated');
                 });
             })
@@ -146,7 +147,7 @@ export function FirebaseProvider({children}) {
         get(phoneRef).then((snapshot) => {
             if (snapshot.exists()) {
                 Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use.');
-                return;
+                throw new Error('Phone number in use');
             } else {
                 remove(oldPhoneRef).then(() => {
                     console.log('Old phone entry deleted successfully');
@@ -166,8 +167,9 @@ export function FirebaseProvider({children}) {
                 })
             }
         }).catch((error) => {
-        console.log(error);
-    })
+            console.log(error.message);
+            throw error;
+        })
     }
 
     // Sends a password reset email associated with the email 
