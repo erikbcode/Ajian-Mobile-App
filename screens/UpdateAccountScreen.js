@@ -110,7 +110,13 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
     const [phone, setPhone] = useState(currentPhone);
     
     onSubmit = async () => {
-      await updatePhone(phone, currentPhone);
+      if (phone.length != 10) {
+        Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number');
+        onClose();
+      } else {
+        await updatePhone(phone, currentPhone);
+      }
+      
     }
   
     return (
@@ -146,7 +152,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
 
 const UpdateAccountScreen = () => {
-  const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount, updateUserName, updateUserEmail, updateUserPhone} = useFirebase();
+  const { user, userData, updateUserName, updateUserEmail, updateUserPhone} = useFirebase();
   const accountStyles = useAccountStyles();
 
   const [firstName, setFirstName] = useState(userData.fullName.split(' ').slice(0, -1).join(' '));
