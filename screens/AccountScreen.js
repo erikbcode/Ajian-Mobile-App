@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, Text, Alert, Pressable, TouchableWithoutFeedback, Keyboard, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused} from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 
 const AccountScreen = () => {
   const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount} = useFirebase();
   const accountStyles = useAccountStyles();
+  const isFocused = useIsFocused();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,6 +58,10 @@ const AccountScreen = () => {
     navigation.navigate('PasswordReset');
   };
 
+  const handleUpdateAccountNavigate = () => {
+    navigation.navigate('UpdateAccount');
+  }
+
   // When reward is redeemed, show the confirmation modal
   const handleRedeemReward = () => {
     setShowRedeemConfirmation(true);
@@ -86,7 +91,7 @@ const AccountScreen = () => {
     console.log('data: ', userData);
     return (
       <View style={accountStyles.container}>
-        <Text style={[accountStyles.titleText, accountStyles.shadow]}>Hello, {user.displayName?.split(' ')[0]}</Text>
+        <Text style={[accountStyles.titleText, accountStyles.shadow]}>Hello, {user.displayName?.split(' ').slice(0, -1).join(' ')}</Text>
         <Text style={[accountStyles.titleText, accountStyles.shadow]}>Rewards points: {userPoints}</Text>
         {userData && userData.hasSignUpReward && (
           <Pressable style={({pressed}) => [
@@ -146,6 +151,14 @@ const AccountScreen = () => {
           onPress={handleSignOut}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Log Out</Text>
+          )}
+        </Pressable>
+        <Pressable style={({pressed}) => [
+              pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
+          ]}
+          onPress={handleUpdateAccountNavigate}>
+          {({pressed}) => (
+              <Text style={accountStyles.text}>Update Account Information</Text>
           )}
         </Pressable>
         <Pressable style={({pressed}) => [

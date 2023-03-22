@@ -25,6 +25,11 @@ const SignUpScreen = () => {
         return;
       }
 
+      if (firstName.length == 0 || lastName.length == 0) {
+        Alert.alert("Invalid Name", "Please enter a valid first and last name.");
+        return;
+      }
+
       let name = firstName.trim().concat(' ', lastName.trim())
       firebaseContext.signUp(email, password, name, phoneNumber)
         .then(() => {

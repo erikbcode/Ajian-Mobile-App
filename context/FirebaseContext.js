@@ -99,8 +99,32 @@ export function FirebaseProvider({children}) {
     }
 
     // Updates the user's auth profile displayName field
-    function updateUserName(name) {
-        return updateProfile(user, {displayName: name});
+    async function updateUserName(firstName, lastName) {
+        try {
+            let fullName = String(firstName).trim().concat(' ', String(lastName).trim())
+            updateProfile(user, {displayName: fullName}).then(() => {
+                setUser(user);
+                setUserData({
+                    ...userData,
+                    fullName: fullName
+                })
+                const userRef = ref(database, `users/${user.uid}`)
+                set(userRef, {
+                    fullName: fullName,
+                    hasSignUpReward: userData.hasSignUpReward,
+                    phoneNumber: userData.phoneNumber,
+                    rewardsPoints: userData.rewardsPoints,
+                    userEmail: userData.userEmail
+                }).then(() => {
+                    const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
+                    set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid});
+                })
+            }).catch((error) => {
+                console.log(error);
+            })
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     // Sends a password reset email associated with the email 
@@ -124,29 +148,20 @@ export function FirebaseProvider({children}) {
     // Effectively deletes a user's account by removing their data in the users database, then their authorization data, and then their data in the phoneNumbers database
     function deleteAccount() {
         console.log('userData: ', userData);
-        const userRef = ref(database, `users/${user.uid}`);
-        remove(userRef)
-            .then(() => {
-                console.log('User data deleted successfully.')
-                user.delete()
-                    .then(() => {
-                        console.log('User deleted successfully')
-                        const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
-                        remove(phoneRef)
-                            .then(() => {
-                                console.log('Phone number deleted successfully.');
-                        })
-                        .catch((error) => {
-                            console.log('Phone number not deleted');
-                        })
-                    })
-                    .catch((error) => {
-                        console.log('User not deleted');
-                    });
+        const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
+        remove(phoneRef).then(() => {
+            console.log('Phone number deleted successfully.');
+            const userRef = ref(database, `users/${user.uid}`)
+            remove(userRef).then(() => {
+                console.log('User data deleted successfully');
+                user.delete().then(() => {
+                    console.log('User account deleted successfully.');
+                })
             })
-            .catch((error) => {
-                console.log('User data not deleted.');
-            });
+        }).catch((error) => {
+            console.log(error);
+        });
+    
             
     }
     
