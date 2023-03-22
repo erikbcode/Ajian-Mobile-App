@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { Alert } from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updateEmail} from 'firebase/auth';
-import { ref, update, get, set, child, remove, onValue, off, query, orderByValue, equalTo} from 'firebase/database';
+import { ref, update, get, set, child, remove} from 'firebase/database';
 import { auth, database } from '../firebaseConfig';
 
 const FirebaseContext = React.createContext();
