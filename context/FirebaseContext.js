@@ -18,6 +18,9 @@ export function FirebaseProvider({children}) {
 
     // Function to sign a user up. Calls firebase method to create auth user, and then uses this new user to update the database and local state data.
     async function signUp(email, password, name, phoneNumber) {
+
+        email = email.toLowerCase();
+
         try {
             if (!phoneNumber) {
                 Alert.alert('no phone', 'No phone number');
@@ -25,8 +28,6 @@ export function FirebaseProvider({children}) {
             }
 
             const phoneRef = ref(database, `phoneNumbers/${phoneNumber}`);
-            
-
 
             get(phoneRef).then((snapshot) => {
                 if (snapshot.exists()) {
@@ -54,7 +55,7 @@ export function FirebaseProvider({children}) {
                                     phoneNumber: phoneNumber
                                 }).then(() => {
                                     const phoneUserRef = ref(database, `phoneNumbers/${phoneNumber}`)
-                                    set(phoneUserRef, { fullName: name, userEmail: email, indexOn: 'value'}).then(() => {
+                                    set(phoneUserRef, { fullName: name, userEmail: email, userId: newUser.uid}).then(() => {
                                         return(newUser);
                                     })
                                 })
@@ -114,33 +115,15 @@ export function FirebaseProvider({children}) {
             update(ref(database, `users/${user.uid}`), {
                 hasSignUpReward: false
             });
-            setUserData({hasSignUpReward: false});
+            setUserData({
+                ...userData, // spready operator to copy all existing userData fields
+                hasSignUpReward: false});
         };
     }
 
-    // Queries the database for the current user, sets their data in state, 
-    function getUserData() {
-        try {
-            if (user) {
-                get(ref(database, `users/${user.uid}`)).then((snapshot) => {
-                    if (snapshot.exists()) {
-                        setUserData(snapshot.val());
-                        console.log(snapshot.val());
-                        return userData
-                    } else {
-                        console.log('No data');
-                    }
-                })
-            } else {
-                console.log('getUserData() failed due to no user.');
-            }
-        } catch (error) {
-            console.log(error);
-            Alert.alert('Error', error.code);
-        }
-    }
-
+    // Effectively deletes a user's account by removing their data in the users database, then their authorization data, and then their data in the phoneNumbers database
     function deleteAccount() {
+        console.log('userData: ', userData);
         const userRef = ref(database, `users/${user.uid}`);
         remove(userRef)
             .then(() => {
@@ -152,7 +135,6 @@ export function FirebaseProvider({children}) {
                         remove(phoneRef)
                             .then(() => {
                                 console.log('Phone number deleted successfully.');
-
                         })
                         .catch((error) => {
                             console.log('Phone number not deleted');
@@ -185,7 +167,7 @@ export function FirebaseProvider({children}) {
     }, []);
 
     return (
-        <FirebaseContext.Provider value={{loading, user, userData, hoursData, signUp, logIn, logOut, updateUserName, resetPassword, redeemReward, getUserData, deleteAccount}}>
+        <FirebaseContext.Provider value={{loading, user, userData, hoursData, signUp, logIn, logOut, updateUserName, resetPassword, redeemReward, deleteAccount}}>
             {children}
         </FirebaseContext.Provider>
     )
