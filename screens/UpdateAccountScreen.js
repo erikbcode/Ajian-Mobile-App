@@ -21,6 +21,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
         }
       } catch (error) {
         console.log(error);
+        onClose();
       }
     }
 
@@ -62,16 +63,42 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
     );
   };
 
-  const UpdateEmailModal = ({ onClose, currentEmail }) => {
+  const UpdateEmailModal = ({ onClose, currentEmail, updateEmail }) => {
     const accountStyles = useAccountStyles();
 
     const [email, setEmail] = useState(currentEmail);
+
+    const onSubmit = async () => {
+      await updateEmail(email);
+    }
   
   
     return (
         <Modal visible={true}>
         <View style={accountStyles.container}>
-          <Text>Email</Text>
+          <TextInput
+                style={accountStyles.longInput}
+                placeholder={email}
+                placeholderTextColor="grey"
+                onChangeText = {setEmail}
+                value={email}
+            />
+          <Pressable style={({pressed}) => [
+                      pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+                  ]}
+                  onPress={onSubmit}>
+                  {({pressed}) => (
+                      <Text style={accountStyles.altButtonText}>Update</Text>
+                  )}
+            </Pressable>
+            <Pressable style={({pressed}) => [
+                      pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+                  ]}
+                  onPress={onClose}>
+                  {({pressed}) => (
+                      <Text style={accountStyles.altButtonText}>Cancel</Text>
+                  )}
+            </Pressable>
         </View>
       </Modal>
     );
@@ -94,7 +121,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
 
 const UpdateAccountScreen = () => {
-  const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount, updateUserName} = useFirebase();
+  const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount, updateUserName, updateUserEmail} = useFirebase();
   const accountStyles = useAccountStyles();
 
   const [firstName, setFirstName] = useState(userData.fullName.split(' ').slice(0, -1).join(' '));
@@ -120,7 +147,6 @@ const UpdateAccountScreen = () => {
   const handleShowEmailModal = () => {
     setModalType('email');
     setModalVisible(true);
-
   }
 
   const handleShowPhoneModal = () => {
@@ -129,18 +155,20 @@ const UpdateAccountScreen = () => {
   }
 
   const handleCloseModal = () => {
-    console.log('handling close');
     setModalType('');
     setModalVisible(false);
-    console.log('done');
-    console.log('modalVisible: ', modalVisible);
   };
 
   const updateName = async (firstName, lastName) => {
-       console.log('updating name');
-      await updateUserName(firstName, lastName);
-      handleCloseModal();
-      console.log('done');
+      updateUserName(firstName, lastName).then(() => {
+        handleCloseModal();
+      });
+  }
+
+  const updateEmail = async (email) => {
+      updateUserEmail(email).then(() => {
+        handleCloseModal();
+      });
   }
 
   return (
@@ -158,7 +186,7 @@ const UpdateAccountScreen = () => {
         <Pressable style={({pressed}) => [
                     pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
                 ]}
-                onPress={null}>
+                onPress={handleShowEmailModal}>
                 {({pressed}) => (
                     <Text style={accountStyles.altButtonText}>Email</Text>
                 )}
@@ -172,7 +200,7 @@ const UpdateAccountScreen = () => {
                 )}
         </Pressable>
         {modalType === 'name' && <UpdateNameModal onClose={handleCloseModal} updateName={updateName} currentFirstName={firstName} currentLastName={lastName}/>}
-        {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal}/>}
+        {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateEmail} currentEmail={email}/>}
         {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal}/>}
       </View>
     </TouchableWithoutFeedback>

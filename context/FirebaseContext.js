@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { Alert } from 'react-native';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, deleteUser} from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updateEmail} from 'firebase/auth';
 import { ref, update, get, set, child, remove, onValue, off, query, orderByValue, equalTo} from 'firebase/database';
 import { auth, database } from '../firebaseConfig';
 
@@ -117,7 +117,9 @@ export function FirebaseProvider({children}) {
                     userEmail: userData.userEmail
                 }).then(() => {
                     const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
-                    set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid});
+                    set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid}).then(() => {
+                        Alert.alert("Name successfully updated");
+                    });
                 })
             }).catch((error) => {
                 console.log(error);
@@ -161,8 +163,20 @@ export function FirebaseProvider({children}) {
         }).catch((error) => {
             console.log(error);
         });
-    
-            
+    }
+
+    async function updateUserEmail(email) {
+        updateEmail(user, email).then(() => {
+            const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}/userEmail`);
+            set(phoneRef, email).then(() => {
+                const userRef = ref(database, `users/${user.uid}/userEmail`)
+                set(userRef, email).then(() => {
+                    Alert.alert('Email successfully updated');
+                });
+            })
+        }).catch((error) => {
+            Alert.alert('Error when updating email', error.code);
+        });
     }
     
     // Event listener to check for change in user state
@@ -182,7 +196,7 @@ export function FirebaseProvider({children}) {
     }, []);
 
     return (
-        <FirebaseContext.Provider value={{loading, user, userData, hoursData, signUp, logIn, logOut, updateUserName, resetPassword, redeemReward, deleteAccount}}>
+        <FirebaseContext.Provider value={{loading, user, userData, hoursData, signUp, logIn, logOut, updateUserName, resetPassword, redeemReward, deleteAccount, updateUserEmail}}>
             {children}
         </FirebaseContext.Provider>
     )
