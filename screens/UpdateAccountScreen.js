@@ -3,12 +3,13 @@ import { View, TextInput, Alert, Pressable, Text, Keyboard, TouchableWithoutFeed
 import { useNavigation } from '@react-navigation/native';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 import { useFirebase } from '../context/FirebaseContext';
+import { ref, get, set, remove} from 'firebase/database';
+import { updateEmail, updateProfile } from 'firebase/auth';
+import { database } from '../firebaseConfig';
 
-const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastName, isVisible }) => {
+const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastName }) => {
 
     const accountStyles = useAccountStyles();
-
-    const navigation = useNavigation();
 
     const [firstName, setFirstName] = useState(currentFirstName);
     const [lastName, setLastName] = useState(currentLastName);
@@ -19,8 +20,8 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
           Alert.alert('Invalid Name', 'Please enter a valid name.');
           onClose();
         } else {
-          updateName(firstName, lastName).then(() => {
-          });
+          await updateName(firstName, lastName);
+          onClose();
         }
       } catch (error) {
         console.log(error);
@@ -73,8 +74,8 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
     const [email, setEmail] = useState(currentEmail);
 
     const onSubmit = async () => {
-      updateEmail(email.trim()).then(() => {
-      });
+      await updateEmail(email.trim())
+      onClose();
     }
   
   
@@ -111,7 +112,6 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
   const UpdatePhoneModal = ({ onClose, currentPhone, updatePhone}) => {
     const accountStyles = useAccountStyles();
-    const navigation = useNavigation();
 
     const [phone, setPhone] = useState(currentPhone);
     
@@ -158,7 +158,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
 
 
 const UpdateAccountScreen = () => {
-  const { user, userData, updateUserName, updateUserEmail, updateUserPhone} = useFirebase();
+  const { user, setUser, userData, setUserData, refreshUserData } = useFirebase();
   const accountStyles = useAccountStyles();
 
   const [firstName, setFirstName] = useState(userData.fullName.split(' ').slice(0, -1).join(' '));
@@ -194,40 +194,90 @@ const UpdateAccountScreen = () => {
     setModalVisible(false);
   };
 
-  const updateName = async (firstName, lastName) => {
-    updateUserName(firstName, lastName).then(() => {
-      setFirstName(firstName);
-      setLastName(lastName);
-      handleCloseModal();
+  // Updates the user's auth profile displayName field
+  async function updateUserName(firstName, lastName) {
+    try {
+        let fullName = String(firstName).trim().concat(' ', String(lastName).trim())
+        updateProfile(user, {displayName: fullName}).then(() => {
+            setUser(user);
+            setUserData({
+                ...userData,
+                fullName: fullName
+            })
+            const userRef = ref(database, `users/${user.uid}`)
+            set(userRef, {
+                fullName: fullName,
+                hasSignUpReward: userData.hasSignUpReward,
+                phoneNumber: userData.phoneNumber,
+                rewardsPoints: userData.rewardsPoints,
+                userEmail: userData.userEmail
+            }).then(() => {
+                const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
+                set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid}).then(() => {
+                    Alert.alert("Name successfully updated");
+                });
+            })
+        }).catch((error) => {
+            console.log(error);
+        })
+    } catch (error) {
+        console.log(error);
+    }
+  }
+
+  // Updates the users email in both their auth account and realtime database
+  async function updateUserEmail(email) {
+    email = email.toLowerCase();
+    updateEmail(user, email).then(() => {
+        const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}/userEmail`);
+        set(phoneRef, email).then(() => {
+            const userRef = ref(database, `users/${user.uid}/userEmail`)
+            set(userRef, email).then(() => {
+                refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
+                Alert.alert('Email successfully updated');
+            });
+        })
     }).catch((error) => {
-      console.log(error);
+      if (error.code == 'auth/email-already-in-use') {
+        Alert.alert('Error when updating email', 'Email already in use.');
+      } else {
+        Alert.alert('Error when updating email', error.code);
+      }
     });
   }
 
-  const updateEmail = async (email) => {
-    updateUserEmail(email).then(() => {
-      setEmail(email);
-      handleCloseModal();
+  // Updates the user's phone number in realtime database 
+  async function updateUserPhone(newPhone, oldPhone) {
+    const oldPhoneRef = ref(database, `phoneNumbers/${oldPhone}`)
+    const phoneRef = ref(database, `phoneNumbers/${newPhone}`);
+    get(phoneRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use.');
+            return;
+        } else {
+            remove(oldPhoneRef).then(() => {
+                console.log('Old phone entry deleted successfully');
+                set(phoneRef, {
+                    fullName: userData.fullName,
+                    userEmail: userData.userEmail,
+                    userId: user.uid
+                }).then(() => {
+                    const userRef = ref(database, `users/${user.uid}`);
+                    set(userRef, {
+                        ...userData,
+                        phoneNumber: newPhone
+                    }).then(() => {
+                        refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone)
+                        Alert.alert('Phone number successfully updated');
+                    })
+                })
+            })
+        }
     }).catch((error) => {
-      console.log(error.message);
-    });
-  }
-
-  const updatePhone = async (phone, currentPhone) => {
-    updateUserPhone(phone, currentPhone).then(() => {
-      console.log('in then');
-      setPhoneNumber(phone);
-      handleCloseModal();
-    }).catch((error) => {
-      console.log('here');
-      console.log(error.message); 
-      return;
+        console.log(error.message);
+        Alert.alert('Error when updating phone number', error.message);
     })
   }
-
-  useEffect(() => {
-    console.log('userData:', userData);
-  }, [modalVisible])
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -257,9 +307,9 @@ const UpdateAccountScreen = () => {
                     <Text style={accountStyles.altButtonText}>Phone Number</Text>
                 )}
         </Pressable>
-        {modalType === 'name' && <UpdateNameModal onClose={handleCloseModal} updateName={updateName} currentFirstName={firstName} currentLastName={lastName}/>}
-        {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateEmail} currentEmail={email}/>}
-        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updatePhone} currentPhone={phoneNumber}/>}
+        {modalType === 'name' && <UpdateNameModal onClose={handleCloseModal} updateName={updateUserName} currentFirstName={firstName} currentLastName={lastName}/>}
+        {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateUserEmail} currentEmail={email}/>}
+        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updateUserPhone} currentPhone={phoneNumber}/>}
       </View>
     </TouchableWithoutFeedback>
   );

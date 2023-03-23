@@ -95,83 +95,6 @@ export function FirebaseProvider({children}) {
         return signOut(auth);
     }
 
-    // Updates the user's auth profile displayName field
-    async function updateUserName(firstName, lastName) {
-        try {
-            let fullName = String(firstName).trim().concat(' ', String(lastName).trim())
-            updateProfile(user, {displayName: fullName}).then(() => {
-                setUser(user);
-                setUserData({
-                    ...userData,
-                    fullName: fullName
-                })
-                const userRef = ref(database, `users/${user.uid}`)
-                set(userRef, {
-                    fullName: fullName,
-                    hasSignUpReward: userData.hasSignUpReward,
-                    phoneNumber: userData.phoneNumber,
-                    rewardsPoints: userData.rewardsPoints,
-                    userEmail: userData.userEmail
-                }).then(() => {
-                    const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
-                    set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid}).then(() => {
-                        Alert.alert("Name successfully updated");
-                    });
-                })
-            }).catch((error) => {
-                console.log(error);
-            })
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    async function updateUserEmail(email) {
-        updateEmail(user, email).then(() => {
-            const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}/userEmail`);
-            set(phoneRef, email).then(() => {
-                const userRef = ref(database, `users/${user.uid}/userEmail`)
-                set(userRef, email).then(() => {
-                    refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
-                    Alert.alert('Email successfully updated');
-                });
-            })
-        }).catch((error) => {
-            Alert.alert('Error when updating email', error.code);
-        });
-    }
-
-    async function updateUserPhone(newPhone, oldPhone) {
-        const oldPhoneRef = ref(database, `phoneNumbers/${oldPhone}`)
-        const phoneRef = ref(database, `phoneNumbers/${newPhone}`);
-        get(phoneRef).then((snapshot) => {
-            if (snapshot.exists()) {
-                Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use.');
-                throw new Error('Phone number in use');
-            } else {
-                remove(oldPhoneRef).then(() => {
-                    console.log('Old phone entry deleted successfully');
-                    set(phoneRef, {
-                        fullName: userData.fullName,
-                        userEmail: userData.userEmail,
-                        userId: user.uid
-                    }).then(() => {
-                        const userRef = ref(database, `users/${user.uid}`);
-                        set(userRef, {
-                            ...userData,
-                            phoneNumber: newPhone
-                        }).then(() => {
-                            refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone)
-                        })
-                    })
-                })
-            }
-        }).catch((error) => {
-            console.log(error.message);
-            throw error;
-        })
-    }
-
     // Sends a password reset email associated with the email 
     function resetPassword(email) {
         return sendPasswordResetEmail(auth, email);
@@ -229,7 +152,7 @@ export function FirebaseProvider({children}) {
     }, []);
 
     return (
-        <FirebaseContext.Provider value={{loading, user, userData, hoursData, signUp, logIn, logOut, resetPassword, redeemReward, deleteAccount, updateUserName, updateUserEmail, updateUserPhone}}>
+        <FirebaseContext.Provider value={{loading, user, setUser, userData, setUserData, hoursData, signUp, logIn, logOut, resetPassword, redeemReward, deleteAccount, refreshUserData}}>
             {children}
         </FirebaseContext.Provider>
     )

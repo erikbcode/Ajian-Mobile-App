@@ -49,7 +49,7 @@ function RootNavigator() {
       <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: 'Create Account', headerTitleStyle: {fontFamily: 'Ubuntu'}, headerStyle: {backgroundColor: 'white'}}} />
       <Stack.Screen name="PasswordReset" component={PasswordResetScreen} options={{title: 'Reset Password', headerTitleStyle: {fontFamily: 'Ubuntu'}, headerStyle: {backgroundColor: 'white'}}} />
       <Stack.Screen name="Account" component={AccountScreen} options={{}} />
-      <Stack.Screen name="UpdateAccount" component={UpdateAccountScreen} options={{}} />
+      <Stack.Screen name="UpdateAccount" component={UpdateAccountScreen} options={{title: 'Update Profile Information'}} />
     </Stack.Navigator>
   );
 }
