@@ -7,6 +7,7 @@ import { ref, get, set, remove} from 'firebase/database';
 import { updateEmail, updateProfile } from 'firebase/auth';
 import { database } from '../firebaseConfig';
 
+// Component that displays a modal to update the user's name
 const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastName }) => {
 
     const accountStyles = useAccountStyles();
@@ -14,6 +15,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
     const [firstName, setFirstName] = useState(currentFirstName);
     const [lastName, setLastName] = useState(currentLastName);
 
+    // Checks that the user entered valid info for their name and calls the updateName function before closing the modal
     const onSubmit = async () => {
       try {
         if (firstName.length == 0 || lastName.length == 0 ) {
@@ -30,22 +32,69 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
     }
 
     return (
-          <Modal visible={true}>
+        <Modal visible={true}>
           <View style={accountStyles.container}>
+            <View style={accountStyles.signUpContainer}>
+              <TextInput
+                style={accountStyles.longInput}
+                placeholder={firstName}
+                placeholderTextColor="grey"
+                onChangeText = {setFirstName}
+                value={firstName}
+              />
+              <TextInput
+                style={accountStyles.longInput}
+                placeholder={lastName}
+                placeholderTextColor="grey"
+                onChangeText = {setLastName}
+                value={lastName}
+              />
+              <Pressable style={({pressed}) => [
+                        pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+                    ]}
+                    onPress={onSubmit}>
+                    {({pressed}) => (
+                        <Text style={accountStyles.altButtonText}>Update</Text>
+                    )}
+              </Pressable>
+              <Pressable style={({pressed}) => [
+                        pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+                    ]}
+                    onPress={onClose}>
+                    {({pressed}) => (
+                        <Text style={accountStyles.altButtonText}>Cancel</Text>
+                    )}
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+    );
+  };
+
+  // Component that displays a modal to update the user's email
+  const UpdateEmailModal = ({ onClose, currentEmail, updateEmail, emailSetter }) => {
+    const accountStyles = useAccountStyles();
+    const navigation = useNavigation();
+
+    const [email, setEmail] = useState(currentEmail);
+
+    const onSubmit = async () => {
+      await updateEmail(email.trim());
+      onClose();
+    }
+  
+  
+    return (
+        <Modal visible={true}>
+        <View style={accountStyles.container}>
+          <View style={accountStyles.signUpContainer}>
             <TextInput
-              style={accountStyles.longInput}
-              placeholder={firstName}
-              placeholderTextColor="grey"
-              onChangeText = {setFirstName}
-              value={firstName}
-            />
-            <TextInput
-              style={accountStyles.longInput}
-              placeholder={lastName}
-              placeholderTextColor="grey"
-              onChangeText = {setLastName}
-              value={lastName}
-            />
+                  style={accountStyles.longInput}
+                  placeholder={email}
+                  placeholderTextColor="grey"
+                  onChangeText = {setEmail}
+                  value={email}
+              />
             <Pressable style={({pressed}) => [
                       pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
                   ]}
@@ -63,53 +112,12 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
                   )}
             </Pressable>
           </View>
-        </Modal>
-    );
-  };
-
-  const UpdateEmailModal = ({ onClose, currentEmail, updateEmail }) => {
-    const accountStyles = useAccountStyles();
-    const navigation = useNavigation();
-
-    const [email, setEmail] = useState(currentEmail);
-
-    const onSubmit = async () => {
-      await updateEmail(email.trim())
-      onClose();
-    }
-  
-  
-    return (
-        <Modal visible={true}>
-        <View style={accountStyles.container}>
-          <TextInput
-                style={accountStyles.longInput}
-                placeholder={email}
-                placeholderTextColor="grey"
-                onChangeText = {setEmail}
-                value={email}
-            />
-          <Pressable style={({pressed}) => [
-                      pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
-                  ]}
-                  onPress={onSubmit}>
-                  {({pressed}) => (
-                      <Text style={accountStyles.altButtonText}>Update</Text>
-                  )}
-            </Pressable>
-            <Pressable style={({pressed}) => [
-                      pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
-                  ]}
-                  onPress={onClose}>
-                  {({pressed}) => (
-                      <Text style={accountStyles.altButtonText}>Cancel</Text>
-                  )}
-            </Pressable>
         </View>
       </Modal>
     );
   };
 
+  // Component that displays a modal to update the user's phone number
   const UpdatePhoneModal = ({ onClose, currentPhone, updatePhone}) => {
     const accountStyles = useAccountStyles();
 
@@ -120,28 +128,29 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
         Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number');
         onClose();
       } else {
-        updatePhone(phone, currentPhone).then(() => {
-        });
+        await updatePhone(phone, currentPhone);
+        onClose();
       }
     }
   
     return (
       <Modal visible={true}>
         <View style={accountStyles.container}>
-          <TextInput
-                style={accountStyles.longInput}
-                placeholder={phone}
-                placeholderTextColor="grey"
-                onChangeText = {setPhone}
-                value={phone}
-            />
-          <Pressable style={({pressed}) => [
-                      pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
-                  ]}
-                  onPress={onSubmit}>
-                  {({pressed}) => (
-                      <Text style={accountStyles.altButtonText}>Update</Text>
-                  )}
+          <View style={accountStyles.signUpContainer}>
+            <TextInput
+                  style={accountStyles.longInput}
+                  placeholder={phone}
+                  placeholderTextColor="grey"
+                  onChangeText = {setPhone}
+                  value={phone}
+              />
+            <Pressable style={({pressed}) => [
+                        pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
+                    ]}
+                    onPress={onSubmit}>
+                    {({pressed}) => (
+                        <Text style={accountStyles.altButtonText}>Update</Text>
+                    )}
             </Pressable>
             <Pressable style={({pressed}) => [
                       pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
@@ -151,6 +160,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
                       <Text style={accountStyles.altButtonText}>Cancel</Text>
                   )}
             </Pressable>
+          </View>
         </View>
       </Modal>
     );
@@ -214,6 +224,8 @@ const UpdateAccountScreen = () => {
             }).then(() => {
                 const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
                 set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid}).then(() => {
+                    setFirstName(firstName);
+                    setLastName(lastName);
                     Alert.alert("Name successfully updated");
                 });
             })
@@ -234,6 +246,7 @@ const UpdateAccountScreen = () => {
             const userRef = ref(database, `users/${user.uid}/userEmail`)
             set(userRef, email).then(() => {
                 refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
+                setEmail(email);
                 Alert.alert('Email successfully updated');
             });
         })
@@ -267,7 +280,8 @@ const UpdateAccountScreen = () => {
                         ...userData,
                         phoneNumber: newPhone
                     }).then(() => {
-                        refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone)
+                        refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone);
+                        setPhoneNumber(newPhone);
                         Alert.alert('Phone number successfully updated');
                     })
                 })
@@ -282,7 +296,7 @@ const UpdateAccountScreen = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={accountStyles.container}>
-      <Text style={[accountStyles.titleText, accountStyles.shadow]}>Update Account Info</Text>
+        <Text style={[accountStyles.titleText, accountStyles.shadow]}>Update Account Info</Text>
         <Pressable style={({pressed}) => [
                     pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
                 ]}
@@ -308,7 +322,7 @@ const UpdateAccountScreen = () => {
                 )}
         </Pressable>
         {modalType === 'name' && <UpdateNameModal onClose={handleCloseModal} updateName={updateUserName} currentFirstName={firstName} currentLastName={lastName}/>}
-        {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateUserEmail} currentEmail={email}/>}
+        {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateUserEmail} currentEmail={email} emailSetter = {setEmail}/>}
         {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updateUserPhone} currentPhone={phoneNumber}/>}
       </View>
     </TouchableWithoutFeedback>
