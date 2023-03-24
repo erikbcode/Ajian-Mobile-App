@@ -115,7 +115,6 @@ export function FirebaseProvider({children}) {
 
     // Effectively deletes a user's account by removing their data in the users database, then their authorization data, and then their data in the phoneNumbers database
     function deleteAccount() {
-        console.log('userData: ', userData);
         const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
         remove(phoneRef).then(() => {
             console.log('Phone number deleted successfully.');
