@@ -86,7 +86,7 @@ const AccountScreen = () => {
   }
 
 
-  // If a user is logged in, display account info. Otherwise, display sign-in/sigrn-up
+  // If a user is logged in, display account info. Otherwise, display sign-in/sign-up
   if (user) {
     console.log('data: ', userData);
     return (
