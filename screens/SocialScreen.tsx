@@ -1,11 +1,11 @@
 import {useState, useEffect} from 'react';
 import React from 'react';
 import {View, Image, Text, ScrollView,  } from 'react-native';
-import {WebView} from 'react-native-webview'
 import MobileOrderButton from '../components/MobileOrderButton';
 import { StyleSheet } from 'react-native';
 import axios from 'axios';
-import HTML from 'react-native-render-html';
+import database from '@react-native-firebase/database';
+import { firebase } from '@react-native-firebase/database';
 
 
 interface IPost {
@@ -17,10 +17,19 @@ interface IPost {
 
 const defaultPosts:IPost[] = [];
 
+const reference = firebase
+  .app()
+  .database('https://ajian-mobile-app-default-rtdb.firebaseio.com/')
+  .ref('/Announcements/Top')
+  .once('value')
+  .then(snapshot => {
+    console.log('User data: ', snapshot.val());
+  });
+
 const SocialScreen = () => {
 
   
-  const [posts, setPosts]: [IPost[], (posts: IPost[]) => void] = React.useState(defaultPosts);
+ /* const [posts, setPosts]: [IPost[], (posts: IPost[]) => void] = React.useState(defaultPosts);
   const [loading, setLoading]: [boolean, (loading: boolean) => void] = React.useState<boolean>(true);
   const [error, setError]: [string, (error: string) => void] = React.useState("");
 
@@ -60,7 +69,19 @@ const SocialScreen = () => {
 
     </View>
     
-  )
+  )*/
+
+  database()
+  .ref('/users/123')
+  .once('value')
+  .then(snapshot => {
+    console.log('User data: ', snapshot.val());
+  });
+
+
+
+
+  
 }
 
 
