@@ -1,25 +1,15 @@
 import { StyleSheet, ScrollView, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
 import React, { useState } from 'react';
+import { onValue, ref, set, get} from 'firebase/database';
+import { database } from '../firebaseConfig';
 // import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { useFonts } from 'expo-font';
 
+import { MenuEntry } from '../types';
+import { styles, banner_styles } from '../styles/MenuScreenStyle'
+
 export default function MenuScreen() {
-  // const [fontsLoaded, setFontsLoaded] = useState(false);
-  // const loadFont = async () => {
-  //   try {
-  //     await Font.loadAsync({
-  //       'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
-  //       'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
-  //       'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
-  //     });
-  //     setFontsLoaded(true);
-  //   }
-  //   catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-  // loadFont();
   const [fontsLoaded] = useFonts({
     'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
     'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
@@ -64,12 +54,6 @@ function Tabs() {
   );
 };
 
-type MenuEntry = {
-  item: string;
-  description: string;
-  price: string;
-};
-
 function MenuItems(section_title: string, items: Array<MenuEntry>) {
   // firebase call for current hours / specific day hours here
   return (
@@ -87,15 +71,47 @@ function MenuItems(section_title: string, items: Array<MenuEntry>) {
   );
 }
 
+// function readMenuDB(db_loc: string) {
+//   const query = ref(database, `menu/${db_loc}`)
+//   let val : MenuEntry
+//   onValue(query, (snapshot) => {
+//     val = snapshot.val()
+//   })
+//   console.log(val)
+//   return val
+// }
+
+function readMenuDB(db_loc : string) {
+  const query = ref(database, `menu/${db_loc}`);
+  let val : Array<MenuEntry> | null=null;
+  get(query).then((snapshot) => {
+    if (snapshot.exists()) {
+      val = snapshot.val();
+      console.log(snapshot.val());
+    } else {
+      console.log("No data available");
+    }
+  }).catch((error) => {
+    console.error(error);
+  });
+  return val;
+}
+
 interface Props {
   text: string;
 }
+
+// get(ref(database, 'menu/youreOnARoll/rice'))
+// get(ref(database, 'menu/youreOnARoll/wrap'))
+// get(ref(database, 'menu/youreOnARoll/protein'))
+// get(ref(database, 'menu/youreOnARoll/additional'))
+// get(ref(database, 'menu/youreOnARoll/finish'))
 
 const youreOnARollTab = () => {
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Start with Rice', startWithRice)}
+      {MenuItems('Start with Rice', startWithRice)} 
       <SectionSeparator />
       {MenuItems('Pick your Wrap', pickYourWrap)}
       <SectionSeparator />
@@ -109,6 +125,12 @@ const youreOnARollTab = () => {
     </View>
   );
 };
+
+// get(ref(database, 'menu/suggested'))
+// get(ref(database, 'menu/sides'))
+// get(ref(database, 'menu/rice'))
+// get(ref(database, 'menu/drinks'))
+// get(ref(database, 'menu/nutrition'))
 
 const suggestedRollsTab = () => {
   return (
@@ -187,154 +209,18 @@ const SectionSeparator = () => {
   );
 };
 
-const banner_styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    minHeight: 110,
-    maxHeight: '100%',
-    width: '100%',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: 'rgb(135, 31, 31)',
-    marginTop: 34,
-    paddingTop: 10,
-    zIndex: 2,
-  },
-  text: {
-    fontFamily: 'Ubuntu',
-    fontSize: 16,
-    fontWeight: 'normal',
-    color: 'white',
-    zIndex: 1,
-    marginLeft: 10,
-  },
-});
-
-const styles = StyleSheet.create({
-  tab_container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 10,
-    columnGap: 20,
-  },
-  tab_style: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    width: '100%',
-    borderRadius: 1,
-    borderWidth: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgb(135, 31, 31)',
-    borderColor: 'black',
-    marginTop: 30,
-    marginBottom: 0,
-  },
-  tab_button: {
-    flexBasis: '32%',
-    alignItems: 'center',
-    paddingTop: 2,
-    paddingBottom: 2,
-  },
-  tab_text: {
-    fontFamily: 'Ubuntu',
-    fontWeight: 'normal',
-    color: 'white',
-    fontSize: 18,
-  },
-  tab_text_selected: {
-    fontFamily: 'Ubuntu',
-    fontWeight: 'normal',
-    color: '#a7aaad',
-    fontSize: 18,
-  },
-  tab_content: {
-    margin: 'auto',
-    fontFamily: 'Ubuntu',
-    fontSize: 12,
-    fontWeight: 'bold',
-    paddingBottom: 10,
-  },
-  scroll_view: {
-    paddingTop: StatusBar.currentHeight,
-    backgroundColor: 'rgb(135, 31, 31)',
-  },
-  header_title: {
-    fontFamily: 'UbuntuBold',
-    color: 'white',
-    fontSize: 40,
-    fontWeight: 'bold',
-    paddingTop: StatusBar.currentHeight + 20,
-    paddingBottom: 20,
-    textAlign: 'center',
-    backgroundColor: 'rgb(135, 31, 31)',
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 30,
-    paddingBottom: 30,
-    width: Dimensions.get('window').width,
-  },
-  menu_container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  title: {
-    fontFamily: 'UbuntuBold',
-    margin: 'auto',
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  item_item: {
-    fontFamily: 'Ubuntu',
-    margin: 'auto',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  item_description: {
-    fontFamily: 'Ubuntu',
-    margin: 'auto',
-    fontSize: 12,
-    fontWeight: 'normal',
-    textAlign: 'center',
-  },
-  item_price: {
-    fontFamily: 'Ubuntu',
-    margin: 'auto',
-    fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-  small_separator: {
-    marginVertical: 2,
-    height: 2,
-    width: '60%',
-  },
-});
-
-// You're on a roll
+// You're on a Roll
+// rice
 const startWithRice: MenuEntry[] = [
   {item: 'White', description: '', price: ''},
   {item: 'Brown', description: '', price: ''},
 ];
+// wrap
 const pickYourWrap: MenuEntry[] = [
   {item: 'Seaweed', description: 'Traditional wrap with hint of ocean', price: ''},
   {item: 'Soy', description: 'Soy', price: ''},
 ];
+// protein
 const pickYourProtein: MenuEntry[] = [
   {item: 'Tuna*', description: '', price: '8.50'},
   {item: 'Salmon', description: '', price: '8.50'},
@@ -350,6 +236,7 @@ const pickYourProtein: MenuEntry[] = [
   {item: 'Roasted Tofu**', description: '', price: '7.50'},
   {item: 'Veggie**', description: '', price: '7'},
 ];
+// additional
 const makeItYourOwn: MenuEntry[] = [
   {item: 'Asparagus', description: '', price: ''},
   {item: 'Avocado', description: '', price: ''},
@@ -361,6 +248,7 @@ const makeItYourOwn: MenuEntry[] = [
   {item: 'Selection of the Moment', description: '', price: ''},
   {item: 'Spinach', description: '', price: ''},
 ];
+// finish
 const finishIt: MenuEntry[] = [
   {item: 'Sauces', description: 'Spicy Mayo, Wasabi Mayo, Sweet Chili Mayo, Sweet Soy (Eel Sauce), Sweet Chili, Sriracha, Sweet Orange Sauce, Spicy Soy', price: ''},
   {item: 'Toppings', description: 'Sesame Seeds, Tempura Crunch, Sesame Chili Flake, Everything Bagel Spice, Wasabi Pea Crunch, Chopped Peanuts, Fried Onions, Flamin Hot Cheeto Crunch', price: ''},
@@ -368,8 +256,7 @@ const finishIt: MenuEntry[] = [
   {item: 'Spicy Crab Salad', description: '', price: '2'},
 ];
 
-
-// Suggested Rolls
+// Suggested
 const suggestedRolls: MenuEntry[] = [
   {item: 'California Roll', description: 'Your choice of rice, seaweed wrap, crab stick, avocado, cucumber with sweet soy sauce and sesame seed', price: '7.50'},
   {item: 'Boston Roll', description: 'Your choice of rice, seaweed wrap, poached shrimp, avocado, cucumber with spicy mayonnaise and sesame seed', price: '8'},
@@ -407,7 +294,7 @@ const friedRice: MenuEntry[] = [
   {item: 'Make it Spicy', description: '', price: ''},
 ];
 
-// Fried Rice
+// Drinks
 const drinks: MenuEntry[] = [
   {item: 'Fountain', description: '', price: '1.95'},
   {item: 'Bottled', description: '', price: '2.50'},
@@ -446,3 +333,24 @@ const nutrition: MenuEntry[] = [
   {item: 'Masago', description: 'Calories - 10\nTotal Fat - 0g\nSaturated Fat - 0g\nSodium - 100mg\nCarbs - .5g\nFiber - 0g\nSugar - .5g\nProtein - 0g', price: ''},
   {item: 'Tempura Crunch', description: 'Calories - 100\nTotal Fat - 5g\nSaturated Fat - 2g\nSodium - 100mg\nCarbs - 25g\nFiber - 1g\nSugar - 1g\nProtein - 3g', price: ''},
 ];
+
+const rollSections: Array<string> = ['rice','wrap','protein','additional','finish']
+const rollSectionItems: Array<MenuEntry[]> = [startWithRice, pickYourWrap, pickYourProtein, makeItYourOwn, finishIt]
+
+const otherSections: Array<string> = ['suggested','sides','rice','drinks','nutrition']
+const otherSectionItems: Array<MenuEntry[]> = [suggestedRolls, sides, friedRice, drinks, nutrition]
+
+
+function SetDefaultMenu() {
+  for (let i=0; i < rollSections.length; i++) {
+    const section = rollSections[i]
+    const item = rollSectionItems[i]
+    set(ref(database, `menu/youreOnARoll/${section}`), item)
+  }
+  for (let i=0; i < otherSections.length; i++) {
+    const section = otherSections[i]
+    const item = otherSectionItems[i]
+    set(ref(database, `menu/${section}`), item)
+  }
+};
+// SetDefaultHours()
