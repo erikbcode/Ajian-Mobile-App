@@ -153,14 +153,6 @@ const AccountScreen = () => {
         <Pressable style={({pressed}) => [
               pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleSignOut}>
-          {({pressed}) => (
-              <Text style={accountStyles.text}>Log Out</Text>
-          )}
-        </Pressable>
-        <Pressable style={({pressed}) => [
-              pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
-          ]}
           onPress={handleUpdateAccountNavigate}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Update Account Information</Text>
@@ -172,6 +164,14 @@ const AccountScreen = () => {
           onPress={handleDeleteAccount}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Delete Account</Text>
+          )}
+        </Pressable>
+        <Pressable style={({pressed}) => [
+              pressed ? [accountStyles.transparentButton, accountStyles.transparentButtonPressed] : [accountStyles.transparentButton],
+          ]}
+          onPress={handleSignOut}>
+          {({pressed}) => (
+              <Text style={accountStyles.transparentText}>Log Out</Text>
           )}
         </Pressable>
       </View>
