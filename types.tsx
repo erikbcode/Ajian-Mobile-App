@@ -33,7 +33,7 @@ export type RootTabParamList = {
   Home: undefined;
   Menu: undefined;
   Hours: undefined;
-  Social: undefined;
+  Announcements: undefined;
   Account: undefined;
 };
 
