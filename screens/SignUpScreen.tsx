@@ -21,10 +21,14 @@ const SignUpScreen = () => {
   async function handleSignUp() {
     
     try {
-      // Check for valid phone number
+      // Check for valid inputs before attempting to call signUp()
+      if (firstName.length == 0 || lastName.length == 0) {
+        Alert.alert("Sign Up Failed", "Please enter a valid first and last name");
+        return;
+      }
 
-      if (password !== passwordConfirm) {
-        Alert.alert('Error', 'Passwords do not match.');
+      if (!validateEmail(email)) {
+        Alert.alert('Sign Up Failed', 'Please enter a valid email address');
         return;
       }
 
@@ -33,9 +37,13 @@ const SignUpScreen = () => {
         return;
       }
 
-      // Check that a first and last name have been enetered
-      if (firstName.length == 0 || lastName.length == 0) {
-        Alert.alert("Sign Up Failed", "Please enter a valid first and last name");
+      if (password.length < 6) { 
+        Alert.alert('Sign Up Failed', 'Password must be at least 6 characters long');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        Alert.alert('Sign Up Failed', 'Passwords do not match');
         return;
       }
 
@@ -44,7 +52,7 @@ const SignUpScreen = () => {
       // Call method to handle sign up and navigate back to account screen
       firebaseContext.signUp(email, password, name, phoneNumber).then(() => {
         navigation.goBack();
-      })   
+      })
     } catch (error: any) {
       if (error.code == 'auth/email-already-in-use') {
         Alert.alert('Sign Up Failed', 'The email address you entered is already in use');
@@ -53,6 +61,12 @@ const SignUpScreen = () => {
       }
     }
   };
+
+  // Function to validate email (Contains valid @ and .X format)
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.toLowerCase());
+  }
 
   // Function to validate phone number (exists and is 10 digits)
   const validatePhoneNumber = (phoneNumber: string) => {
