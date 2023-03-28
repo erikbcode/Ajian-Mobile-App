@@ -17,6 +17,13 @@ layout: home
 - React Native
 - Firebase
 
+## Experience
+- Home Page : Greets the user and allows immediate ordering
+- Menu Page : Contains all menu and nutritional information for the restaurant
+- Hours Page : Shows location on native map and daily hours
+- Announcements Page : Provides a format for any updates from the restaurant owner
+- Login Page : Allows users to login and view their rewards, change account information
+
 ## Team Members
 - Erik Buinevicius
 - Chris Moorhouse
