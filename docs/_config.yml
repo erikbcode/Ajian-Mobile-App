@@ -18,9 +18,13 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
+domain: ebuinevicius.github.io
+url: https://ebuinevicius.github.io
+baseurl: /docs/
+
 lsi: false
 safe: true
-source: ./Ajian-Mobile-App/
+source: ../../Ajian-Mobile-App/
 incremental: false
 highlighter: rouge
 gist:
