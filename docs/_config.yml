@@ -20,7 +20,7 @@
 
 lsi: false
 safe: true
-source: ../../Ajian-Mobile-App
+source: ./Ajian-Mobile-App/
 incremental: false
 highlighter: rouge
 gist:
