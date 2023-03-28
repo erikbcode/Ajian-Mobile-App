@@ -1,6 +1,7 @@
 import { StyleSheet} from 'react-native';
 import { useContext } from 'react';
 import { FontContext } from '../context/FontContext';
+import Color from 'color';
 
 export const useAccountStyles = () => {
     const fontsLoaded = useContext(FontContext);
@@ -50,11 +51,29 @@ export const useAccountStyles = () => {
             height: 60,
             marginBottom: 20,
         },
+        transparentButton: {
+            alignItems: 'center',
+            justifyContent: 'center',
+            float: 'bottom',
+            paddingHorizontal: 32,
+            borderRadius: 6,
+            elevation: 3,
+            borderWidth: 2,
+            width: 300,
+            height: 40,
+            marginTop: 80,
+            marginBottom: 20,
+            backgroundColor: 'transparent',
+            borderColor: 'white'
+        },  
         buttonUnpressed: {
             backgroundColor: 'white',
         },
         buttonPressed: {
             backgroundColor: 'rgb(145, 145, 145)',
+        },
+        transparentButtonPressed: {
+            backgroundColor: Color('rgb(135, 31, 31)').darken(0.2).rgb().string(),
         },
         titleText: {
             fontSize: 30,
@@ -83,6 +102,13 @@ export const useAccountStyles = () => {
             fontWeight: 'bold',
             letterSpacing: 0.25,
             color: 'rgb(135, 31, 31)',
+            fontFamily: fontsLoaded ? 'UbuntuBold' : 'System'
+        },
+        transparentText: {
+            fontSize: 15,
+            fontWeight: 'bold',
+            letterSpacing: 0.25,
+            color: 'white',
             fontFamily: fontsLoaded ? 'UbuntuBold' : 'System'
         },
         shadow: {

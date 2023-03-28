@@ -22,7 +22,6 @@ export function FirebaseProvider({children}) {
         email = email.toLowerCase();
 
         const phoneRef = ref(database, `phoneNumbers/${phoneNumber}`);
-
         get(phoneRef).then((snapshot) => {
             // Phone number already in database, so cancel sign up
             if (snapshot.exists()) {

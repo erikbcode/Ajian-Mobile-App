@@ -7,9 +7,8 @@ import { ref, get, set, remove} from 'firebase/database';
 import { updateEmail, updateProfile } from 'firebase/auth';
 import { database } from '../firebaseConfig';
 
-// Component that displays a modal to update the user's name
+// Component that displays a modal to update the user's first and/or last name
 const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastName }) => {
-
     const accountStyles = useAccountStyles();
 
     const [firstName, setFirstName] = useState(currentFirstName);
@@ -72,9 +71,8 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
   };
 
   // Component that displays a modal to update the user's email
-  const UpdateEmailModal = ({ onClose, currentEmail, updateEmail, emailSetter }) => {
+  const UpdateEmailModal = ({ onClose, currentEmail, updateEmail}) => {
     const accountStyles = useAccountStyles();
-    const navigation = useNavigation();
 
     const [email, setEmail] = useState(currentEmail);
 
@@ -82,7 +80,6 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
       await updateEmail(email.trim());
       onClose();
     }
-  
   
     return (
         <Modal visible={true}>
@@ -166,7 +163,7 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
     );
   };
 
-
+// Component that displays buttons to open the modals to update the user's name, email, and phone number
 const UpdateAccountScreen = () => {
   const { user, setUser, userData, setUserData, refreshUserData } = useFirebase();
   const accountStyles = useAccountStyles();
@@ -177,8 +174,6 @@ const UpdateAccountScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState(userData.phoneNumber);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState(''); // "name", "email", "phone"
-
-  const navigation = useNavigation();
 
   useEffect(() => {
     console.log('userData:', userData);
@@ -204,47 +199,52 @@ const UpdateAccountScreen = () => {
     setModalVisible(false);
   };
 
-  // Updates the user's auth profile displayName field
+  // Updates the user's auth profile displayName field and name data in users and phoneNumbers databases
   async function updateUserName(firstName, lastName) {
-    try {
-        let fullName = String(firstName).trim().concat(' ', String(lastName).trim())
-        updateProfile(user, {displayName: fullName}).then(() => {
-            setUser(user);
-            setUserData({
-                ...userData,
-                fullName: fullName
-            })
-            const userRef = ref(database, `users/${user.uid}`)
-            set(userRef, {
-                fullName: fullName,
-                hasSignUpReward: userData.hasSignUpReward,
-                phoneNumber: userData.phoneNumber,
-                rewardsPoints: userData.rewardsPoints,
-                userEmail: userData.userEmail
-            }).then(() => {
-                const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
-                set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid}).then(() => {
-                    setFirstName(firstName);
-                    setLastName(lastName);
-                    Alert.alert("Name successfully updated");
-                });
-            })
-        }).catch((error) => {
-            console.log(error);
-        })
-    } catch (error) {
-        console.log(error);
-    }
+      let fullName = String(firstName).trim().concat(' ', String(lastName).trim())
+      // Update displayName in the user's auth profile
+      updateProfile(user, {displayName: fullName}).then(() => {
+          // Set user and userData state
+          setUser(user);
+          setUserData({
+              ...userData,
+              fullName: fullName
+          })
+          // Update user's data in the users databasse
+          const userRef = ref(database, `users/${user.uid}`)
+          set(userRef, {
+              fullName: fullName,
+              hasSignUpReward: userData.hasSignUpReward,
+              phoneNumber: userData.phoneNumber,
+              rewardsPoints: userData.rewardsPoints,
+              userEmail: userData.userEmail
+          }).then(() => {
+              // Update user's data in the phoneNumbers database
+              const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
+              set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid}).then(() => {
+                  setFirstName(firstName);
+                  setLastName(lastName);
+                  Alert.alert("Name successfully updated");
+              });
+          })
+      }).catch((error) => {
+          Alert.alert('Name Update Failed', 'Please try again later');
+      })
   }
 
-  // Updates the users email in both their auth account and realtime database
+  // Updates the users email in both their auth profile and realtime database
   async function updateUserEmail(email) {
     email = email.toLowerCase();
+
+    // Update user's email in their auth profile
     updateEmail(user, email).then(() => {
+        // Update user's email in the phoneNumbers database
         const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}/userEmail`);
         set(phoneRef, email).then(() => {
+            // Update user's email in the users database
             const userRef = ref(database, `users/${user.uid}/userEmail`)
             set(userRef, email).then(() => {
+                // Update local state data
                 refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
                 setEmail(email);
                 Alert.alert('Email successfully updated');
@@ -252,9 +252,9 @@ const UpdateAccountScreen = () => {
         })
     }).catch((error) => {
       if (error.code == 'auth/email-already-in-use') {
-        Alert.alert('Error when updating email', 'Email already in use.');
+        Alert.alert('Email Update Failed', 'Please enter a valid email that is not already in use');
       } else {
-        Alert.alert('Error when updating email', error.code);
+        Alert.alert('Email Update Failed', error.code);
       }
     });
   }
@@ -265,21 +265,25 @@ const UpdateAccountScreen = () => {
     const phoneRef = ref(database, `phoneNumbers/${newPhone}`);
     get(phoneRef).then((snapshot) => {
         if (snapshot.exists()) {
-            Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use.');
+            Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use');
             return;
         } else {
+            // Begin by removing old realtime database entry for the phone number
             remove(oldPhoneRef).then(() => {
                 console.log('Old phone entry deleted successfully');
+                // Add new phone number entry to the phoneNumbers database
                 set(phoneRef, {
                     fullName: userData.fullName,
                     userEmail: userData.userEmail,
                     userId: user.uid
                 }).then(() => {
+                    // Update user's phone number in the users database
                     const userRef = ref(database, `users/${user.uid}`);
                     set(userRef, {
                         ...userData,
                         phoneNumber: newPhone
                     }).then(() => {
+                        // Update local state data
                         refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone);
                         setPhoneNumber(newPhone);
                         Alert.alert('Phone number successfully updated');
@@ -288,8 +292,7 @@ const UpdateAccountScreen = () => {
             })
         }
     }).catch((error) => {
-        console.log(error.message);
-        Alert.alert('Error when updating phone number', error.message);
+        Alert.alert('Phone Number Update Failed', error.message);
     })
   }
 
