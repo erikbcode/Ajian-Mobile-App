@@ -8,6 +8,8 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
+
+*.env
 web-build/
 # static site assets
 docs/
