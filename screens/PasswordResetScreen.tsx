@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, TextInput, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback, Touchable} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 import { useFirebase } from '../context/FirebaseContext';
 
@@ -32,6 +31,7 @@ const PasswordResetScreen = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={accountStyles.container}>
         <View style={accountStyles.resetContainer}>
+          <Text style={[accountStyles.titleText, accountStyles.shadow]}>Reset Password</Text>
           <TextInput
             style={accountStyles.longInput}
             placeholder="Email"
