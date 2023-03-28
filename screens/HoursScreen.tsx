@@ -7,12 +7,36 @@ import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
 import { database } from '../firebaseConfig';
 import { onValue, ref, update} from 'firebase/database';
+// import * as Font from 'expo-font';
+
+// const loadFont = async () => {
+//   const [fontsLoaded, setFontsLoaded] = useState(false);
+//   try {
+//     await Font.loadAsync({
+//       'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+//       'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+//       'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
+//     });
+//     setFontsLoaded(true);
+//   }
+//   catch (error) {
+//     console.error(error);
+//   }
+// };
 
 export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>) {
   return (
     <ScrollView style={styles.scroll_background}>
       <Map />
-      <Text style={styles.header_title}>Hours & Location</Text>
+      <Text style={styles.header_title}>
+        Hours & Location {'\n'} {'\n'}
+        <Text style={styles.address}>
+          1914 University Blvd, {'\n'}
+          Tuscaloosa, AL 35401 {'\n'}
+          205-331-4542
+        </Text>  
+      </Text>
+      
       <View style={styles.container}>
         <Hours />
         <View style={{paddingBottom: 50}}>
@@ -43,24 +67,24 @@ function SetDefaultHours() {
 function Hours() {
   // firebase call for current hours / specific day hours here
   SetDefaultHours()
-  let dayHours: OpenHours[] = []
-  for (let day of days) {
-    const dbRef = ref(database, `hours/${day}`)
-    onValue(dbRef, (snapshot) => {
-      dayHours.push(snapshot.val());
-      // console.log(snapshot.val())
-    });
-  }
+  // let dayHours: OpenHours[] = []
+  // for (let day of days) {
+  //   const dbRef = ref(database, `hours/${day}`)
+  //   onValue(dbRef, (snapshot) => {
+  //     dayHours.push(snapshot.val());
+  //     // console.log(snapshot.val())
+  //   });
+  // }
 
-  // const dayHours = [
-  //   {title: 'Monday', text: '11:00AM - 8:00PM'},
-  //   {title: 'Tuesday', text: '11:00AM - 8:00PM'},
-  //   {title: 'Wednesday', text: '11:00AM - 8:00PM'},
-  //   {title: 'Thursday', text: '11:00AM - 8:00PM'},
-  //   {title: 'Friday', text: '11:00AM - 8:00PM'},
-  //   {title: 'Saturday', text: '11:00AM - 8:00PM'},
-  //   {title: 'Sunday', text: '11:00AM - 8:00PM'},
-  // ];
+  const dayHours = [
+    {day: 'Monday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+    {day: 'Tuesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+    {day: 'Wednesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+    {day: 'Thursday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+    {day: 'Friday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+    {day: 'Saturday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+    {day: 'Sunday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  ];
 
   return (
     <View style={styles.hours_container}>
@@ -73,31 +97,35 @@ function Hours() {
     </View>
   );
 }
-// Function to add two numbers in 
 
 const styles = StyleSheet.create({
+  address: {
+    fontFamily: 'Ubuntu',
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    paddingTop: 50,
+  },
   scroll_background: {
     backgroundColor: 'rgb(135, 31, 31)',
     marginBottom: 0,
   },
   header_title: {
-    // fontFamily: 'georgia',
+    fontFamily: 'Ubuntu',
+    color: 'white',
     fontSize: 40,
     fontWeight: 'bold',
     paddingTop: StatusBar.currentHeight + 50,
-    paddingBottom: 40,
     textAlign: 'center',
-    backgroundColor: 'rgb(135, 31, 31)',
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
+    // borderBottomWidth: StyleSheet.hairlineWidth,
     marginBottom: 400,
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 3,
+    zIndex: 1,
   },
   hours_container: {
     flex: 1,
@@ -107,6 +135,8 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   title: {
+    fontFamily: 'Ubuntu',
+    color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
     paddingBottom: 15,
@@ -115,12 +145,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   day_title: {
-    fontSize: 12,
+    fontFamily: 'Ubuntu',
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   hours: {
-    fontSize: 10,
+    fontFamily: 'Ubuntu',
+    fontSize: 16,
     fontWeight: 'normal',
     textAlign: 'center',
   },

@@ -11,6 +11,7 @@ const SignUpScreen = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
@@ -21,6 +22,12 @@ const SignUpScreen = () => {
     
     try {
       // Check for valid phone number
+
+      if (password !== passwordConfirm) {
+        Alert.alert('Error', 'Passwords do not match.');
+        return;
+      }
+
       if (!validatePhoneNumber(phoneNumber)) {
         Alert.alert('Sign Up Failed', 'Please enter a valid 10-digit phone number');
         return;
@@ -98,6 +105,14 @@ const SignUpScreen = () => {
                     placeholderTextColor="grey"
                     value={password}
                     onChangeText={setPassword}
+                    secureTextEntry
+                />
+                <TextInput
+                    style={styles.longInput}
+                    placeholder="Confirm Password"
+                    placeholderTextColor="grey"
+                    value={passwordConfirm}
+                    onChangeText={setPasswordConfirm}
                     secureTextEntry
                 />
                 <Pressable style={({pressed}) => [
