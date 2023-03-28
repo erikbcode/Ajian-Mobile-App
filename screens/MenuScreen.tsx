@@ -1,5 +1,7 @@
 import { StyleSheet, ScrollView, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
 import React, { useState } from 'react';
+import { onValue, ref, set, get} from 'firebase/database';
+import { database } from '../firebaseConfig';
 // import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { useFonts } from 'expo-font';
@@ -69,15 +71,47 @@ function MenuItems(section_title: string, items: Array<MenuEntry>) {
   );
 }
 
+// function readMenuDB(db_loc: string) {
+//   const query = ref(database, `menu/${db_loc}`)
+//   let val : MenuEntry
+//   onValue(query, (snapshot) => {
+//     val = snapshot.val()
+//   })
+//   console.log(val)
+//   return val
+// }
+
+function readMenuDB(db_loc : string) {
+  const query = ref(database, `menu/${db_loc}`);
+  let val : Array<MenuEntry> | null=null;
+  get(query).then((snapshot) => {
+    if (snapshot.exists()) {
+      val = snapshot.val();
+      console.log(snapshot.val());
+    } else {
+      console.log("No data available");
+    }
+  }).catch((error) => {
+    console.error(error);
+  });
+  return val;
+}
+
 interface Props {
   text: string;
 }
+
+// get(ref(database, 'menu/youreOnARoll/rice'))
+// get(ref(database, 'menu/youreOnARoll/wrap'))
+// get(ref(database, 'menu/youreOnARoll/protein'))
+// get(ref(database, 'menu/youreOnARoll/additional'))
+// get(ref(database, 'menu/youreOnARoll/finish'))
 
 const youreOnARollTab = () => {
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Start with Rice', startWithRice)}
+      {MenuItems('Start with Rice', startWithRice)} 
       <SectionSeparator />
       {MenuItems('Pick your Wrap', pickYourWrap)}
       <SectionSeparator />
@@ -91,6 +125,12 @@ const youreOnARollTab = () => {
     </View>
   );
 };
+
+// get(ref(database, 'menu/suggested'))
+// get(ref(database, 'menu/sides'))
+// get(ref(database, 'menu/rice'))
+// get(ref(database, 'menu/drinks'))
+// get(ref(database, 'menu/nutrition'))
 
 const suggestedRollsTab = () => {
   return (
@@ -294,9 +334,23 @@ const nutrition: MenuEntry[] = [
   {item: 'Tempura Crunch', description: 'Calories - 100\nTotal Fat - 5g\nSaturated Fat - 2g\nSodium - 100mg\nCarbs - 25g\nFiber - 1g\nSugar - 1g\nProtein - 3g', price: ''},
 ];
 
-// function SetDefaultMenu() {
-//   for (let day of days) {
-//     update(ref(database, `hours/${day}`), {day: day, start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'})
-//   }
-// };
+const rollSections: Array<string> = ['rice','wrap','protein','additional','finish']
+const rollSectionItems: Array<MenuEntry[]> = [startWithRice, pickYourWrap, pickYourProtein, makeItYourOwn, finishIt]
+
+const otherSections: Array<string> = ['suggested','sides','rice','drinks','nutrition']
+const otherSectionItems: Array<MenuEntry[]> = [suggestedRolls, sides, friedRice, drinks, nutrition]
+
+
+function SetDefaultMenu() {
+  for (let i=0; i < rollSections.length; i++) {
+    const section = rollSections[i]
+    const item = rollSectionItems[i]
+    set(ref(database, `menu/youreOnARoll/${section}`), item)
+  }
+  for (let i=0; i < otherSections.length; i++) {
+    const section = otherSections[i]
+    const item = otherSectionItems[i]
+    set(ref(database, `menu/${section}`), item)
+  }
+};
 // SetDefaultHours()
