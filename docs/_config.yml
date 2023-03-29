@@ -22,16 +22,16 @@ domain: ebuinevicius.github.io
 url: https://ebuinevicius.github.io
 baseurl: /docs/
 
-lsi: false
-safe: true
-source: ../../Ajian-Mobile-App/
-incremental: false
-highlighter: rouge
-gist:
-  noscript: false
-kramdown:
-  math_engine: mathjax
-  syntax_highlighter: rouge
+# lsi: false
+# safe: true
+# source: ../../Ajian-Mobile-App/
+# incremental: false
+# highlighter: rouge
+# gist:
+#   noscript: false
+# kramdown:
+#   math_engine: mathjax
+#   syntax_highlighter: rouge
 
 title: Ajian Mobile App Development
 email: ajiandev@gmail.com
