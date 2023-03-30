@@ -27,19 +27,24 @@ const AnnouncementsScreen = () => {
   const lookup = keys.map((key) => Number(key));
 
   return (
-    <ScrollView style = {styles.container}>
+    <View>
       <View style = {styles.topBox}>
         <Text style = {[styles.topBoxText, styles.shadow]}>Current Announcements:</Text>
       </View>
-      {Array.from({ length: lookup.length }).map((_, index) => (
-      <View style={styles.announceBox} key={index}>
-        <Text style={[styles.text, styles.textboxShadow]}>
-          {Announcements[lookup[lookup.length - index - 1]]}
-        </Text>
-      </View>
-      ))}
 
-    </ScrollView>
+      <ScrollView style = {styles.container}>
+        {Array.from({ length: lookup.length }).map((_, index) => (
+        <View style={styles.announceBox} key={index}>
+          <Text style={[styles.text, styles.textboxShadow]}>
+            {Announcements[lookup[lookup.length - index - 1]]}
+          </Text>
+        </View>
+        ))}
+      <View style = {styles.bottomView}>
+
+      </View>
+      </ScrollView>
+    </View>
   )
 
 }
@@ -49,16 +54,16 @@ const styles = StyleSheet.create({
   container: {
     borderColor: 'rgb(135, 31, 31)', 
     borderWidth: 5, 
-    borderTopWidth: 20,
+    //borderTopWidth: 20,
     backgroundColor: 'rgb(135, 31, 31)'  
   },
 
   text: {
   fontFamily: 'Times New Roman',
-  fontSize: 20, 
+  fontSize: 25, 
   textAlign: 'center',
-  backgroundColor: 'rgb(254, 251, 234)',
-  borderColor: 'rgb(254, 251, 234)',
+  backgroundColor: 'white',
+  borderColor: 'white',
   borderWidth: 20
   },
 
@@ -66,7 +71,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Times New Roman',
     fontSize: 30,
     backgroundColor: 'rgb(135, 31, 31)',
-    color: 'white'
+    color: 'white',
+    paddingTop: 30,
+    textAlign: 'center'
   },
 
   shadow: {
@@ -91,11 +98,14 @@ const styles = StyleSheet.create({
   },
 
   topBox: {
-    borderWidth: 30,
-    borderTopWidth: 30,
+    padding: 30,
     backgroundColor: 'rgb(135, 31, 31)',
-    borderColor: 'rgb(135, 31, 31)'
 
+  },
+
+  bottomView: {
+    borderWidth: 50,
+    borderColor: 'rgb(135, 31, 31)'
   }
 });
 
