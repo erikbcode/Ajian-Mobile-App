@@ -1,9 +1,20 @@
-import { StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
 import React, { useState } from 'react';
+import { onValue, ref, set, get} from 'firebase/database';
+import { database } from '../firebaseConfig';
 // import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
+import { useFonts } from 'expo-font';
+
+import { MenuEntry } from '../types';
+import { styles, banner_styles } from '../styles/MenuScreenStyle'
 
 export default function MenuScreen() {
+  const [fontsLoaded] = useFonts({
+    'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
+    'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
+  });
+
   return (
     <ScrollView style={styles.scroll_view}>
       <Text style={styles.header_title}>Menu</Text>
@@ -24,12 +35,12 @@ function Tabs() {
   return (
     <View style={styles.tab_container}>
       <View style={styles.tab_style}>
-        <TouchableOpacity style={styles.tab_button} key={1} onPress={() => handleTabClick(0)}><Text style={styles.tab_text}>Roll Addons</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={2} onPress={() => handleTabClick(1)}><Text style={styles.tab_text}>Rolls</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={3} onPress={() => handleTabClick(2)}><Text style={styles.tab_text}>Sides</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={4} onPress={() => handleTabClick(3)}><Text style={styles.tab_text}>Rice</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={5} onPress={() => handleTabClick(4)}><Text style={styles.tab_text}>Drinks</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button } key={6} onPress={() => handleTabClick(5)}><Text style={styles.tab_text}>Nutrition</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={1} onPress={() => handleTabClick(0)}><Text style={activeTab === 0 ? styles.tab_text : styles.tab_text_selected}>Roll Options</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={2} onPress={() => handleTabClick(1)}><Text style={activeTab === 1 ? styles.tab_text : styles.tab_text_selected}>Rolls</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={3} onPress={() => handleTabClick(2)}><Text style={activeTab === 2 ? styles.tab_text : styles.tab_text_selected}>Sides</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={4} onPress={() => handleTabClick(3)}><Text style={activeTab === 3 ? styles.tab_text : styles.tab_text_selected}>Rice</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={5} onPress={() => handleTabClick(4)}><Text style={activeTab === 4 ? styles.tab_text : styles.tab_text_selected}>Drinks</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tab_button} key={6} onPress={() => handleTabClick(5)}><Text style={activeTab === 5 ? styles.tab_text : styles.tab_text_selected}>Nutrition</Text></TouchableOpacity>
       </View>
       <View style={styles.tab_content}>
         {activeTab === 0 && youreOnARollTab()}
@@ -42,21 +53,6 @@ function Tabs() {
     </View>
   );
 };
-
-// function TabText() {
-//   const [activeTab, setActiveTab] = useState(0);
-
-//   return (
-    
-//   );
-// };
-
-
-type MenuEntry = {
-  item: string;
-  description: string;
-  price: string;
-}
 
 function MenuItems(section_title: string, items: Array<MenuEntry>) {
   // firebase call for current hours / specific day hours here
@@ -75,15 +71,47 @@ function MenuItems(section_title: string, items: Array<MenuEntry>) {
   );
 }
 
+// function readMenuDB(db_loc: string) {
+//   const query = ref(database, `menu/${db_loc}`)
+//   let val : MenuEntry
+//   onValue(query, (snapshot) => {
+//     val = snapshot.val()
+//   })
+//   console.log(val)
+//   return val
+// }
+
+function readMenuDB(db_loc : string) {
+  const query = ref(database, `menu/${db_loc}`);
+  let val : Array<MenuEntry> | null=null;
+  get(query).then((snapshot) => {
+    if (snapshot.exists()) {
+      val = snapshot.val();
+      console.log(snapshot.val());
+    } else {
+      console.log("No data available");
+    }
+  }).catch((error) => {
+    console.error(error);
+  });
+  return val;
+}
+
 interface Props {
   text: string;
 }
+
+// get(ref(database, 'menu/youreOnARoll/rice'))
+// get(ref(database, 'menu/youreOnARoll/wrap'))
+// get(ref(database, 'menu/youreOnARoll/protein'))
+// get(ref(database, 'menu/youreOnARoll/additional'))
+// get(ref(database, 'menu/youreOnARoll/finish'))
 
 const youreOnARollTab = () => {
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Start with Rice', startWithRice)}
+      {MenuItems('Start with Rice', startWithRice)} 
       <SectionSeparator />
       {MenuItems('Pick your Wrap', pickYourWrap)}
       <SectionSeparator />
@@ -92,10 +120,17 @@ const youreOnARollTab = () => {
       {MenuItems('Make it your Own', makeItYourOwn)}
       <SectionSeparator />
       {MenuItems('Finish It', finishIt)}
-      <HorizontalBanner text='**1: asterisks' />
+      <SectionSeparator />
+      <HorizontalBanner text='Double Up: +$3 | *Raw Protein | **Vegan Option'/>
     </View>
   );
 };
+
+// get(ref(database, 'menu/suggested'))
+// get(ref(database, 'menu/sides'))
+// get(ref(database, 'menu/rice'))
+// get(ref(database, 'menu/drinks'))
+// get(ref(database, 'menu/nutrition'))
 
 const suggestedRollsTab = () => {
   return (
@@ -103,7 +138,7 @@ const suggestedRollsTab = () => {
       <SectionSeparator />
       {MenuItems('Suggested Rolls', suggestedRolls)}
       <SectionSeparator />
-      <HorizontalBanner text='**2: asterisks' />
+      <HorizontalBanner text='*Consuming raw or undercooked meats, poultry, seafood, shellfish, eggs or unpasteurized milk may increase your risk of foodborne illness' />
     </View>
   );
 };
@@ -114,7 +149,7 @@ const sidesTab = () => {
       <SectionSeparator />
       {MenuItems('Sides', sides)}
       <SectionSeparator />
-      <HorizontalBanner text='**3: asterisks' />
+      <HorizontalBanner text='' />
     </View>
   );
 };
@@ -124,7 +159,8 @@ const friedRiceTab = () => {
     <View style={styles.container}>
       <SectionSeparator />
       {MenuItems('Fried Rice', friedRice)}
-      <HorizontalBanner text='**4: asterisks' />
+      <SectionSeparator />
+      <HorizontalBanner text='All fried rice comes with carrot, jalapeno, green onion, asparagus, cabbage, edamame and egg' />
     </View>
   );
 };
@@ -135,7 +171,7 @@ const drinksTab = () => {
       <SectionSeparator />
       {MenuItems('Drinks', drinks)}
       <SectionSeparator />
-      <HorizontalBanner text='**5: asterisks' />
+      <HorizontalBanner text='' />
     </View>
   );
 };
@@ -145,7 +181,8 @@ const nutritionTab = () => {
     <View style={styles.container}>
       <SectionSeparator />
       {MenuItems('Nutrition', nutrition)}
-      <HorizontalBanner text='**6: asterisks' />
+      <SectionSeparator />
+      <HorizontalBanner text='All nutritional information is estimated based on desired portions and is subject to variation' />
     </View>
   );
 };
@@ -172,150 +209,18 @@ const SectionSeparator = () => {
   );
 };
 
-const banner_styles = StyleSheet.create({
-  container: {
-    height: 50,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.5,
-    // shadowRadius: 2,
-    // elevation: 2,
-    backgroundColor: 'rgb(135, 31, 31)',
-
-    // fontSize: 30,
-    // fontWeight: 'bold',
-    paddingTop: StatusBar.currentHeight + 50,
-    // paddingBottom: 40,
-    // textAlign: 'center',
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
-  },
-});
-
-const styles = StyleSheet.create({
-  tab_container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 10,
-    paddingBottom: 30,
-    columnGap: 20,
-  },
-  tab_style: {
-    alignItems: 'center',
-    flexDirection: 'column',
-    width: '50%',
-    borderRadius: 10,
-    borderWidth: 2,
-    backgroundColor: 'rgb(135, 31, 31)',
-    borderColor: 'black',
-    marginTop: 140,
-    marginBottom: 0,
-    // boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-  },
-  tab_button: {
-    paddingTop: 2,
-    paddingBottom: 2,
-  },
-  tab_text: {
-    fontWeight: 'bold',
-    color: 'white',
-    // justifyContent: 'center',
-    // textAlign: 'center',
-  },
-  tab_content: {
-    // justifyContent: 'center',
-    // textAlign: 'center',
-    margin: 'auto',
-    fontSize: 12,
-    fontWeight: 'bold',
-    paddingBottom: 10,
-  },
-  scroll_view: {
-    paddingTop: StatusBar.currentHeight,
-  },
-  header_title: {
-    // fontFamily: 'georgia',
-    fontSize: 40,
-    fontWeight: 'bold',
-    paddingTop: StatusBar.currentHeight + 50,
-    paddingBottom: 40,
-    textAlign: 'center',
-    backgroundColor: 'rgb(135, 31, 31)',
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 30,
-    paddingBottom: 30,
-  },
-  menu_container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  small_margin: {
-    marginBottom: 2,
-  },
-  title: {
-    margin: 'auto',
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  item_item: {
-    margin: 'auto',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  item_description: {
-    margin: 'auto',
-    fontSize: 12,
-    fontWeight: 'normal',
-    textAlign: 'center',
-  },
-  item_price: {
-    margin: 'auto',
-    fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-  small_separator: {
-    marginVertical: 2,
-    height: 2,
-    width: '60%',
-  },
-});
-
-// You're on a roll
+// You're on a Roll
+// rice
 const startWithRice: MenuEntry[] = [
   {item: 'White', description: '', price: ''},
   {item: 'Brown', description: '', price: ''},
 ];
+// wrap
 const pickYourWrap: MenuEntry[] = [
   {item: 'Seaweed', description: 'Traditional wrap with hint of ocean', price: ''},
   {item: 'Soy', description: 'Soy', price: ''},
 ];
+// protein
 const pickYourProtein: MenuEntry[] = [
   {item: 'Tuna*', description: '', price: '8.50'},
   {item: 'Salmon', description: '', price: '8.50'},
@@ -331,6 +236,7 @@ const pickYourProtein: MenuEntry[] = [
   {item: 'Roasted Tofu**', description: '', price: '7.50'},
   {item: 'Veggie**', description: '', price: '7'},
 ];
+// additional
 const makeItYourOwn: MenuEntry[] = [
   {item: 'Asparagus', description: '', price: ''},
   {item: 'Avocado', description: '', price: ''},
@@ -342,6 +248,7 @@ const makeItYourOwn: MenuEntry[] = [
   {item: 'Selection of the Moment', description: '', price: ''},
   {item: 'Spinach', description: '', price: ''},
 ];
+// finish
 const finishIt: MenuEntry[] = [
   {item: 'Sauces', description: 'Spicy Mayo, Wasabi Mayo, Sweet Chili Mayo, Sweet Soy (Eel Sauce), Sweet Chili, Sriracha, Sweet Orange Sauce, Spicy Soy', price: ''},
   {item: 'Toppings', description: 'Sesame Seeds, Tempura Crunch, Sesame Chili Flake, Everything Bagel Spice, Wasabi Pea Crunch, Chopped Peanuts, Fried Onions, Flamin Hot Cheeto Crunch', price: ''},
@@ -349,8 +256,7 @@ const finishIt: MenuEntry[] = [
   {item: 'Spicy Crab Salad', description: '', price: '2'},
 ];
 
-
-// Suggested Rolls
+// Suggested
 const suggestedRolls: MenuEntry[] = [
   {item: 'California Roll', description: 'Your choice of rice, seaweed wrap, crab stick, avocado, cucumber with sweet soy sauce and sesame seed', price: '7.50'},
   {item: 'Boston Roll', description: 'Your choice of rice, seaweed wrap, poached shrimp, avocado, cucumber with spicy mayonnaise and sesame seed', price: '8'},
@@ -388,7 +294,7 @@ const friedRice: MenuEntry[] = [
   {item: 'Make it Spicy', description: '', price: ''},
 ];
 
-// Fried Rice
+// Drinks
 const drinks: MenuEntry[] = [
   {item: 'Fountain', description: '', price: '1.95'},
   {item: 'Bottled', description: '', price: '2.50'},
@@ -427,3 +333,24 @@ const nutrition: MenuEntry[] = [
   {item: 'Masago', description: 'Calories - 10\nTotal Fat - 0g\nSaturated Fat - 0g\nSodium - 100mg\nCarbs - .5g\nFiber - 0g\nSugar - .5g\nProtein - 0g', price: ''},
   {item: 'Tempura Crunch', description: 'Calories - 100\nTotal Fat - 5g\nSaturated Fat - 2g\nSodium - 100mg\nCarbs - 25g\nFiber - 1g\nSugar - 1g\nProtein - 3g', price: ''},
 ];
+
+const rollSections: Array<string> = ['rice','wrap','protein','additional','finish']
+const rollSectionItems: Array<MenuEntry[]> = [startWithRice, pickYourWrap, pickYourProtein, makeItYourOwn, finishIt]
+
+const otherSections: Array<string> = ['suggested','sides','rice','drinks','nutrition']
+const otherSectionItems: Array<MenuEntry[]> = [suggestedRolls, sides, friedRice, drinks, nutrition]
+
+
+function SetDefaultMenu() {
+  for (let i=0; i < rollSections.length; i++) {
+    const section = rollSections[i]
+    const item = rollSectionItems[i]
+    set(ref(database, `menu/youreOnARoll/${section}`), item)
+  }
+  for (let i=0; i < otherSections.length; i++) {
+    const section = otherSections[i]
+    const item = otherSectionItems[i]
+    set(ref(database, `menu/${section}`), item)
+  }
+};
+// SetDefaultHours()

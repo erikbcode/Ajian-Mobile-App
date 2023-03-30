@@ -17,37 +17,63 @@ const SignUpScreen = () => {
 
   const navigation = useNavigation();
 
-  // Async function to sign a user in. Checks for valid inputs and then creates the user and updates the realtime data base with their info. 
+  // Async function to sign a user in. Checks for valid input formats and then creates calls FirebaseContext method to attempt to sign up user.
   async function handleSignUp() {
+    
     try {
+      // Check for valid inputs before attempting to call signUp()
+      if (firstName.length == 0 || lastName.length == 0) {
+        Alert.alert("Sign Up Failed", "Please enter a valid first and last name");
+        return;
+      }
 
-      if (password !== passwordConfirm) {
-        Alert.alert('Error', 'Passwords do not match.');
+      if (!validateEmail(email)) {
+        Alert.alert('Sign Up Failed', 'Please enter a valid email address');
         return;
       }
 
       if (!validatePhoneNumber(phoneNumber)) {
-        Alert.alert('Error', 'Please enter a valid phone number')
+        Alert.alert('Sign Up Failed', 'Please enter a valid 10-digit phone number');
         return;
       }
 
-      let name = firstName.trim().concat(' ', lastName.trim())
-      firebaseContext.signUp(email, password, name, phoneNumber)
-        .then(() => {
-          navigation.goBack();
-        })
-      
+      if (password.length < 6) { 
+        Alert.alert('Sign Up Failed', 'Password must be at least 6 characters long');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        Alert.alert('Sign Up Failed', 'Passwords do not match');
+        return;
+      }
+
+      let name = firstName.trim().concat(' ', lastName.trim());
+
+      // Call method to handle sign up and navigate back to account screen
+      firebaseContext.signUp(email, password, name, phoneNumber).then(() => {
+        navigation.goBack();
+      })
     } catch (error: any) {
       if (error.code == 'auth/email-already-in-use') {
-        Alert.alert('Email Already in Use', 'The email address you entered is already in use.');
+        Alert.alert('Sign Up Failed', 'The email address you entered is already in use');
       } else {
-          Alert.alert('Error', 'Sign up failed. Please enter valid info and try again.')
+          Alert.alert('Sign Up Failed', 'Sign up failed. Please enter valid info and try again.')
       }
-      console.log(error)
     }
   };
 
+  // Function to validate email (Contains valid @ and .X format)
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.toLowerCase());
+  }
+
+  // Function to validate phone number (exists and is 10 digits)
   const validatePhoneNumber = (phoneNumber: string) => {
+    if (!phoneNumber || phoneNumber.length == 0) {
+      return false;
+    }
+
     return /^\d{10}$/.test(phoneNumber);
   }
 
@@ -124,6 +150,5 @@ const SignUpScreen = () => {
     </TouchableWithoutFeedback>
   );
 };
-
 
 export default SignUpScreen;

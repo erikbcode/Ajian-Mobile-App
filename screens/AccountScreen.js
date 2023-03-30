@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, Text, Alert, Pressable, TouchableWithoutFeedback, Keyboard, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused} from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 
 const AccountScreen = () => {
-  const { user, userData, loading, logIn, logOut, redeemReward, deleteAccount} = useFirebase();
+  const { user, userData, logIn, logOut, redeemReward, deleteAccount} = useFirebase();
   const accountStyles = useAccountStyles();
+  const isFocused = useIsFocused();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,22 +19,22 @@ const AccountScreen = () => {
 
   // Function for handling user sign-in with Firebase Authentication
   async function handleSignIn() {
-
     try {
       await logIn(email, password);
       setEmail('')
       setPassword('')
     } catch (error) {
       if (error.code == 'auth/user-not-found') {
-        Alert.alert('Log in Failed', 'Please enter valid credentials or create an account.')
+        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
       } else if (error.code == 'auth/invalid-email') {
-          Alert.alert('Invalid Email', 'Please enter a valid email associated with an Ajian account.') 
+        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
       } else if (error.code == 'auth/wrong-password') {
-        Alert.alert('Invalid Password', 'Please enter the correct password associated with your account') 
+        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
       } else if (error.code == 'auth/internal-error') {
-        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later.')
+        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
+      } else {
+        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
       }
-      console.log(error);
     }
   };
 
@@ -57,6 +58,10 @@ const AccountScreen = () => {
     navigation.navigate('PasswordReset');
   };
 
+  const handleUpdateAccountNavigate = () => {
+    navigation.navigate('UpdateAccount');
+  }
+
   // When reward is redeemed, show the confirmation modal
   const handleRedeemReward = () => {
     setShowRedeemConfirmation(true);
@@ -76,17 +81,22 @@ const AccountScreen = () => {
 
   // Wrapper function to delete a user's account and info associated with it 
   const handleConfirmDelete = () => {
-    deleteAccount();
-    setShowDeleteConfirmation(false);
+    try {
+      deleteAccount();
+    } catch (error) {
+      Alert.alert('Failed to delete account', 'Error when deleting account. Please try again.');
+      console.log(error);
+    } finally {
+      setShowDeleteConfirmation(false);
+    }
   }
 
-
-  // If a user is logged in, display account info. Otherwise, display sign-in/sigrn-up
+  // If a user is logged in, display account info. Otherwise, display sign-in/sign-up
   if (user) {
     console.log('data: ', userData);
     return (
       <View style={accountStyles.container}>
-        <Text style={[accountStyles.titleText, accountStyles.shadow]}>Hello, {user.displayName?.split(' ')[0]}</Text>
+        <Text style={[accountStyles.titleText, accountStyles.shadow]}>Hello, {user.displayName?.split(' ').slice(0, -1).join(' ')}</Text>
         <Text style={[accountStyles.titleText, accountStyles.shadow]}>Rewards points: {userPoints}</Text>
         {userData && userData.hasSignUpReward && (
           <Pressable style={({pressed}) => [
@@ -143,9 +153,9 @@ const AccountScreen = () => {
         <Pressable style={({pressed}) => [
               pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleSignOut}>
+          onPress={handleUpdateAccountNavigate}>
           {({pressed}) => (
-              <Text style={accountStyles.text}>Log Out</Text>
+              <Text style={accountStyles.text}>Update Account Information</Text>
           )}
         </Pressable>
         <Pressable style={({pressed}) => [
@@ -154,6 +164,14 @@ const AccountScreen = () => {
           onPress={handleDeleteAccount}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Delete Account</Text>
+          )}
+        </Pressable>
+        <Pressable style={({pressed}) => [
+              pressed ? [accountStyles.transparentButton, accountStyles.transparentButtonPressed] : [accountStyles.transparentButton],
+          ]}
+          onPress={handleSignOut}>
+          {({pressed}) => (
+              <Text style={accountStyles.transparentText}>Log Out</Text>
           )}
         </Pressable>
       </View>

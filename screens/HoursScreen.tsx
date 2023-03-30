@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView, StatusBar } from 'react-native';
+import {  ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import Map from '../components/Map'
 // import EditScreenInfo from '../components/EditScreenInfo';
@@ -7,6 +7,11 @@ import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
 import { database } from '../firebaseConfig';
 import { onValue, ref, update} from 'firebase/database';
+import { styles } from '../styles/HoursScreenStyle';
+
+import { OpenHours } from '../types';
+
+const days: Array<string> = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] 
 
 export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>) {
   return (
@@ -31,26 +36,15 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
   );
 }
 
-const days: Array<string> = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] 
-
-type OpenHours = {
-  day: string;
-  start_hour: number;
-  start_minute: string;
-  end_hour: number;
-  end_minute: string;
-  // include AM/PM bool
-};
-
-function SetDefaultHours() {
-  for (let day of days) {
-    update(ref(database, `hours/${day}`), {day: day, start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'})
-  }
-};
+// function SetDefaultHours() {
+//   for (let day of days) {
+//     update(ref(database, `hours/${day}`), {day: day, start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'})
+//   }
+// };
+// SetDefaultHours()
 
 function Hours() {
   // firebase call for current hours / specific day hours here
-  SetDefaultHours()
   // let dayHours: OpenHours[] = []
   // for (let day of days) {
   //   const dbRef = ref(database, `hours/${day}`)
@@ -81,66 +75,5 @@ function Hours() {
     </View>
   );
 }
-// Function to add two numbers in 
 
-const styles = StyleSheet.create({
-  address: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
-    paddingTop: 50,
-  },
-  scroll_background: {
-    backgroundColor: 'rgb(135, 31, 31)',
-    marginBottom: 0,
-  },
-  header_title: {
-    // fontFamily: 'georgia',
-    fontSize: 40,
-    fontWeight: 'bold',
-    paddingTop: StatusBar.currentHeight + 50,
-    paddingBottom: 40,
-    textAlign: 'center',
-    backgroundColor: 'rgb(135, 31, 31)',
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: -10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    marginBottom: 400,
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  hours_container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingBottom: 50,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingBottom: 15,
-  },
-  day_margin: {
-    marginBottom: 2,
-  },
-  day_title: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  hours: {
-    fontSize: 10,
-    fontWeight: 'normal',
-    textAlign: 'center',
-  },
-  separator: {
-    marginVertical: 5,
-    height: 2,
-    width: '80%',
-  },
-});
+
