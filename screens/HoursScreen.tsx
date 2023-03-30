@@ -5,7 +5,7 @@ import Map from '../components/Map'
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
-import { database } from '../firebaseConfig';
+import { database, get } from '../firebaseConfig';
 import { onValue, ref, update} from 'firebase/database';
 import { styles } from '../styles/HoursScreenStyle';
 
@@ -36,40 +36,45 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
   );
 }
 
-// function SetDefaultHours() {
-//   for (let day of days) {
-//     update(ref(database, `hours/${day}`), {day: day, start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'})
-//   }
-// };
-// SetDefaultHours()
+function readHours(day : string) {
+  const query = ref(database, `hours/${day}`);
+  let val : OpenHours = {day: 'Day', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'};
+  get(query).then((snapshot:any) => {
+    if (snapshot.exists()) {
+      val = snapshot.val();
+      console.log(snapshot.val());
+    } else {
+      console.log("No data available");
+    }
+  }).catch((error:any) => {
+    console.error(error);
+  });
+  return val;
+}
 
 function Hours() {
-  // firebase call for current hours / specific day hours here
-  // let dayHours: OpenHours[] = []
-  // for (let day of days) {
-  //   const dbRef = ref(database, `hours/${day}`)
-  //   onValue(dbRef, (snapshot) => {
-  //     dayHours.push(snapshot.val());
-  //     // console.log(snapshot.val())
-  //   });
-  // }
+// firebase call for current hours / specific day hours here
+  let dayHours: Array<OpenHours> = []
+  for (let day of days) {
+    dayHours.push(readHours(day));
+  }
 
-  const dayHours = [
-    {day: 'Monday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Tuesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Wednesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Thursday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Friday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Saturday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Sunday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-  ];
+  // const dayHours = [
+  //   {day: 'Monday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  //   {day: 'Tuesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  //   {day: 'Wednesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  //   {day: 'Thursday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  //   {day: 'Friday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  //   {day: 'Saturday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  //   {day: 'Sunday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
+  // ];
 
   return (
     <View style={styles.hours_container}>
       {dayHours.map((item, index) => (
         <View key={index} style={styles.day_margin}>
           <Text style={styles.day_title}>{item.day}</Text>
-          <Text style={styles.hours}>{`${item.start_hour}:00AM - ${item.end_hour}:00PM`}</Text>
+          <Text style={styles.hours}>{`${item.start_hour}:${item.start_minute}AM - ${item.end_hour}:${item.end_minute}PM`}</Text>
         </View>
       ))}
     </View>
