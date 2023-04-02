@@ -23,21 +23,24 @@ const AnnouncementsScreen = () => {
   }, [Announcements])
 
   //Retuns a list of all keys pulled from Firebase as an array of strings
-  const keys: string[] = Object.keys(Announcements);
+  if (Announcements.length != 1) {
+    
+    const keys: string[] = Object.keys(Announcements);
 
   //Convert the strings into numbers for use in indexing
-  const lookup = keys.map((key) => Number(key));
+    const lookup = keys.map((key) => Number(key));
+   
 
   return (
-    <View>
+    <View style = {styles.background}>
       <View style = {styles.topBox}>
-        <Text style = {[styles.topBoxText, styles.shadow]}>Current Announcements</Text>
+        <Text style = {[styles.topBoxText, styles.shadow]}>Announcements</Text>
       </View>
 
       <ScrollView style = {styles.container}>{
 
         //Loop through all announcements and build a display box for each
-        Array.from({ length: lookup.length }).map((_, index) => (
+        Array.from({ length: lookup.length - 1 }).map((_, index) => (
         <View style={styles.announceBox} key={index}>
           <Text style={[styles.text, styles.textboxShadow]}>
             {Announcements[lookup[lookup.length - index - 1]]}
@@ -49,7 +52,29 @@ const AnnouncementsScreen = () => {
       </View>
       </ScrollView>
     </View>
-  )
+  )}
+
+  else {
+    return(
+      <View style = {styles.background}>
+      <View style = {styles.topBox}>
+        <Text style = {[styles.topBoxText, styles.shadow]}>Announcements</Text>
+      </View>
+
+      <ScrollView style = {styles.container}>
+      <View style={styles.announceBox}>
+          <Text style={[styles.text, styles.textboxShadow]}>
+           There aren't currently any announcements. Check back later!
+          </Text>
+        </View>
+      <View style = {styles.bottomView}>
+      </View>
+      </ScrollView>
+    </View>
+
+    )
+  }
+
 
 }
 
@@ -107,8 +132,12 @@ const styles = StyleSheet.create({
   },
 
   bottomView: {
-    borderWidth: 50,
+    borderWidth: 250,
     borderColor: 'rgb(135, 31, 31)'
+  },
+
+  background: {
+    backgroundColor: 'rgb(135, 31, 31)'
   }
 });
 
