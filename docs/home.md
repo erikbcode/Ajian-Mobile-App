@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Ajian Sushi Mobile App
-permalink: /home/
+permalink: /
 ---
 
 ## Goals
