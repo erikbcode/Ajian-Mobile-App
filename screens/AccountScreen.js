@@ -166,7 +166,7 @@ const AccountScreen = () => {
           )}
         </Pressable>
         <Pressable style={({pressed}) => [
-              pressed ? [accountStyles.transparentButton, accountStyles.transparentButtonPressed] : [accountStyles.transparentButton],
+              pressed ? [accountStyles.transparentButton, accountStyles.shadow, accountStyles.transparentButtonPressed] : [accountStyles.transparentButton, accountStyles.shadow],
           ]}
           onPress={handleSignOut}>
           {({pressed}) => (
