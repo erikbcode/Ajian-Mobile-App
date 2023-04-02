@@ -1,11 +1,8 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
-layout: home
+layout: page
+title: Ajian Sushi Mobile App
+permalink: /home/
 ---
-
-# Ajian Sushi Mobile App
 
 ## Goals
 1. Build Presentable app with information from client's website

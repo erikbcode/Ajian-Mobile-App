@@ -43,13 +43,19 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # github_username:  jekyll
 
 # Build settings
-remote_theme: pages-themes/merlot@v0.2.0
+theme: minima
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
-
-gems:
   - jekyll-seo-tag
+
+
+header_pages: 
+  - home.md
+  - sprint1.md
+  - sprint2.md
+  - sprint3.md
+
 
 # Exclude from processing.
 # The following items will not be processed, by default.
