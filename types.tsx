@@ -34,7 +34,7 @@ export type RootTabParamList = {
   Home: undefined;
   Menu: undefined;
   Hours: undefined;
-  Social: undefined;
+  Announcements: undefined;
   Account: undefined;
 };
 
@@ -42,3 +42,18 @@ export type RootTabScreenProps<Screen extends keyof RootTabParamList> = Composit
   BottomTabScreenProps<RootTabParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
 >;
+
+export type MenuEntry = {
+  item: string;
+  description: string;
+  price: string;
+};
+
+export type OpenHours = {
+  day: string;
+  start_hour: number;
+  start_minute: string;
+  end_hour: number;
+  end_minute: string;
+  // could include AM/PM bool
+};

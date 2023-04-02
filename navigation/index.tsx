@@ -16,7 +16,7 @@ import NotFoundScreen from '../screens/NotFoundScreen';
 import HomeScreen from '../screens/HomeScreen';
 import MenuScreen from '../screens/MenuScreen';
 import HoursScreen from '../screens/HoursScreen';
-import SocialScreen from '../screens/SocialScreen';
+import AnnouncementsScreen from '../screens/AnnouncementsScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import AccountScreen from '../screens/AccountScreen';
 import UpdateAccountScreen from '../screens/UpdateAccountScreen';
@@ -124,11 +124,11 @@ function BottomTabNavigator() {
         }}
       />
        <BottomTab.Screen
-        name="Social"
-        component={SocialScreen}
+        name="Announcements"
+        component={AnnouncementsScreen}
         options={{
-          title: 'Twitter Feed',
-          tabBarIcon: ({ color }) => <TabBarIcon name="retweet" color={color} />,
+          title: 'Announcements',
+          tabBarIcon: ({ color }) => <TabBarIcon name="exclamation" color={color} />,
           headerShown: false,
         }}
       />
