@@ -43,9 +43,10 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # github_username:  jekyll
 
 # Build settings
-theme: merlot
+remote_theme: pages-themes/merlot@v0.2.0
 plugins:
   - jekyll-feed
+  - jekyll-remote-theme
 
 gems:
   - jekyll-seo-tag
