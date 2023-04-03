@@ -34,7 +34,7 @@ const AnnouncementsScreen = () => {
   return (
     <View style = {styles.background}>
       <View style = {styles.topBox}>
-        <Text style = {[styles.topBoxText, styles.shadow]}>Announcements</Text>
+        <Text style = {[styles.topText, styles.shadow]}>Announcements</Text>
       </View>
 
       <ScrollView style = {styles.container}>{
@@ -58,7 +58,7 @@ const AnnouncementsScreen = () => {
     return(
       <View style = {styles.background}>
         <View style = {styles.topBox}>
-          <Text style = {[styles.topBoxText, styles.shadow]}>Announcements</Text>
+          <Text style = {[styles.topText, styles.shadow]}>Announcements</Text>
         </View>
 
         <ScrollView style = {styles.container}>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 
   text: {
   fontFamily: 'Ubuntu',
-  fontSize: 25, 
+  fontSize: 22, 
   textAlign: 'center',
   borderWidth: 20,
   borderColor : "#0000" // invisible color
@@ -97,9 +97,9 @@ const styles = StyleSheet.create({
 
   },
 
-  topBoxText: {
+  topText: {
     fontFamily: 'Ubuntu',
-    fontSize: 30,
+    fontSize: 35,
     backgroundColor: 'rgb(135, 31, 31)',
     color: 'white',
     paddingTop: 30,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
 
   shadow: {
     shadowOffset: { width: -2, height: 5 },
-    shadowColor: 'grey',
+    shadowColor: 'black',
     shadowOpacity: 0.5,
     elevation: 3,
     // background color must be set
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   textboxShadow: {
     shadowOffset: { width: -.5, height: 2 },
     shadowColor: 'black',
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.3,
     elevation: 3,
     backgroundColor : "#0000" // invisible color
 
