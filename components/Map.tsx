@@ -39,6 +39,8 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       // backgroundColor: '#fff',
+      paddingBottom: 300,
+      paddingTop: 60,
     },
     map: {
       // ...StyleSheet.absoluteFillObject,
