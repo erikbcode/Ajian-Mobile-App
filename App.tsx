@@ -1,13 +1,12 @@
-import React, {useContext} from 'react';
+import React from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
-import { Text } from './components/Themed';
-
-import AppLoading from 'expo-app-loading';
+import { FirebaseProvider } from './context/FirebaseContext';
+import { FontProvider } from './context/FontContext';
 
 
 export default function App() {
@@ -21,8 +20,12 @@ export default function App() {
 
     return (
         <SafeAreaProvider>
-          <Navigation colorScheme={colorScheme} />
-          <StatusBar />
+          <FontProvider>
+            <FirebaseProvider>
+              <Navigation colorScheme={colorScheme} />
+              <StatusBar />
+            </FirebaseProvider>
+          </FontProvider>
         </SafeAreaProvider>
     );
   };

@@ -1,41 +1,81 @@
 import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, Button, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
-import { auth, database } from '../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
-import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, signOut, User, AuthError} from 'firebase/auth';
-import { ref, update} from 'firebase/database';
-import {} from 'firebase/database'
+import { useFirebase } from '../context/FirebaseContext';
+import { useAccountStyles } from '../styles/AccountScreenStyles';
 
 const SignUpScreen = () => {
+  const firebaseContext = useFirebase();
+  const styles = useAccountStyles();
+
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [error, setError] = useState('')
 
   const navigation = useNavigation();
 
+  // Async function to sign a user in. Checks for valid input formats and then creates calls FirebaseContext method to attempt to sign up user.
   async function handleSignUp() {
+    
     try {
-        if (firstName && lastName && email && password) {
-            const { user } = await createUserWithEmailAndPassword(auth, email, password)
-            let name = firstName.trim() + ' ' + lastName.trim();
-            await updateProfile(user, {
-                displayName: name
-            })
-            update(ref(database, `users/${user.uid}`), {fullName: name, rewardsPoints: 0, signUpRewardUsed: false, userEmail: email})
-            navigation.goBack();
-        } else {
-            Alert.alert('Invalid Info', 'Please fill out all information to sign up.')
-        }
+      // Check for valid inputs before attempting to call signUp()
+      if (firstName.length == 0 || lastName.length == 0) {
+        Alert.alert("Sign Up Failed", "Please enter a valid first and last name");
+        return;
+      }
+
+      if (!validateEmail(email)) {
+        Alert.alert('Sign Up Failed', 'Please enter a valid email address');
+        return;
+      }
+
+      if (!validatePhoneNumber(phoneNumber)) {
+        Alert.alert('Sign Up Failed', 'Please enter a valid 10-digit phone number');
+        return;
+      }
+
+      if (password.length < 6) { 
+        Alert.alert('Sign Up Failed', 'Password must be at least 6 characters long');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        Alert.alert('Sign Up Failed', 'Passwords do not match');
+        return;
+      }
+
+      let name = firstName.trim().concat(' ', lastName.trim());
+
+      // Call method to handle sign up and navigate back to account screen
+      firebaseContext.signUp(email, password, name, phoneNumber).then(() => {
+        navigation.goBack();
+      })
     } catch (error: any) {
-        if (error.code == 'auth/email-already-in-use') {
-            Alert.alert('Email Already in Use', 'The email address you entered is already in use.');
-        } else {
-            Alert.alert('Error', 'Sign up failed. Please enter valid info and try again.')
-        }
+      if (error.code == 'auth/email-already-in-use') {
+        Alert.alert('Sign Up Failed', 'The email address you entered is already in use');
+      } else {
+          Alert.alert('Sign Up Failed', 'Sign up failed. Please enter valid info and try again.')
+      }
     }
   };
+
+  // Function to validate email (Contains valid @ and .X format)
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.toLowerCase());
+  }
+
+  // Function to validate phone number (exists and is 10 digits)
+  const validatePhoneNumber = (phoneNumber: string) => {
+    if (!phoneNumber || phoneNumber.length == 0) {
+      return false;
+    }
+
+    return /^\d{10}$/.test(phoneNumber);
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -67,10 +107,26 @@ const SignUpScreen = () => {
                 />
                 <TextInput
                     style={styles.longInput}
+                    placeholder="Phone Number"
+                    keyboardType="phone-pad"
+                    placeholderTextColor="grey" 
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                />
+                <TextInput
+                    style={styles.longInput}
                     placeholder="Password"
                     placeholderTextColor="grey"
                     value={password}
                     onChangeText={setPassword}
+                    secureTextEntry
+                />
+                <TextInput
+                    style={styles.longInput}
+                    placeholder="Confirm Password"
+                    placeholderTextColor="grey"
+                    value={passwordConfirm}
+                    onChangeText={setPasswordConfirm}
                     secureTextEntry
                 />
                 <Pressable style={({pressed}) => [
@@ -83,136 +139,16 @@ const SignUpScreen = () => {
                 </Pressable>
         </View>
         <Pressable style={({pressed}) => [
-                pressed ? [styles.shadow, styles.altButton, styles.buttonPressed] : [styles.shadow, styles.altButton, styles.buttonUnpressed],
-                ]}
-                onPress={() => navigation.goBack()}>
-                {({pressed}) => (
-                    <Text style={styles.altButtonText}>Back to Sign In</Text>
-                )}
-            </Pressable>
+            pressed ? [styles.shadow, styles.altButton, styles.buttonPressed] : [styles.shadow, styles.altButton, styles.buttonUnpressed],
+            ]}
+            onPress={() => navigation.goBack()}>
+            {({pressed}) => (
+                <Text style={styles.altButtonText}>Back to Sign In</Text>
+            )}
+        </Pressable>
         </View>
     </TouchableWithoutFeedback>
   );
 };
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      flexBasis: 'auto',
-      backgroundColor: 'rgb(135, 31, 31)',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    logInContainer: {
-      backgroundColor: 'rgb(135, 31, 31)',
-      flexDirection: 'column',
-      alignItems: 'center',
-      width: '80%',
-      marginBottom: 80,
-    },
-    signUpContainer: {
-      backgroundColor: 'rgb(135, 31, 31)',
-      flexDirection: 'column',
-      alignItems: 'center',
-      width: '80%',
-      marginBottom: 20,
-    },
-    sideBySide: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-    },
-    shortInput: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
-        width: '49%',
-        backgroundColor: 'white',
-      },
-    longInput: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
-        width: '100%',
-        backgroundColor: 'white',
-    },
-    button: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 35,
-        elevation: 3,
-        borderWidth: 0,
-        width: 300,
-        height: 60,
-        marginBottom: 20,
-    },
-    altButton: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 35,
-        elevation: 3,
-        borderWidth: 0,
-        width: 200,
-        height: 40,
-        marginBottom: 20,
-    },
-    altButtonText: {
-        fontSize: 13,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: 'rgb(135, 31, 31)',
-        fontFamily: 'UbuntuBold'
-    },
-    buttonUnpressed: {
-      backgroundColor: 'white',
-    },
-    buttonPressed: {
-        backgroundColor: 'rgb(145, 145, 145)',
-    },
-    titleText: {
-      fontSize: 30,
-      fontWeight: 'bold',
-      marginBottom: 30,
-      fontFamily: 'Ubuntu',
-    },
-    bodyText: {
-      fontSize: 24,
-      fontFamily: 'Ubuntu',
-      marginBottom: 30,
-    },
-    buttonContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 16,
-    },
-    text: {
-      fontSize: 16,
-      lineHeight: 21,
-      fontWeight: 'bold',
-      letterSpacing: 0.25,
-      color: 'rgb(135, 31, 31)',
-      fontFamily: 'UbuntuBold'
-    },
-    shadow: {
-      shadowOffset: { width: -2, height: 5 },
-      shadowColor: 'black',
-      shadowOpacity: 0.5,
-      elevation: 3,
-      // background color must be set
-      backgroundColor : "#0000" // invisible color
-    },
-  });
 
 export default SignUpScreen;

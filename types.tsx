@@ -20,7 +20,9 @@ export type RootStackParamList = {
   Home: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  PasswordReset: undefined;
   Account: undefined;
+  UpdateAccount: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -32,7 +34,7 @@ export type RootTabParamList = {
   Home: undefined;
   Menu: undefined;
   Hours: undefined;
-  Social: undefined;
+  Announcements: undefined;
   Account: undefined;
 };
 
