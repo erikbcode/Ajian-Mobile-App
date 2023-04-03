@@ -24,69 +24,12 @@ export const banner_styles = StyleSheet.create({
   });
 
 export const styles = StyleSheet.create({
-    small_margin: {
+    smallMargin: {
         marginTop: 20,
     },
-    tab_container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingTop: 10,
-      columnGap: 20,
-    },
-    tab_style: {
-      alignItems: 'center',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-      width: '100%',
-      borderRadius: 1,
-      borderWidth: StyleSheet.hairlineWidth,
-      backgroundColor: 'rgb(135, 31, 31)',
-      borderColor: 'black',
-      marginTop: 30,
-      marginBottom: 0,
-    },
-    tab_button: {
-      flexBasis: '32%',
-      alignItems: 'center',
-      paddingTop: 2,
-      paddingBottom: 2,
-    },
-    tab_text: {
-      fontFamily: 'Ubuntu',
-      fontWeight: 'normal',
-      color: 'white',
-      fontSize: 18,
-    },
-    tab_text_selected: {
-      fontFamily: 'Ubuntu',
-      fontWeight: 'normal',
-      color: '#a7aaad',
-      fontSize: 18,
-    },
-    tab_content: {
-      margin: 'auto',
-      fontFamily: 'Ubuntu',
-      fontSize: 12,
-      fontWeight: 'bold',
-      paddingBottom: 10,
-    },
-    scroll_view: {
-      paddingTop: StatusBar.currentHeight,
-      backgroundColor: 'rgb(135, 31, 31)',
-    },
-    header_title: {
-      fontFamily: 'UbuntuBold',
-      color: 'white',
-      fontSize: 40,
-      fontWeight: 'bold',
-      paddingTop: StatusBar.currentHeight + 20,
-      paddingBottom: 20,
-      textAlign: 'center',
-      backgroundColor: 'rgb(135, 31, 31)',
-    },
+    
     container: {
+      backgroundColor: 'rgb(135, 31, 31)',
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
@@ -94,49 +37,111 @@ export const styles = StyleSheet.create({
       paddingBottom: 30,
       width: Dimensions.get('window').width,
     },
-    menu_container: {
+    menuContainer: {
+      backgroundColor: 'rgb(135, 31, 31)',
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
       paddingTop: 20,
       paddingBottom: 10,
     },
-    title: {
-      fontFamily: 'UbuntuBold',
-      margin: 'auto',
-      fontSize: 24,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      paddingBottom: 10,
+    tabContainer: {
+      backgroundColor: 'rgb(135, 31, 31)',
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: 10,
+      columnGap: 20,
     },
-    item_item: {
-      fontFamily: 'Ubuntu',
-      margin: 'auto',
-      fontSize: 18,
-      fontWeight: 'bold',
-      textAlign: 'center',
+    tabStyle: {
+      backgroundColor: 'rgb(135, 31, 31)',
+      alignItems: 'center',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      width: '100%',
+      borderRadius: 1,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: 'black',
+      marginTop: 30,
+      marginBottom: 0,
     },
-    item_description: {
+    tabButton: {
+      flexBasis: '32%',
+      alignItems: 'center',
+      paddingTop: 2,
+      paddingBottom: 2,
+    },
+    scroll_view: {
+      backgroundColor: 'rgb(135, 31, 31)',
+      paddingTop: StatusBar.currentHeight,
+    },
+
+    textParent: {
+      backgroundColor: 'rgb(135, 31, 31)',
       fontFamily: 'Ubuntu',
-      margin: 'auto',
-      maxWidth: 300,
-      fontSize: 12,
       fontWeight: 'normal',
       textAlign: 'center',
-    },
-    item_price: {
-      fontFamily: 'Ubuntu',
+      color: 'white',
       margin: 'auto',
+      fontSize: 18,
+    },
+    tabTextSelected: {
+      fontSize: 18,
+      color: '#a7aaad',
+    },
+    tabContent: {
+      fontWeight: 'bold',
       fontSize: 12,
+      paddingBottom: 10,
+    },
+    headerText: {
+      // fontFamily: 'Ubuntu',
+      // color: 'white',
+      fontWeight: 'bold',
+      fontSize: 40,
+      paddingTop: StatusBar.currentHeight + 20,
+      paddingBottom: 20,
+    },
+    menuTitle: {
+      fontWeight: 'bold',
+      fontSize: 24,
+      paddingBottom: 10,
+    },
+    itemItemText: {
+      // fontFamily: 'Ubuntu',
+      // margin: 'auto',
+      // fontSize: 18,
       fontWeight: 'bold',
       textAlign: 'center',
     },
+    itemDescriptionText: {
+      // fontFamily: 'Ubuntu',
+      // margin: 'auto',
+      // fontWeight: 'normal',
+      // textAlign: 'center',
+      fontSize: 12,
+      maxWidth: 300,
+    },
+    itemPriceText: {
+      // fontFamily: 'Ubuntu',
+      // margin: 'auto',
+      // textAlign: 'center',
+      fontWeight: 'bold',
+      fontSize: 12,
+    },
+    loadingText: {
+      marginTop: 30,
+      fontWeight: 'bold',
+      fontsize: 18,
+    },
+
     separator: {
       marginVertical: 30,
-      height: 1,
+      height: 2,
       width: '80%',
     },
-    small_separator: {
+    smallSeparator: {
       marginVertical: 2,
       height: 2,
       width: '60%',

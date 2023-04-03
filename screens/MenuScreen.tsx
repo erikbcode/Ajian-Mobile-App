@@ -1,8 +1,7 @@
-import { StyleSheet, ScrollView, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
-import React, { useState } from 'react';
-import { onValue, ref, set, get} from 'firebase/database';
+import { ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { onValue, ref, get} from 'firebase/database';
 import { database } from '../firebaseConfig';
-// import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { useFonts } from 'expo-font';
 
@@ -17,7 +16,7 @@ export default function MenuScreen() {
 
   return (
     <ScrollView style={styles.scroll_view}>
-      <Text style={styles.header_title}>Menu</Text>
+      <Text style={[styles.textParent, styles.headerText]}>Menu</Text>
       {/* <HorizontalBanner text='Menu' /> */}
       <Tabs />
       {/* <TabText /> */}
@@ -27,28 +26,49 @@ export default function MenuScreen() {
 
 function Tabs() {
   const [activeTab, setActiveTab] = useState(0);
+  const [menuEntries, setMenuEntries] = useState([[{item:'', description:'', price:''}]]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleTabClick = (tabIndex: number) => {
     setActiveTab(tabIndex);
-  }; 
+  };
+
+  useEffect(() => {
+    async function fetchMenuEntries() {
+      const menuLocations: Array<string> = ['youreOnARoll/rice','youreOnARoll/wrap','youreOnARoll/protein','youreOnARoll/additional','youreOnARoll/finish','suggested','sides','rice','drinks','nutrition']
+      let menuEntries: Array<Array<MenuEntry>> = []
+      for (let menuLocation of menuLocations) {
+        const val = await readMenuItems(menuLocation)
+        // console.log(val)
+        menuEntries.push(val)
+      }
+      setMenuEntries(menuEntries)
+      setIsLoading(false)
+    }
+    fetchMenuEntries()
+  }, []);
+
+  if (isLoading) {
+    return <View><Text style={[styles.textParent, styles.loadingText]}>Loading Data...</Text></View>
+  }
 
   return (
-    <View style={styles.tab_container}>
-      <View style={styles.tab_style}>
-        <TouchableOpacity style={styles.tab_button} key={1} onPress={() => handleTabClick(0)}><Text style={activeTab === 0 ? styles.tab_text : styles.tab_text_selected}>Roll Options</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={2} onPress={() => handleTabClick(1)}><Text style={activeTab === 1 ? styles.tab_text : styles.tab_text_selected}>Rolls</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={3} onPress={() => handleTabClick(2)}><Text style={activeTab === 2 ? styles.tab_text : styles.tab_text_selected}>Sides</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={4} onPress={() => handleTabClick(3)}><Text style={activeTab === 3 ? styles.tab_text : styles.tab_text_selected}>Rice</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={5} onPress={() => handleTabClick(4)}><Text style={activeTab === 4 ? styles.tab_text : styles.tab_text_selected}>Drinks</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tab_button} key={6} onPress={() => handleTabClick(5)}><Text style={activeTab === 5 ? styles.tab_text : styles.tab_text_selected}>Nutrition</Text></TouchableOpacity>
+    <View style={styles.tabContainer}>
+      <View style={styles.tabStyle}>
+        <TouchableOpacity style={styles.tabButton} key={1} onPress={() => handleTabClick(0)}><Text style={activeTab === 0 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Roll Options</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={2} onPress={() => handleTabClick(1)}><Text style={activeTab === 1 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Rolls</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={3} onPress={() => handleTabClick(2)}><Text style={activeTab === 2 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Sides</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={4} onPress={() => handleTabClick(3)}><Text style={activeTab === 3 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Rice</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={5} onPress={() => handleTabClick(4)}><Text style={activeTab === 4 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Drinks</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={6} onPress={() => handleTabClick(5)}><Text style={activeTab === 5 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Nutrition</Text></TouchableOpacity>
       </View>
-      <View style={styles.tab_content}>
-        {activeTab === 0 && youreOnARollTab()}
-        {activeTab === 1 && suggestedRollsTab()}
-        {activeTab === 2 && sidesTab()}
-        {activeTab === 3 && friedRiceTab()}
-        {activeTab === 4 && drinksTab()}
-        {activeTab === 5 && nutritionTab()}
+      <View style={[styles.textParent, styles.tabContent]}>
+        {activeTab === 0 && youreOnARollTab(menuEntries.slice(0,5))}
+        {activeTab === 1 && suggestedRollsTab(menuEntries[5])}
+        {activeTab === 2 && sidesTab(menuEntries[6])}
+        {activeTab === 3 && friedRiceTab(menuEntries[7])}
+        {activeTab === 4 && drinksTab(menuEntries[8])}
+        {activeTab === 5 && nutritionTab(menuEntries[9])}
     </View>
     </View>
   );
@@ -56,33 +76,58 @@ function Tabs() {
 
 function MenuItems(section_title: string, items: Array<MenuEntry>) {
   // firebase call for current hours / specific day hours here
+  console.log('Menu Recieved')
+  console.log(items)
   return (
-    <View style={styles.menu_container}>
-      {/* <View style={styles.small_separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
-      <Text style={styles.title}>{section_title}</Text>
+    <View style={styles.menuContainer}>
+      {/* <View style={styles.smallSeparator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" /> */}
+      <Text style={[styles.textParent, styles.menuTitle]}>{section_title}</Text>
       {items.map((item, index) => (
-        <View key={index} style={styles.small_margin}>        
-          {item.item ? <Text style={styles.item_item}>{item.item}</Text> : null}
-          {item.description ? <Text style={styles.item_description}>{item.description}</Text> : null}
-          {item.price ? <Text style={styles.item_price}>{item.price}</Text> : null}
+        <View key={index} style={styles.smallMargin}>        
+          {item.item ? <Text style={[styles.textParent, styles.itemItemText]}>{item.item}</Text> : null}
+          {item.description ? <Text style={[styles.textParent, styles.itemDescriptionText]}>{item.description}</Text> : null}
+          {item.price ? <Text style={[styles.textParent, styles.itemPriceText]}>{item.price}</Text> : null}
         </View>
       ))}
     </View>
   );
 }
 
-function readMenuDB(db_loc : string) {
+// async function readHours(day : string) {
+//   const query_loc : string = `hours/${day}`
+//   const query = ref(database, query_loc);
+//   let val : OpenHours = {day: 'Day', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'};
+//   val = await get(query).then((snapshot:any) => {
+//     if (snapshot.exists()) {
+//       val = snapshot.val();
+//       console.log(snapshot.val());
+//       return val;
+//     } else {
+//       console.log("No data available");
+//       return val;
+//     }
+//   }).catch((error:any) => {
+//     console.error(error);
+//     return val;
+//   });
+//   return val
+// }
+
+async function readMenuItems(db_loc : string) {
   const query = ref(database, `menu/${db_loc}`);
   let val : Array<MenuEntry> = [{item:'', description:'', price:''}];
-  get(query).then((snapshot:any) => {
+  val = await get(query).then((snapshot:any) => {
     if (snapshot.exists()) {
       val = snapshot.val();
       console.log(snapshot.val());
+      return val;
     } else {
       console.log("No data available");
+      return val;
     }
   }).catch((error:any) => {
     console.error(error);
+    return val;
   });
   return val;
 }
@@ -97,20 +142,44 @@ interface Props {
 // get(ref(database, 'menu/youreOnARoll/additional'))
 // get(ref(database, 'menu/youreOnARoll/finish'))
 
-const youreOnARollTab = () => {
+
+const youreOnARollTab = (menuEntries : Array<Array<MenuEntry>>) => {
+  // const [menuEntries, setMenuEntries] = useState([[{item:'', description:'', price:''}]]);
+  // const [isLoading, setIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   async function fetchMenuEntries() {
+  //     const menuLocations: Array<string> = ['youreOnARoll/rice','youreOnARoll/wrap','youreOnARoll/protein','youreOnARoll/additional','youreOnARoll/finish']
+  //     let menuEntries: Array<Array<MenuEntry>> = []
+  //     for (let menuLocation of menuLocations) {
+  //       const val = await readMenuItems(menuLocation)
+  //       // console.log(val)
+  //       menuEntries.push(val)
+  //     }
+  //     setMenuEntries(menuEntries)
+  //     setIsLoading(false)
+  //   }
+  //   fetchMenuEntries()
+  // }, []);
+
+  // if (isLoading) {
+  //   return <View><Text>Loading Data...</Text></View>
+  // }
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Start with Rice', readMenuDB('youreOnARoll/rice'))} 
+      
+      {MenuItems('Start with Rice', menuEntries[0])} 
       <SectionSeparator />
-      {MenuItems('Pick your Wrap', readMenuDB('youreOnARoll/wrap'))}
+      {MenuItems('Pick your Wrap', menuEntries[1])}
       <SectionSeparator />
-      {MenuItems('Pick your Protein', readMenuDB('youreOnARoll/protein'))}
+      {MenuItems('Pick your Protein', menuEntries[2])}
       <SectionSeparator />
-      {MenuItems('Make it your Own', readMenuDB('youreOnARoll/additional'))}
+      {MenuItems('Make it your Own', menuEntries[3])}
       <SectionSeparator />
-      {MenuItems('Finish It', readMenuDB('youreOnARoll/finish'))}
+      {MenuItems('Finish It', menuEntries[4])}
       <SectionSeparator />
+
       <HorizontalBanner text='Double Up: +$3 | *Raw Protein | **Vegan Option'/>
     </View>
   );
@@ -122,55 +191,132 @@ const youreOnARollTab = () => {
 // get(ref(database, 'menu/drinks'))
 // get(ref(database, 'menu/nutrition'))
 
-const suggestedRollsTab = () => {
+const suggestedRollsTab = (suggestedMenuEntry : Array<MenuEntry>) => {
+  // const [suggestedMenuEntry, setSuggestedMenuEntry] = useState([{item:'', description:'', price:''}]);
+  // const [isLoading, setIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   async function fetchMenuEntry() {
+  //     let suggestedMenuEntry: Array<MenuEntry> = await readMenuItems('suggested')
+  //     setSuggestedMenuEntry(suggestedMenuEntry)
+  //     setIsLoading(false)
+  //   }
+  //   fetchMenuEntry()
+  // }, []);
+
+  // console.log('Suggested')
+  // console.log(suggestedMenuEntry)
+  // if (isLoading) {
+  //   return <View><Text>Loading Data...</Text></View>
+  // }
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Suggested Rolls', readMenuDB('youreOnARoll/suggested'))}
+      {MenuItems('Suggested Rolls', suggestedMenuEntry)}
       <SectionSeparator />
       <HorizontalBanner text='*Consuming raw or undercooked meats, poultry, seafood, shellfish, eggs or unpasteurized milk may increase your risk of foodborne illness' />
     </View>
   );
 };
 
-const sidesTab = () => {
+const sidesTab = (sidesMenuEntry : Array<MenuEntry>) => {
+  // const [sidesMenuEntry, setSidesMenuEntry] = useState([{item:'', description:'', price:''}]);
+  // const [isLoading, setIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   async function fetchMenuEntry() {
+  //     let sidesMenuEntry: Array<MenuEntry> = await readMenuItems('sides')
+  //     setSidesMenuEntry(sidesMenuEntry)
+  //     setIsLoading(false)
+  //   }
+  //   fetchMenuEntry()
+  // }, []);
+
+  // if (isLoading) {
+  //   return <View><Text>Loading Data...</Text></View>
+  // }
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Sides', readMenuDB('youreOnARoll/sides'))}
+      {MenuItems('Sides', sidesMenuEntry)}
       <SectionSeparator />
       <HorizontalBanner text='' />
     </View>
   );
 };
 
-const friedRiceTab = () => {
+const friedRiceTab = (riceMenuEntry : Array<MenuEntry>) => {
+  // const [riceMenuEntry, setRiceMenuEntry] = useState([{item:'', description:'', price:''}]);
+  // const [isLoading, setIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   async function fetchMenuEntry() {
+  //     let riceMenuEntry: Array<MenuEntry> = await readMenuItems('rice')
+  //     setRiceMenuEntry(riceMenuEntry)
+  //     setIsLoading(false)
+  //   }
+  //   fetchMenuEntry()
+  // }, []);
+
+  // if (isLoading) {
+  //   return <View><Text>Loading Data...</Text></View>
+  // }
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Fried Rice', readMenuDB('youreOnARoll/rice'))}
+      {MenuItems('Fried Rice', riceMenuEntry)}
       <SectionSeparator />
       <HorizontalBanner text='All fried rice comes with carrot, jalapeno, green onion, asparagus, cabbage, edamame and egg' />
     </View>
   );
 };
 
-const drinksTab = () => {
+const drinksTab = (drinksMenuEntry : Array<MenuEntry>) => {
+  // const [drinksMenuEntry, setDrinksMenuEntry] = useState([{item:'', description:'', price:''}]);
+  // const [isLoading, setIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   async function fetchMenuEntry() {
+  //     let drinksMenuEntry: Array<MenuEntry> = await readMenuItems('drinks')
+  //     setDrinksMenuEntry(drinksMenuEntry)
+  //     setIsLoading(false)
+  //   }
+  //   fetchMenuEntry()
+  // }, []);
+
+  // if (isLoading) {
+  //   return <View><Text>Loading Data...</Text></View>
+  // }
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Drinks', readMenuDB('youreOnARoll/drinks'))}
+      {MenuItems('Drinks', drinksMenuEntry)}
       <SectionSeparator />
       <HorizontalBanner text='' />
     </View>
   );
 };
 
-const nutritionTab = () => {
+const nutritionTab = (nutritionMenuEntry : Array<MenuEntry>) => {
+  // const [nutritionMenuEntry, setNutritionMenuEntry] = useState([{item:'', description:'', price:''}]);
+  // const [isLoading, setIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   async function fetchMenuEntry() {
+  //     let nutritionMenuEntry: Array<MenuEntry> = await readMenuItems('nutrition')
+  //     setNutritionMenuEntry(nutritionMenuEntry)
+  //     setIsLoading(false)
+  //   }
+  //   fetchMenuEntry()
+  // }, []);
+
+  // if (isLoading) {
+  //   return <View><Text>Loading Data...</Text></View>
+  // }
   return (
     <View style={styles.container}>
       <SectionSeparator />
-      {MenuItems('Nutrition', readMenuDB('youreOnARoll/nutrition'))}
+      {MenuItems('Nutrition', nutritionMenuEntry)}
       <SectionSeparator />
       <HorizontalBanner text='All nutritional information is estimated based on desired portions and is subject to variation' />
     </View>
