@@ -27,7 +27,6 @@ export const styles = StyleSheet.create({
     smallMargin: {
         marginTop: 20,
     },
-    
     container: {
       backgroundColor: 'rgb(135, 31, 31)',
       flex: 1,
@@ -54,7 +53,7 @@ export const styles = StyleSheet.create({
       columnGap: 20,
     },
     tabStyle: {
-      backgroundColor: 'rgb(135, 31, 31)',
+      backgroundColor: 'white',
       alignItems: 'center',
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -67,12 +66,13 @@ export const styles = StyleSheet.create({
       marginBottom: 0,
     },
     tabButton: {
+      backgroundColor: 'white',
       flexBasis: '32%',
       alignItems: 'center',
-      paddingTop: 2,
-      paddingBottom: 2,
+      paddingTop: 8,
+      paddingBottom: 8,
     },
-    scroll_view: {
+    scrollView: {
       backgroundColor: 'rgb(135, 31, 31)',
       paddingTop: StatusBar.currentHeight,
     },
@@ -86,9 +86,15 @@ export const styles = StyleSheet.create({
       margin: 'auto',
       fontSize: 18,
     },
+    tabTextUnselected: {
+      backgroundColor: 'white',
+      fontWeight: 'bold',
+      color: 'rgb(135, 31, 31)',
+    },
     tabTextSelected: {
+      backgroundColor: 'white',
       fontSize: 18,
-      color: '#a7aaad',
+      color: 'rgb(100, 31, 31)',
     },
     tabContent: {
       fontWeight: 'bold',
@@ -101,7 +107,7 @@ export const styles = StyleSheet.create({
       fontWeight: 'bold',
       fontSize: 40,
       paddingTop: StatusBar.currentHeight + 20,
-      paddingBottom: 20,
+      paddingBottom: 35,
     },
     menuTitle: {
       fontWeight: 'bold',
@@ -131,7 +137,7 @@ export const styles = StyleSheet.create({
       fontSize: 12,
     },
     loadingText: {
-      marginTop: 30,
+      paddingTop: 30,
       fontWeight: 'bold',
       fontsize: 18,
     },

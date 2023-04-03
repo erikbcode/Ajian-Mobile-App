@@ -15,7 +15,7 @@ export default function MenuScreen() {
   });
 
   return (
-    <ScrollView style={styles.scroll_view}>
+    <ScrollView style={styles.scrollView}>
       <Text style={[styles.textParent, styles.headerText]}>Menu</Text>
       {/* <HorizontalBanner text='Menu' /> */}
       <Tabs />
@@ -55,12 +55,12 @@ function Tabs() {
   return (
     <View style={styles.tabContainer}>
       <View style={styles.tabStyle}>
-        <TouchableOpacity style={styles.tabButton} key={1} onPress={() => handleTabClick(0)}><Text style={activeTab === 0 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Roll Options</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} key={2} onPress={() => handleTabClick(1)}><Text style={activeTab === 1 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Rolls</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} key={3} onPress={() => handleTabClick(2)}><Text style={activeTab === 2 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Sides</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} key={4} onPress={() => handleTabClick(3)}><Text style={activeTab === 3 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Rice</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} key={5} onPress={() => handleTabClick(4)}><Text style={activeTab === 4 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Drinks</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton} key={6} onPress={() => handleTabClick(5)}><Text style={activeTab === 5 ? styles.textParent : [styles.textParent, styles.tabTextSelected]}>Nutrition</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={1} onPress={() => handleTabClick(0)}><Text style={activeTab === 0 ? [styles.textParent, styles.tabTextUnselected] : [styles.textParent, styles.tabTextSelected]}>Roll Options</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={2} onPress={() => handleTabClick(1)}><Text style={activeTab === 1 ? [styles.textParent, styles.tabTextUnselected] : [styles.textParent, styles.tabTextSelected]}>Rolls</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={3} onPress={() => handleTabClick(2)}><Text style={activeTab === 2 ? [styles.textParent, styles.tabTextUnselected] : [styles.textParent, styles.tabTextSelected]}>Sides</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={4} onPress={() => handleTabClick(3)}><Text style={activeTab === 3 ? [styles.textParent, styles.tabTextUnselected] : [styles.textParent, styles.tabTextSelected]}>Rice</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={5} onPress={() => handleTabClick(4)}><Text style={activeTab === 4 ? [styles.textParent, styles.tabTextUnselected] : [styles.textParent, styles.tabTextSelected]}>Drinks</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} key={6} onPress={() => handleTabClick(5)}><Text style={activeTab === 5 ? [styles.textParent, styles.tabTextUnselected] : [styles.textParent, styles.tabTextSelected]}>Nutrition</Text></TouchableOpacity>
       </View>
       <View style={[styles.textParent, styles.tabContent]}>
         {activeTab === 0 && youreOnARollTab(menuEntries.slice(0,5))}

@@ -50,17 +50,8 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
   }, []);
 
   if (isLoading) {
-    return <View><Text>Loading Data...</Text></View>
+    return <View><Text style={styles.loadingText}>Loading Data...</Text></View>
   }
-  // const dayHours = [ // for debugging
-  //   {day: 'Monday', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'},
-  //   {day: 'Tuesday', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'},
-  //   {day: 'Wednesday', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'},
-  //   {day: 'Thursday', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'},
-  //   {day: 'Friday', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'},
-  //   {day: 'Saturday', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'},
-  //   {day: 'Sunday', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'},
-  // ];
   return (
     <ScrollView style={styles.scrollContainer}>
       <Map />
@@ -75,7 +66,7 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
       
       <View style={[styles.containerParent, styles.dayContainer]}>
         {Hours(dayHours)}
-        <View style={{marginBottom: 50}}>
+        <View style={styles.mobileButton}>
           <MobileOrderButton />
         </View>
       </View>

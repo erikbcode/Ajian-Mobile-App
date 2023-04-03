@@ -13,12 +13,13 @@ export const styles = StyleSheet.create({
   dayContainer: {
     flex: 1,
     elevation: 3,
-    zIndex: 1,
+    // zIndex: 1,
+    paddingTop: 40,
   },
   hoursContainer: {
     flex: 1,
     marginTop: 50,
-    marginBottom: 50,
+    marginBottom: 10,
   },
 
   parentText: {
@@ -63,6 +64,11 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 5,
   },
+  loadingText: {
+    paddingTop: 30,
+    fontWeight: 'bold',
+    fontsize: 18,
+  },
 
   separator: {
     marginVertical: 5,
@@ -72,5 +78,10 @@ export const styles = StyleSheet.create({
   dayMargin: {
     backgroundColor: 'rgb(135, 31, 31)',
     marginBottom: 14,
+  },
+  mobileButton: {
+    backgroundColor:'rgb(135, 31, 31)',
+    marginBottom: 50, 
+    marginTop: 30,
   },
 });
