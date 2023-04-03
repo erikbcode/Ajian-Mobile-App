@@ -57,20 +57,21 @@ const AnnouncementsScreen = () => {
   else {
     return(
       <View style = {styles.background}>
-      <View style = {styles.topBox}>
-        <Text style = {[styles.topBoxText, styles.shadow]}>Announcements</Text>
-      </View>
-
-      <ScrollView style = {styles.container}>
-      <View style={styles.announceBox}>
-          <Text style={[styles.text, styles.textboxShadow]}>
-           There aren't currently any announcements. Check back later!
-          </Text>
+        <View style = {styles.topBox}>
+          <Text style = {[styles.topBoxText, styles.shadow]}>Announcements</Text>
         </View>
-      <View style = {styles.bottomView}>
-      </View>
-      </ScrollView>
-    </View>
+
+        <ScrollView style = {styles.container}>
+          <View style={styles.announceBox}>
+              <Text style={[styles.text, styles.textboxShadow]}>
+              There aren't currently any announcements. Check back later!
+              </Text>
+          </View>
+          
+          <View style = {styles.bottomView}>
+          </View>
+        </ScrollView>
+     </View>
 
     )
   }
@@ -87,16 +88,17 @@ const styles = StyleSheet.create({
   },
 
   text: {
-  fontFamily: 'Times New Roman',
+  fontFamily: 'Ubuntu',
   fontSize: 25, 
   textAlign: 'center',
-  backgroundColor: 'white',
-  borderColor: 'white',
-  borderWidth: 20
+  borderWidth: 20,
+  borderColor : "#0000" // invisible color
+
+
   },
 
   topBoxText: {
-    fontFamily: 'Times New Roman',
+    fontFamily: 'Ubuntu',
     fontSize: 30,
     backgroundColor: 'rgb(135, 31, 31)',
     color: 'white',
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
 
   shadow: {
     shadowOffset: { width: -2, height: 5 },
-    shadowColor: 'black',
+    shadowColor: 'grey',
     shadowOpacity: 0.5,
     elevation: 3,
     // background color must be set
@@ -114,15 +116,20 @@ const styles = StyleSheet.create({
   },
 
   textboxShadow: {
-    shadowOffset: { width: -2, height: 5 },
+    shadowOffset: { width: -.5, height: 2 },
     shadowColor: 'black',
     shadowOpacity: 0.5,
     elevation: 3,
+    backgroundColor : "#0000" // invisible color
+
   },
 
   announceBox: {
-    borderColor: 'rgb(135, 31, 31)', 
-    borderWidth: 25
+    borderColor: 'white', 
+    backgroundColor: 'white',
+    borderWidth: 20,
+    borderRadius: 10,
+    marginVertical: 25
   },
 
   topBox: {
@@ -132,7 +139,7 @@ const styles = StyleSheet.create({
   },
 
   bottomView: {
-    borderWidth: 250,
+    borderWidth: 70,
     borderColor: 'rgb(135, 31, 31)'
   },
 
