@@ -6,34 +6,41 @@ import { database } from '../firebaseConfig';
 import { ref, get, onValue, push, update, remove, Query} from 'firebase/database';
 
 const dat = ref(database, `Announcements`);
-const first = ref(database, `Announcements/1st`);
-const second = ref(database, `Announcements/2nd`);
-const third = ref(database, `Announcements/3rd`);
-const fourth = ref(database, `Announcements/4th`);
-const fifth = ref(database, `Announcements/5th`);
-
 
 const AnnouncementsScreen = () => {
 
+  //Variable to store announcement key/value pairs
   var [Announcements, setAnnouncements] = useState([]);
 
+  //Maintain variable
   useEffect(() => {
 
-  get (dat).then((snapshot) => {setAnnouncements(snapshot.val());})
+    //Retrieve the data from firebase
+    get (dat).then((snapshot) => {
+      setAnnouncements(snapshot.val());
+    })
 
   }, [Announcements])
 
-  const keys: string[] = Object.keys(Announcements);
-  const lookup = keys.map((key) => Number(key));
+  //Retuns a list of all keys pulled from Firebase as an array of strings
+  if (Announcements.length != 1) {
+    
+    const keys: string[] = Object.keys(Announcements);
+
+  //Convert the strings into numbers for use in indexing
+    const lookup = keys.map((key) => Number(key));
+   
 
   return (
-    <View>
+    <View style = {styles.background}>
       <View style = {styles.topBox}>
-        <Text style = {[styles.topBoxText, styles.shadow]}>Current Announcements:</Text>
+        <Text style = {[styles.topText, styles.shadow]}>Announcements</Text>
       </View>
 
-      <ScrollView style = {styles.container}>
-        {Array.from({ length: lookup.length }).map((_, index) => (
+      <ScrollView style = {styles.container}>{
+
+        //Loop through all announcements and build a display box for each
+        Array.from({ length: lookup.length - 1 }).map((_, index) => (
         <View style={styles.announceBox} key={index}>
           <Text style={[styles.text, styles.textboxShadow]}>
             {Announcements[lookup[lookup.length - index - 1]]}
@@ -45,7 +52,30 @@ const AnnouncementsScreen = () => {
       </View>
       </ScrollView>
     </View>
-  )
+  )}
+
+  else {
+    return(
+      <View style = {styles.background}>
+        <View style = {styles.topBox}>
+          <Text style = {[styles.topText, styles.shadow]}>Announcements</Text>
+        </View>
+
+        <ScrollView style = {styles.container}>
+          <View style={styles.announceBox}>
+              <Text style={[styles.text, styles.textboxShadow]}>
+              There aren't currently any announcements. Check back later!
+              </Text>
+          </View>
+          
+          <View style = {styles.bottomView}>
+          </View>
+        </ScrollView>
+     </View>
+
+    )
+  }
+
 
 }
 
@@ -54,22 +84,22 @@ const styles = StyleSheet.create({
   container: {
     borderColor: 'rgb(135, 31, 31)', 
     borderWidth: 5, 
-    //borderTopWidth: 20,
     backgroundColor: 'rgb(135, 31, 31)'  
   },
 
   text: {
-  fontFamily: 'Times New Roman',
-  fontSize: 25, 
+  fontFamily: 'Ubuntu',
+  fontSize: 22, 
   textAlign: 'center',
-  backgroundColor: 'white',
-  borderColor: 'white',
-  borderWidth: 20
+  borderWidth: 20,
+  borderColor : "#0000" // invisible color
+
+
   },
 
-  topBoxText: {
-    fontFamily: 'Times New Roman',
-    fontSize: 30,
+  topText: {
+    fontFamily: 'Ubuntu',
+    fontSize: 35,
     backgroundColor: 'rgb(135, 31, 31)',
     color: 'white',
     paddingTop: 30,
@@ -86,15 +116,20 @@ const styles = StyleSheet.create({
   },
 
   textboxShadow: {
-    shadowOffset: { width: -2, height: 5 },
+    shadowOffset: { width: -.5, height: 2 },
     shadowColor: 'black',
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.3,
     elevation: 3,
+    backgroundColor : "#0000" // invisible color
+
   },
 
   announceBox: {
-    borderColor: 'rgb(135, 31, 31)', 
-    borderWidth: 25
+    borderColor: 'white', 
+    backgroundColor: 'white',
+    borderWidth: 20,
+    borderRadius: 10,
+    marginVertical: 25
   },
 
   topBox: {
@@ -104,8 +139,12 @@ const styles = StyleSheet.create({
   },
 
   bottomView: {
-    borderWidth: 50,
+    borderWidth: 70,
     borderColor: 'rgb(135, 31, 31)'
+  },
+
+  background: {
+    backgroundColor: 'rgb(135, 31, 31)'
   }
 });
 
