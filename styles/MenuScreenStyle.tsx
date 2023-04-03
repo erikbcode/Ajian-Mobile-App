@@ -106,8 +106,16 @@ export const styles = StyleSheet.create({
       // color: 'white',
       fontWeight: 'bold',
       fontSize: 40,
-      paddingTop: StatusBar.currentHeight + 20,
+      paddingTop: StatusBar.currentHeight + 50,
       paddingBottom: 35,
+    },
+    shadow: {
+      shadowOffset: { width: -2, height: 5 },
+      shadowColor: 'black',
+      shadowOpacity: 0.5,
+      elevation: 3,
+      // background color must be set
+      backgroundColor : "#0000" // invisible color
     },
     menuTitle: {
       fontWeight: 'bold',

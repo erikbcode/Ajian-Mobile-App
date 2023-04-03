@@ -21,7 +21,14 @@ export const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 10,
   },
-
+  shadow: {
+    shadowOffset: { width: -2, height: 5 },
+    shadowColor: 'black',
+    shadowOpacity: 0.5,
+    elevation: 3,
+    // background color must be set
+    backgroundColor : "#0000" // invisible color
+  },
   parentText: {
     backgroundColor: 'rgb(135, 31, 31)',
     fontFamily: 'Ubuntu',
