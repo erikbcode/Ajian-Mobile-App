@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
 
   bottomView: {
-    borderWidth: 70,
+    borderWidth: 250,
     borderColor: 'rgb(135, 31, 31)'
   },
 
