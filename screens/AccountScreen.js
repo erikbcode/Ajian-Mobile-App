@@ -5,7 +5,7 @@ import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 
 const AccountScreen = () => {
-  const { user, userData, logIn, logOut, redeemReward, deleteAccount} = useFirebase();
+  const { user, userData, logIn, logOut, redeemReward, deleteAccount, isLoading} = useFirebase();
   const accountStyles = useAccountStyles();
   const isFocused = useIsFocused();
 
@@ -24,6 +24,7 @@ const AccountScreen = () => {
       setEmail('')
       setPassword('')
     } catch (error) {
+      console.log(error);
       if (error.code == 'auth/user-not-found') {
         Alert.alert('Login Failed', 'Please enter a valid email/password combination');
       } else if (error.code == 'auth/invalid-email') {
@@ -91,6 +92,14 @@ const AccountScreen = () => {
     }
   }
 
+  if (isLoading) {
+    return (
+      <View style={accountStyles.container}>
+        <Text style={[accountStyles.titleText, accountStyles.shadow]}>Loading...</Text>
+      </View>
+    )
+  }
+
   // If a user is logged in, display account info. Otherwise, display sign-in/sign-up
   if (user) {
     return (
@@ -102,9 +111,7 @@ const AccountScreen = () => {
             pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
           onPress={handleRedeemReward}>
-          {({pressed}) => (
-              <Text style={accountStyles.text}>Redeem your free roll!</Text>
-          )}
+          <Text style={accountStyles.text}>Redeem your free roll!</Text>
           </Pressable>
         )}
         <Modal visible={showRedeemConfirmation}>
