@@ -54,11 +54,7 @@ const SignUpScreen = () => {
         navigation.goBack();
       })
     } catch (error: any) {
-      if (error.code == 'auth/email-already-in-use') {
-        Alert.alert('Sign Up Failed', 'The email address you entered is already in use');
-      } else {
-          Alert.alert('Sign Up Failed', 'Sign up failed. Please enter valid info and try again.')
-      }
+        Alert.alert('Sign Up Failed', 'Sign up failed. Please enter valid info and try again.')
     }
   };
 

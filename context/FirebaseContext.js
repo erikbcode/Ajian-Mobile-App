@@ -89,9 +89,12 @@ export function FirebaseProvider({children}) {
                             })
                         })
                     })
-                })
+                }).catch((error) => {
+                    console.log(error);
+                    Alert.alert('Sign Up Failed', error.code);
+                });      
             }
-        })            
+        })
     }
 
     // Function to log a user into the platform. Calls Firebase auth method to sign in, and then accesses the database to update client-side state data.
