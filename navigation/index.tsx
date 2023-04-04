@@ -12,14 +12,14 @@ import { ColorSchemeName, Pressable, StyleSheet } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import HomeScreen from '../screens/HomeScreen';
 import MenuScreen from '../screens/MenuScreen';
 import HoursScreen from '../screens/HoursScreen';
-import SocialScreen from '../screens/SocialScreen';
+import AnnouncementsScreen from '../screens/AnnouncementsScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import AccountScreen from '../screens/AccountScreen';
+import UpdateAccountScreen from '../screens/UpdateAccountScreen';
 import PasswordResetScreen from '../screens/PasswordResetScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -49,9 +49,7 @@ function RootNavigator() {
       <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: 'Create Account', headerTitleStyle: {fontFamily: 'Ubuntu'}, headerStyle: {backgroundColor: 'white'}}} />
       <Stack.Screen name="PasswordReset" component={PasswordResetScreen} options={{title: 'Reset Password', headerTitleStyle: {fontFamily: 'Ubuntu'}, headerStyle: {backgroundColor: 'white'}}} />
       <Stack.Screen name="Account" component={AccountScreen} options={{}} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
+      <Stack.Screen name="UpdateAccount" component={UpdateAccountScreen} options={{title: 'Update Profile Information'}} />
     </Stack.Navigator>
   );
 }
@@ -126,11 +124,11 @@ function BottomTabNavigator() {
         }}
       />
        <BottomTab.Screen
-        name="Social"
-        component={SocialScreen}
+        name="Announcements"
+        component={AnnouncementsScreen}
         options={{
-          title: 'Twitter Feed',
-          tabBarIcon: ({ color }) => <TabBarIcon name="retweet" color={color} />,
+          title: 'Announcements',
+          tabBarIcon: ({ color }) => <TabBarIcon name="exclamation" color={color} />,
           headerShown: false,
         }}
       />

@@ -1,45 +1,72 @@
-import { StyleSheet, ScrollView, StatusBar } from 'react-native';
-import React, { useState } from 'react';
+import {  ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import Map from '../components/Map'
 // import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
 import { database } from '../firebaseConfig';
-import { onValue, ref, update} from 'firebase/database';
-// import * as Font from 'expo-font';
+import { onValue, ref, get } from 'firebase/database';
+import { styles } from '../styles/HoursScreenStyle';
 
-// const loadFont = async () => {
-//   const [fontsLoaded, setFontsLoaded] = useState(false);
-//   try {
-//     await Font.loadAsync({
-//       'Ubuntu': require('../styles/fonts/Ubuntu-Regular.ttf'),
-//       'UbuntuBold': require('../styles/fonts/Ubuntu-Bold.ttf'),
-//       'Aboreto': require('../styles/fonts/Aboreto-Regular.ttf')
-//     });
-//     setFontsLoaded(true);
-//   }
-//   catch (error) {
-//     console.error(error);
-//   }
-// };
+import { OpenHours } from '../types';
+
+async function readHours(day : string) {
+  const query = ref(database, `hours/${day}`);
+  let val : OpenHours = {day: 'Day', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'};
+  val = await get(query).then((snapshot:any) => {
+    if (snapshot.exists()) {
+      val = snapshot.val();
+      console.log(snapshot.val());
+      return val;
+    } else {
+      console.log("No data available");
+      return val;
+    }
+  }).catch((error:any) => {
+    console.error(error);
+    return val;
+  });
+  return val
+}
 
 export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>) {
+  const [dayHours, setDayHours] = useState([{day: 'Day', start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'}]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDayHours() {
+      const days: Array<string> = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+      let dayHours: Array<OpenHours> = []
+      for (let day of days) {
+        const val = await readHours(day)
+        // console.log(val)
+        dayHours.push(val)
+      }
+      setDayHours(dayHours)
+      setIsLoading(false)
+    }
+    fetchDayHours()
+  }, []);
+
+  if (isLoading) {
+    return <View><Text style={styles.loadingText}>Loading Data...</Text></View>
+  }
   return (
-    <ScrollView style={styles.scroll_background}>
+    <ScrollView style={styles.scrollContainer}>
       <Map />
-      <Text style={styles.header_title}>
+      <Text style={[styles.parentText, styles.headerText]}>
         Hours & Location {'\n'} {'\n'}
-        <Text style={styles.address}>
+        <Text style={[styles.parentText, styles.addressText]}>
           1914 University Blvd, {'\n'}
           Tuscaloosa, AL 35401 {'\n'}
           205-331-4542
         </Text>  
       </Text>
       
-      <View style={styles.container}>
-        <Hours />
-        <View style={{paddingBottom: 50}}>
+      <View style={[styles.containerParent, styles.dayContainer]}>
+        {Hours(dayHours)}
+        <View style={styles.mobileButton}>
           <MobileOrderButton />
         </View>
       </View>
@@ -47,118 +74,21 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
   );
 }
 
-const days: Array<string> = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] 
-
-type OpenHours = {
-  day: string;
-  start_hour: number;
-  start_minute: string;
-  end_hour: number;
-  end_minute: string;
-  // include AM/PM bool
-};
-
-function SetDefaultHours() {
-  for (let day of days) {
-    update(ref(database, `hours/${day}`), {day: day, start_hour: 11, start_minute: '00', end_hour: 8, end_minute: '00'})
-  }
-};
-
-function Hours() {
-  // firebase call for current hours / specific day hours here
-  SetDefaultHours()
-  // let dayHours: OpenHours[] = []
-  // for (let day of days) {
-  //   const dbRef = ref(database, `hours/${day}`)
-  //   onValue(dbRef, (snapshot) => {
-  //     dayHours.push(snapshot.val());
-  //     // console.log(snapshot.val())
-  //   });
-  // }
-
-  const dayHours = [
-    {day: 'Monday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Tuesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Wednesday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Thursday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Friday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Saturday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-    {day: 'Sunday', start_hour: 11, start_minute: 0, end_hour: 8, end_minute: 0},
-  ];
-
+function Hours(dayHours : Array<OpenHours>) {
+  // console.log('Entered Hours')
+  // console.log(dayHours[0].day)
   return (
-    <View style={styles.hours_container}>
-      {dayHours.map((item, index) => (
-        <View key={index} style={styles.day_margin}>
-          <Text style={styles.day_title}>{item.day}</Text>
-          <Text style={styles.hours}>{`${item.start_hour}:00AM - ${item.end_hour}:00PM`}</Text>
+    // <View style={[styles.containerParent, styles.hoursContainer]}>
+    <View style={styles.containerParent}>
+      {dayHours.map(item => (
+        <View key={item.day} style={styles.dayMargin}>
+          <Text style={[styles.parentText, styles.dayText]}>{item.day}</Text>
+          <Text style={[styles.parentText, styles.hoursText]}>{`${item.start_hour}:${item.start_minute}AM - ${item.end_hour}:${item.end_minute}PM`}</Text>
         </View>
       ))}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  address: {
-    fontFamily: 'Ubuntu',
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingTop: 50,
-  },
-  scroll_background: {
-    backgroundColor: 'rgb(135, 31, 31)',
-    marginBottom: 0,
-  },
-  header_title: {
-    fontFamily: 'Ubuntu',
-    color: 'white',
-    fontSize: 40,
-    fontWeight: 'bold',
-    paddingTop: StatusBar.currentHeight + 50,
-    textAlign: 'center',
-    // borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: 400,
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 3,
-    zIndex: 1,
-  },
-  hours_container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingBottom: 50,
-  },
-  title: {
-    fontFamily: 'Ubuntu',
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingBottom: 15,
-  },
-  day_margin: {
-    marginBottom: 2,
-  },
-  day_title: {
-    fontFamily: 'Ubuntu',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  hours: {
-    fontFamily: 'Ubuntu',
-    fontSize: 16,
-    fontWeight: 'normal',
-    textAlign: 'center',
-  },
-  separator: {
-    marginVertical: 5,
-    height: 2,
-    width: '80%',
-  },
-});
+
+
