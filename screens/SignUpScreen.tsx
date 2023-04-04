@@ -14,6 +14,7 @@ const SignUpScreen = () => {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation();
 
@@ -50,7 +51,9 @@ const SignUpScreen = () => {
       let name = firstName.trim().concat(' ', lastName.trim());
 
       // Call method to handle sign up and navigate back to account screen
+      setIsLoading(true);
       firebaseContext.signUp(email, password, name, phoneNumber).then(() => {
+        setIsLoading(false);
         navigation.goBack();
       })
     } catch (error: any) {
@@ -73,6 +76,9 @@ const SignUpScreen = () => {
     return /^\d{10}$/.test(phoneNumber);
   }
 
+  if (isLoading) {
+    return <View style={styles.container}><Text>Loading...</Text></View>
+  }
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
