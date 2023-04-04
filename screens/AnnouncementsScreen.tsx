@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import React from 'react';
 import {View, Image, Text, ScrollView,  } from 'react-native';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { database } from '../firebaseConfig';
 import { ref, get, onValue, push, update, remove, Query} from 'firebase/database';
 
@@ -32,7 +32,7 @@ const AnnouncementsScreen = () => {
    
 
   return (
-    <View style = {styles.background}>
+    <View style = {[styles.background, {height: (Dimensions.get('window').height)}]}>
       <View style = {styles.topBox}>
         <Text style = {[styles.topText, styles.shadow]}>Announcements</Text>
       </View>
@@ -47,16 +47,16 @@ const AnnouncementsScreen = () => {
           </Text>
         </View>
         ))}
-      <View style = {styles.bottomView}>
+        <View style = {styles.bottomView}>
 
-      </View>
+        </View>
       </ScrollView>
     </View>
   )}
 
   else {
     return(
-      <View style = {styles.background}>
+      <View style = {[styles.background, {height: Dimensions.get('window').height}]}>
         <View style = {styles.topBox}>
           <Text style = {[styles.topText, styles.shadow]}>Announcements</Text>
         </View>
@@ -66,9 +66,6 @@ const AnnouncementsScreen = () => {
               <Text style={[styles.text, styles.textboxShadow]}>
               There aren't currently any announcements. Check back later!
               </Text>
-          </View>
-          
-          <View style = {styles.bottomView}>
           </View>
         </ScrollView>
      </View>
@@ -139,7 +136,7 @@ const styles = StyleSheet.create({
   },
 
   bottomView: {
-    borderWidth: 250,
+    borderWidth: 50,
     borderColor: 'rgb(135, 31, 31)'
   },
 
