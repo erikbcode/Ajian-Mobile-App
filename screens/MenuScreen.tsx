@@ -16,7 +16,9 @@ export default function MenuScreen() {
 
   return (
     <ScrollView style={styles.scrollView}>
-      <Text style={[styles.textParent, styles.headerText]}>Menu</Text>
+      <Text style={[styles.textParent, styles.headerText, styles.shadow]}>
+        Menu
+      </Text>
       {/* <HorizontalBanner text='Menu' /> */}
       <Tabs />
       {/* <TabText /> */}

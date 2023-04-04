@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updateEmail} from 'firebase/auth';
 import { ref, update, get, set, child, remove} from 'firebase/database';
 import { auth, database } from '../firebaseConfig';
+import { encode } from 'base-64';
 
 const FirebaseContext = React.createContext();
 
@@ -34,17 +35,53 @@ export function FirebaseProvider({children}) {
                     const newUser = userCredential.user;
                     // Update auth profile information for name and phone
                     updateProfile(newUser, {displayName: name, phoneNumber: phoneNumber}).then(() => {
-                        // Set user data in local state
-                        setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email, phoneNumber: phoneNumber})
-                        // Set user data in users database
-                        const userRef = ref(database, `users/${newUser.uid}`)
-                        set(userRef, {
-                            fullName: name,
-                            rewardsPoints: 0,
-                            hasSignUpReward: true,
-                            userEmail: email,
-                            phoneNumber: phoneNumber
+                        // Check if user has signed up with this email or phone number before 
+                        const encodedEmail = encode(email);
+                        const usedEmailRef = ref(database, `usedEmails/${encodedEmail}`);
+                        const usedPhoneRef = ref(database, `usedPhones/${phoneNumber}`);
+                        get(usedEmailRef).then((snapshot) => {
+                            if (snapshot.exists()) {
+                                setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: false, userEmail: email, phoneNumber: phoneNumber})
+                                // Set user data in users database
+                                const userRef = ref(database, `users/${newUser.uid}`)
+                                set(userRef, {
+                                    fullName: name,
+                                    rewardsPoints: 0,
+                                    hasSignUpReward: false,
+                                    userEmail: email,
+                                    phoneNumber: phoneNumber
+                                })
+                            } else {
+                                get(usedPhoneRef).then((snapshot) => {
+                                    if (snapshot.exists()) {
+                                        setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: false, userEmail: email, phoneNumber: phoneNumber})
+                                        // Set user data in users database
+                                        const userRef = ref(database, `users/${newUser.uid}`)
+                                        set(userRef, {
+                                            fullName: name,
+                                            rewardsPoints: 0,
+                                            hasSignUpReward: false,
+                                            userEmail: email,
+                                            phoneNumber: phoneNumber
+                                        })
+                                    } else {
+                                        setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email, phoneNumber: phoneNumber})
+                                        // Set user data in users database
+                                        const userRef = ref(database, `users/${newUser.uid}`)
+                                        set(userRef, {
+                                            fullName: name,
+                                            rewardsPoints: 0,
+                                            hasSignUpReward: true,
+                                            userEmail: email,
+                                            phoneNumber: phoneNumber
+                                        })
+                                    }
+                                })
+                            }
                         }).then(() => {
+                            set(usedEmailRef, {email: email});
+                            set(usedPhoneRef, {phoneNumber: phoneNumber});
+
                             // Set user data in phoneNumbers database
                             const phoneUserRef = ref(database, `phoneNumbers/${phoneNumber}`)
                             set(phoneUserRef, { fullName: name, userEmail: email, userId: newUser.uid}).then(() => {
