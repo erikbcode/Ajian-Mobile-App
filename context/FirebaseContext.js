@@ -13,13 +13,13 @@ export function useFirebase() {
 }
 
 export function FirebaseProvider({children}) {
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null); // Firebase auth user object
     const [userData, setUserData] = useState(null); // Contains data for user in object format {fullName: string, rewardsPoints: int, hasSignUpReward: boolean, userEmail: string, phoneNumber: string}
 
     // Function to sign a user up. Calls firebase method to create auth user, and then uses this new user to update the database and local state data.
     async function signUp(email, password, name, phoneNumber) {
-
+        setIsLoading(true);
         email = email.toLowerCase();
 
         const phoneRef = ref(database, `phoneNumbers/${phoneNumber}`);
@@ -90,6 +90,7 @@ export function FirebaseProvider({children}) {
                         })
                     })
                 }).catch((error) => {
+                    setIsLoading(false);
                     console.log(error);
                     Alert.alert('Sign Up Failed', error.code);
                 });      
@@ -99,6 +100,7 @@ export function FirebaseProvider({children}) {
 
     // Function to log a user into the platform. Calls Firebase auth method to sign in, and then accesses the database to update client-side state data.
     function logIn(email, password) {
+        setIsLoading(true);
         return signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
             const loggedUser = userCredential.user; // Grab user credentials of the user that was just signed in
             setUser(loggedUser); // Set the current user state to the logged in user
@@ -110,11 +112,17 @@ export function FirebaseProvider({children}) {
                     console.log('No user data available.')
                 }
             })
+        }).catch((error) => {
+            setIsLoading(false);
+            console.log(error);
+            Alert.alert('Log In Failed', error.code);
         });
     }
 
     // Logs a user out by calling the appropriate Firebase auth method
     function logOut() {
+        setUserData(null);
+        setUser(null);
         return signOut(auth);
     }
 
@@ -151,6 +159,8 @@ export function FirebaseProvider({children}) {
                 console.log('User data deleted successfully');
                 // Finally, remove the user's authorization data
                 user.delete().then(() => {
+                    setUser(null);
+                    setUserData(null);
                     console.log('User account deleted successfully.');
                 })
             })
@@ -172,14 +182,17 @@ export function FirebaseProvider({children}) {
                 // User is signed out.
                 setUser(null);
             }
-            setLoading(false);
         })
 
         return unsubscribe;
     }, []);
 
+    useEffect(() => {
+        setIsLoading(false);
+    }, [userData])
+
     return (
-        <FirebaseContext.Provider value={{loading, user, setUser, userData, setUserData, signUp, logIn, logOut, resetPassword, redeemReward, deleteAccount, refreshUserData}}>
+        <FirebaseContext.Provider value={{ user, setUser, userData, setUserData, isLoading, signUp, logIn, logOut, resetPassword, redeemReward, deleteAccount, refreshUserData}}>
             {children}
         </FirebaseContext.Provider>
     )
