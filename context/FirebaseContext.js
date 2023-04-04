@@ -19,14 +19,12 @@ export function FirebaseProvider({children}) {
 
     // Function to sign a user up. Calls firebase method to create auth user, and then uses this new user to update the database and local state data.
     async function signUp(email, password, name, phoneNumber) {
-        setIsLoading(true);
         email = email.toLowerCase();
 
         const phoneRef = ref(database, `phoneNumbers/${phoneNumber}`);
         get(phoneRef).then((snapshot) => {
             // Phone number already in database, so cancel sign up
             if (snapshot.exists()) {
-                console.log(snapshot.val())
                 Alert.alert('Sign Up Failed', 'Please enter a valid 10-digit phone number that is not in use')
                 return;
             } else {
@@ -40,6 +38,7 @@ export function FirebaseProvider({children}) {
                         const usedEmailRef = ref(database, `usedEmails/${encodedEmail}`);
                         const usedPhoneRef = ref(database, `usedPhones/${phoneNumber}`);
                         get(usedEmailRef).then((snapshot) => {
+                            setIsLoading(true);
                             if (snapshot.exists()) {
                                 setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: false, userEmail: email, phoneNumber: phoneNumber})
                                 // Set user data in users database
@@ -100,13 +99,13 @@ export function FirebaseProvider({children}) {
 
     // Function to log a user into the platform. Calls Firebase auth method to sign in, and then accesses the database to update client-side state data.
     function logIn(email, password) {
-        setIsLoading(true);
         return signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
             const loggedUser = userCredential.user; // Grab user credentials of the user that was just signed in
             setUser(loggedUser); // Set the current user state to the logged in user
             const userDataRef = ref(database);
             get(child(userDataRef, `users/${loggedUser.uid}`)).then((snapshot) => {
                 if (snapshot.exists()) {
+                    setIsLoading(true);
                     setUserData(snapshot.val()); // Set current state data to the user's existing data in realtime database if it exists
                 } else {
                     console.log('No user data available.')
