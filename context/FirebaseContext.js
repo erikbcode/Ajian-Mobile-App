@@ -22,79 +22,73 @@ export function FirebaseProvider({children}) {
         email = email.toLowerCase();
 
         const phoneRef = ref(database, `phoneNumbers/${phoneNumber}`);
-        get(phoneRef).then((snapshot) => {
+        try {
+            const snapshot = await get(phoneRef);
             // Phone number already in database, so cancel sign up
             if (snapshot.exists()) {
                 Alert.alert('Sign Up Failed', 'Please enter a valid 10-digit phone number that is not in use')
                 return;
             } else {
                 // Create a new user with email and password
-                createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
-                    const newUser = userCredential.user;
-                    // Update auth profile information for name and phone
-                    updateProfile(newUser, {displayName: name, phoneNumber: phoneNumber}).then(() => {
-                        // Check if user has signed up with this email or phone number before 
-                        const encodedEmail = encode(email);
-                        const usedEmailRef = ref(database, `usedEmails/${encodedEmail}`);
-                        const usedPhoneRef = ref(database, `usedPhones/${phoneNumber}`);
-                        get(usedEmailRef).then((snapshot) => {
-                            setIsLoading(true);
-                            if (snapshot.exists()) {
-                                setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: false, userEmail: email, phoneNumber: phoneNumber})
-                                // Set user data in users database
-                                const userRef = ref(database, `users/${newUser.uid}`)
-                                set(userRef, {
-                                    fullName: name,
-                                    rewardsPoints: 0,
-                                    hasSignUpReward: false,
-                                    userEmail: email,
-                                    phoneNumber: phoneNumber
-                                })
-                            } else {
-                                get(usedPhoneRef).then((snapshot) => {
-                                    if (snapshot.exists()) {
-                                        setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: false, userEmail: email, phoneNumber: phoneNumber})
-                                        // Set user data in users database
-                                        const userRef = ref(database, `users/${newUser.uid}`)
-                                        set(userRef, {
-                                            fullName: name,
-                                            rewardsPoints: 0,
-                                            hasSignUpReward: false,
-                                            userEmail: email,
-                                            phoneNumber: phoneNumber
-                                        })
-                                    } else {
-                                        setUserData({fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email, phoneNumber: phoneNumber})
-                                        // Set user data in users database
-                                        const userRef = ref(database, `users/${newUser.uid}`)
-                                        set(userRef, {
-                                            fullName: name,
-                                            rewardsPoints: 0,
-                                            hasSignUpReward: true,
-                                            userEmail: email,
-                                            phoneNumber: phoneNumber
-                                        })
-                                    }
-                                })
-                            }
-                        }).then(() => {
-                            set(usedEmailRef, {email: email});
-                            set(usedPhoneRef, {phoneNumber: phoneNumber});
-
-                            // Set user data in phoneNumbers database
-                            const phoneUserRef = ref(database, `phoneNumbers/${phoneNumber}`)
-                            set(phoneUserRef, { fullName: name, userEmail: email, userId: newUser.uid}).then(() => {
-                                return(newUser);
-                            })
-                        })
-                    })
-                }).catch((error) => {
-                    setIsLoading(false);
-                    console.log(error);
-                    Alert.alert('Sign Up Failed', error.code);
-                });      
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const newUser = userCredential.user;
+                // Update auth profile information for name and phone
+                await updateProfile(newUser, { displayName: name, phoneNumber: phoneNumber });
+                // Check if user has signed up with this email or phone number before 
+                const encodedEmail = encode(email);
+                const usedEmailRef = ref(database, `usedEmails/${encodedEmail}`);
+                const usedPhoneRef = ref(database, `usedPhones/${phoneNumber}`);
+                const emailSnapshot = await get(usedEmailRef);
+                setIsLoading(true);
+                if (emailSnapshot.exists()) {
+                    setUserData({ fullName: name, rewardsPoints: 0, hasSignUpReward: false, userEmail: email, phoneNumber: phoneNumber })
+                    // Set user data in users database
+                    const userRef = ref(database, `users/${newUser.uid}`);
+                    await set(userRef, {
+                        fullName: name,
+                        rewardsPoints: 0,
+                        hasSignUpReward: false,
+                        userEmail: email,
+                        phoneNumber: phoneNumber
+                    });
+                } else {
+                    const phoneSnapshot = await get(usedPhoneRef);
+                    if (phoneSnapshot.exists()) {
+                        setUserData({ fullName: name, rewardsPoints: 0, hasSignUpReward: false, userEmail: email, phoneNumber: phoneNumber })
+                        // Set user data in users database
+                        const userRef = ref(database, `users/${newUser.uid}`);
+                        await set(userRef, {
+                            fullName: name,
+                            rewardsPoints: 0,
+                            hasSignUpReward: false,
+                            userEmail: email,
+                            phoneNumber: phoneNumber
+                        });
+                    } else {
+                        setUserData({ fullName: name, rewardsPoints: 0, hasSignUpReward: true, userEmail: email, phoneNumber: phoneNumber })
+                        // Set user data in users database
+                        const userRef = ref(database, `users/${newUser.uid}`);
+                        await set(userRef, {
+                            fullName: name,
+                            rewardsPoints: 0,
+                            hasSignUpReward: true,
+                            userEmail: email,
+                            phoneNumber: phoneNumber
+                        });
+                    }
+                }
+                await set(usedEmailRef, { email: email });
+                await set(usedPhoneRef, { phoneNumber: phoneNumber });
+                // Set user data in phoneNumbers database
+                const phoneUserRef = ref(database, `phoneNumbers/${phoneNumber}`);
+                await set(phoneUserRef, { fullName: name, userEmail: email, userId: newUser.uid });
+                return newUser;
             }
-        })
+        } catch (error) {
+            setIsLoading(false);
+            console.log(error);
+            Alert.alert('Sign Up Failed', error.code);
+        }
     }
 
     // Function to log a user into the platform. Calls Firebase auth method to sign in, and then accesses the database to update client-side state data.
