@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 40,
-    marginTop: StatusBar.currentHeight + 50,
+    marginTop: StatusBar.currentHeight ? StatusBar.currentHeight + 50 : 50,
     marginBottom: 400,
   },
   addressText: {

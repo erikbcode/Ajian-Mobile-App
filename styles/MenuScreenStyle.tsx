@@ -106,7 +106,7 @@ export const styles = StyleSheet.create({
       // color: 'white',
       fontWeight: 'bold',
       fontSize: 40,
-      paddingTop: StatusBar.currentHeight + 50,
+      paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 50 : 50,
       paddingBottom: 35,
     },
     shadow: {
