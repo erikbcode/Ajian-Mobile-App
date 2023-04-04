@@ -87,29 +87,43 @@ export function FirebaseProvider({children}) {
         } catch (error) {
             setIsLoading(false);
             console.log(error);
-            Alert.alert('Sign Up Failed', error.code);
+            if (error.code == 'auth/email-already-in-use') {
+                Alert.alert('Sign Up Failed', 'This email is already in use. Please enter a different email address.');
+            } else {
+                Alert.alert('Sign Up Failed', error.code);
+            }
         }
     }
 
     // Function to log a user into the platform. Calls Firebase auth method to sign in, and then accesses the database to update client-side state data.
-    function logIn(email, password) {
-        return signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+    async function logIn(email, password) {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const loggedUser = userCredential.user; // Grab user credentials of the user that was just signed in
             setUser(loggedUser); // Set the current user state to the logged in user
             const userDataRef = ref(database);
-            get(child(userDataRef, `users/${loggedUser.uid}`)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    setIsLoading(true);
-                    setUserData(snapshot.val()); // Set current state data to the user's existing data in realtime database if it exists
-                } else {
-                    console.log('No user data available.')
-                }
-            })
-        }).catch((error) => {
+            const snapshot = await get(child(userDataRef, `users/${loggedUser.uid}`));
+            if (snapshot.exists()) {
+                setIsLoading(true);
+                setUserData(snapshot.val()); // Set current state data to the user's existing data in realtime database if it exists
+            } else {
+                console.log('No user data available.')
+            }
+        } catch (error) {
             setIsLoading(false);
             console.log(error);
-            Alert.alert('Log In Failed', error.code);
-        });
+            if (error.code == 'auth/user-not-found') {
+                Alert.alert('Login Failed', 'Please enter a valid email/password combination');
+            } else if (error.code == 'auth/invalid-email') {
+                Alert.alert('Login Failed', 'Please enter a valid email/password combination');
+            } else if (error.code == 'auth/wrong-password') {
+                Alert.alert('Login Failed', 'Please enter a valid email/password combination');
+            } else if (error.code == 'auth/internal-error') {
+                Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
+            } else {
+                Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
+            }
+        }
     }
 
     // Logs a user out by calling the appropriate Firebase auth method
@@ -141,23 +155,26 @@ export function FirebaseProvider({children}) {
     }
 
     // Effectively deletes a user's account by removing their data in the users database, then their authorization data, and then their data in the phoneNumbers database
-    function deleteAccount() {
-        // First remove data from the phoneNumbers database
-        const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
-        remove(phoneRef).then(() => {
+    async function deleteAccount() {
+        try {
+            // First remove data from the phoneNumbers database
+            const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
+            await remove(phoneRef);
             console.log('Phone number deleted successfully.');
+        
             // Then remove data from the users database
-            const userRef = ref(database, `users/${user.uid}`)
-            remove(userRef).then(() => {
-                console.log('User data deleted successfully');
-                // Finally, remove the user's authorization data
-                user.delete().then(() => {
-                    setUser(null);
-                    setUserData(null);
-                    console.log('User account deleted successfully.');
-                })
-            })
-        })
+            const userRef = ref(database, `users/${user.uid}`);
+            await remove(userRef);
+            console.log('User data deleted successfully.');
+        
+            // Finally, remove the user's authorization data
+            await user.delete();
+            setUser(null);
+            setUserData(null);
+            console.log('User account deleted successfully.');
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     // Refresh local state for user data using info passed in
