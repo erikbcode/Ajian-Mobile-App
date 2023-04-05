@@ -12,6 +12,9 @@ export function useFirebase() {
     return useContext(FirebaseContext);
 }
 
+/* FirebaseProvider provides functions that interact with the Firebase auth and realtime database services directly.
+    It also provides the current user and user data state to the rest of the app.
+     */
 export function FirebaseProvider({children}) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null); // Firebase auth user object
@@ -134,8 +137,21 @@ export function FirebaseProvider({children}) {
     }
 
     // Sends a password reset email to the specified email address
-    function resetPassword(email) {
-        return sendPasswordResetEmail(auth, email);
+    async function resetPassword(email) {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            Alert.alert('Password Reset Email Sent', 'Please check your email for a password reset link');
+        } catch (error) {
+            if (error.code == 'auth/missing-email') {
+                Alert.alert('Password Reset Failed', 'Please enter a valid email associated with an Ajian account');
+            } else if (error.code == 'auth/invalid-email') {
+                Alert.alert('Password Reset Failed', 'Please enter a valid email associated with an Ajian account');
+            } else if (error.code == 'auth/user-not-found') {
+                Alert.alert('Password Reset Failed', 'Please enter a valid email associated with an Ajian account');
+            } else {
+                Alert.alert('Password Reset Failed', 'Please try again later');
+            }
+        }
     }
 
     // Redeems a user's sign-up reward by updating their database field to false 
