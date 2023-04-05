@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { Alert } from 'react-native';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updateEmail} from 'firebase/auth';
-import { ref, update, get, set, child, remove} from 'firebase/database';
+import { ref, get, set, child, remove} from 'firebase/database';
 import { auth, database } from '../firebaseConfig';
 import { encode } from 'base-64';
 
@@ -12,15 +12,16 @@ export function useFirebase() {
     return useContext(FirebaseContext);
 }
 
-/* FirebaseProvider provides functions that interact with the Firebase auth and realtime database services directly.
-    It also provides the current user and user data state to the rest of the app.
-     */
+/*  FirebaseProvider provides functions that interact with the Firebase auth and realtime database services directly.
+    It also provides the current user, userData, and isLoading state to the rest of the app. */
 export function FirebaseProvider({children}) {
     const [isLoading, setIsLoading] = useState(false);
     const [user, setUser] = useState(null); // Firebase auth user object
     const [userData, setUserData] = useState(null); // Contains data for user in object format {fullName: string, rewardsPoints: int, hasSignUpReward: boolean, userEmail: string, phoneNumber: string}
 
-    // Function to sign a user up. Calls firebase method to create auth user, and then uses this new user to update the database and local state data.
+    /**
+     * Function for signing up a new user with Firebase Authentication and updating the realtime database with their information
+     */
     async function signUp(email, password, name, phoneNumber) {
         email = email.toLowerCase();
 
@@ -98,7 +99,9 @@ export function FirebaseProvider({children}) {
         }
     }
 
-    // Function to log a user into the platform. Calls Firebase auth method to sign in, and then accesses the database to update client-side state data.
+    /**
+     * Function for logging in a user with Firebase Authentication and updating the current user and userData state
+     */
     async function logIn(email, password) {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -129,14 +132,23 @@ export function FirebaseProvider({children}) {
         }
     }
 
-    // Logs a user out by calling the appropriate Firebase auth method
-    function logOut() {
-        setUserData(null);
-        setUser(null);
-        return signOut(auth);
+    /**
+     * Function for logging out a user with Firebase Authentication and updating the current user and userData state  
+     */
+    async function logOut() {
+        try {
+            await signOut(auth);
+            setUser(null);
+            setUserData(null);  
+        } catch (error) {
+            Alert.alert("Couldn't Log Out", 'Please try again later');
+            console.log(error.code);
+        }
     }
 
-    // Sends a password reset email to the specified email address
+    /**
+     * Function for sending a password reset email to a user's email address with Firebase Authentication
+     */
     async function resetPassword(email) {
         try {
             await sendPasswordResetEmail(auth, email);
@@ -154,25 +166,12 @@ export function FirebaseProvider({children}) {
         }
     }
 
-    // Redeems a user's sign-up reward by updating their database field to false 
-    function redeemReward() {
-        // Update database to reflect that the reward has been used
-        if (user) {
-            // Update the reward status in realtime database
-            update(ref(database, `users/${user.uid}`), {
-                hasSignUpReward: false
-            });
-            // Update the reward status in local state
-            setUserData({
-                ...userData, // spready operator to copy all existing userData fields
-                hasSignUpReward: false
-            });
-        }
-    }
-
-    // Effectively deletes a user's account by removing their data in the users database, then their authorization data, and then their data in the phoneNumbers database
+    /**
+     * Function for deleting a user's account and all data associated with it with Firebase Authencation and realtime database
+     */
     async function deleteAccount() {
         try {
+            setIsLoading(true);
             // First remove data from the phoneNumbers database
             const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
             await remove(phoneRef);
@@ -189,16 +188,12 @@ export function FirebaseProvider({children}) {
             setUserData(null);
             console.log('User account deleted successfully.');
         } catch (error) {
+            Alert.alert('Account Deletion Failed', 'Please try again later', error.code);
             console.log(error);
         }
     }
-
-    // Refresh local state for user data using info passed in
-    function refreshUserData(fullName, rewardsPoints, hasSignUpReward, userEmail, phoneNumber) {
-        setUserData({fullName: fullName, rewardsPoints: rewardsPoints, hasSignUpReward: hasSignUpReward, userEmail: userEmail, phoneNumber: phoneNumber});
-    }
     
-    // Event listener to check for change in user state
+    // Listens for change in user state
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             if (authUser) {
@@ -213,12 +208,13 @@ export function FirebaseProvider({children}) {
         return unsubscribe;
     }, []);
 
+    // Listens for a change in user data state, and setIsLoading to false when this data finishes updating
     useEffect(() => {
         setIsLoading(false);
     }, [userData])
 
     return (
-        <FirebaseContext.Provider value={{ user, setUser, userData, setUserData, isLoading, signUp, logIn, logOut, resetPassword, redeemReward, deleteAccount, refreshUserData}}>
+        <FirebaseContext.Provider value={{ database, user, setUser, userData, setUserData, isLoading, setIsLoading, signUp, logIn, logOut, resetPassword, deleteAccount}}>
             {children}
         </FirebaseContext.Provider>
     )
