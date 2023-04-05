@@ -3,9 +3,10 @@ import { View, TextInput, Text, Alert, Pressable, TouchableWithoutFeedback, Keyb
 import { useNavigation, useIsFocused} from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
+import { update, ref } from 'firebase/database';
 
 const AccountScreen = () => {
-  const { user, userData, logIn, logOut, redeemReward, deleteAccount, isLoading} = useFirebase();
+  const { user, userData, setUserData, database, logIn, logOut, deleteAccount, isLoading, setIsLoading} = useFirebase();
   const accountStyles = useAccountStyles();
 
   const [email, setEmail] = useState('');
@@ -20,29 +21,32 @@ const AccountScreen = () => {
   async function handleSignIn() {
     try {
       await logIn(email, password);
-      setEmail('')
-      setPassword('')
     } catch (error) {
       console.log('Error when signing up:', error);
+    } finally {
+      setEmail('');
+      setPassword('');
     }
   };
 
-  // Function for handling user sign-out with Firebase Authentication
-  const handleSignOut = async () => {
-    try {
-      await logOut();
-    } catch (error) {
-      Alert.alert('Failed to log out', 'Error when logging out. Please try again.');
-      console.log(error);
-    }
-  }
 
-  // Function to update the user's data in the realtime db upon confirmation of redemption
-  const handleConfirmRedeem = () => {
+  // Redeems a user's sign-up reward by updating their database field to false 
+  const redeemReward = async () => {
     // Update database to reflect that the reward has been used
-    redeemReward();
+    if (user) {
+        // Update the reward status in realtime database
+        await update(ref(database, `users/${user.uid}`), {
+            hasSignUpReward: false
+        });
+        // Update the reward status in local state
+        setIsLoading(true);
+        setUserData({
+            ...userData, // spready operator to copy all existing userData fields
+            hasSignUpReward: false
+        });
+    }
     setShowRedeemConfirmation(false);
-  };
+  }
 
   // Wrapper function to delete a user's account and info associated with it 
   const handleConfirmDelete = () => {
@@ -83,7 +87,7 @@ const AccountScreen = () => {
             <Pressable style={({pressed}) => [
                 pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
               ]}
-                onPress={handleConfirmRedeem}>
+                onPress={redeemReward}>
               {({pressed}) => (
                   <Text style={accountStyles.altButtonText}>Confirm</Text>
               )}
@@ -138,7 +142,7 @@ const AccountScreen = () => {
         <Pressable style={({pressed}) => [
               pressed ? [accountStyles.transparentButton, accountStyles.shadow, accountStyles.transparentButtonPressed] : [accountStyles.transparentButton, accountStyles.shadow],
           ]}
-          onPress={handleSignOut}>
+          onPress={() => logOut}>
           {({pressed}) => (
               <Text style={accountStyles.transparentText}>Log Out</Text>
           )}
