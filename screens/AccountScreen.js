@@ -24,18 +24,7 @@ const AccountScreen = () => {
       setEmail('')
       setPassword('')
     } catch (error) {
-      console.log(error);
-      if (error.code == 'auth/user-not-found') {
-        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
-      } else if (error.code == 'auth/invalid-email') {
-        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
-      } else if (error.code == 'auth/wrong-password') {
-        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
-      } else if (error.code == 'auth/internal-error') {
-        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
-      } else {
-        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
-      }
+      console.log('Error when signing up:', error);
     }
   };
 
@@ -99,7 +88,6 @@ const AccountScreen = () => {
       </View>
     )
   }
-
   // If a user is logged in, display account info. Otherwise, display sign-in/sign-up
   if (user) {
     return (
