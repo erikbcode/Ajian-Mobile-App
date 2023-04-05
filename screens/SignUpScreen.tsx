@@ -52,10 +52,9 @@ const SignUpScreen = () => {
 
       // Call method to handle sign up and navigate back to account screen
       setIsLoading(true);
-      firebaseContext.signUp(email, password, name, phoneNumber).then(() => {
-        setIsLoading(false);
-        navigation.goBack();
-      })
+      await firebaseContext.signUp(email, password, name, phoneNumber);
+      setIsLoading(false);
+      navigation.goBack();
     } catch (error: any) {
         Alert.alert('Sign Up Failed', 'Sign up failed. Please enter valid info and try again.')
     }
@@ -77,7 +76,11 @@ const SignUpScreen = () => {
   }
 
   if (isLoading) {
-    return <View style={styles.container}><Text>Loading...</Text></View>
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.titleText]}>Loading...</Text>
+      </View>
+    );
   }
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
