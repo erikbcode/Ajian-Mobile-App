@@ -7,7 +7,6 @@ import { useAccountStyles } from '../styles/AccountScreenStyles';
 const AccountScreen = () => {
   const { user, userData, logIn, logOut, redeemReward, deleteAccount, isLoading} = useFirebase();
   const accountStyles = useAccountStyles();
-  const isFocused = useIsFocused();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,36 +37,12 @@ const AccountScreen = () => {
     }
   }
 
-  // Sign-up handler for AccountScreen takes the user to the SignUpScreen.
-  const handleSignUp = () => {
-    navigation.navigate('SignUp');
-  };
-  
-  // Navigate to the password reset screen
-  const handlePasswordReset = () => {
-    navigation.navigate('PasswordReset');
-  };
-
-  const handleUpdateAccountNavigate = () => {
-    navigation.navigate('UpdateAccount');
-  }
-
-  // When reward is redeemed, show the confirmation modal
-  const handleRedeemReward = () => {
-    setShowRedeemConfirmation(true);
-  };
-
   // Function to update the user's data in the realtime db upon confirmation of redemption
   const handleConfirmRedeem = () => {
     // Update database to reflect that the reward has been used
     redeemReward();
     setShowRedeemConfirmation(false);
   };
-
-  // Function to toggle confirmation for user account deletion
-  const handleDeleteAccount = () => {
-    setShowDeleteConfirmation(true);
-  }
 
   // Wrapper function to delete a user's account and info associated with it 
   const handleConfirmDelete = () => {
@@ -98,7 +73,7 @@ const AccountScreen = () => {
           <Pressable style={({pressed}) => [
             pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleRedeemReward}>
+          onPress={() => setShowRedeemConfirmation(true)}>
           <Text style={accountStyles.text}>Redeem your free roll!</Text>
           </Pressable>
         )}
@@ -147,7 +122,7 @@ const AccountScreen = () => {
         <Pressable style={({pressed}) => [
               pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleUpdateAccountNavigate}>
+          onPress={() => navigation.navigate('UpdateAccount')}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Update Account Information</Text>
           )}
@@ -155,7 +130,7 @@ const AccountScreen = () => {
         <Pressable style={({pressed}) => [
               pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleDeleteAccount}>
+          onPress={() => setShowDeleteConfirmation(true)}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Delete Account</Text>
           )}
@@ -202,7 +177,7 @@ const AccountScreen = () => {
             <Pressable style={({pressed}) => [
                 pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
             ]}
-            onPress={handlePasswordReset}>
+            onPress={() => navigation.navigate('PasswordReset')}>
             {({pressed}) => (
                 <Text style={accountStyles.altButtonText}>Reset Password</Text>
             )}
@@ -213,7 +188,7 @@ const AccountScreen = () => {
             <Pressable style={({pressed}) => [
                 pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
             ]}
-            onPress={handleSignUp}>
+            onPress={() => navigation.navigate('SignUp')}>
             {({pressed}) => (
                 <Text style={accountStyles.text}>Create an Account</Text>
             )}
