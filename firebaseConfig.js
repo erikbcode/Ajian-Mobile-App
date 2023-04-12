@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { initializeAuth } from "firebase/auth";
+import { initializeAuth, PhoneAuthProvider } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE_PROJECT_ID, FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID, FIREBASE_MEASUREMENT_ID } from '@env';
 
@@ -10,7 +10,7 @@ import { FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_DATABASE_URL, FIREBASE
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
   authDomain: FIREBASE_AUTH_DOMAIN,
   databaseURL: FIREBASE_DATABASE_URL,
@@ -21,7 +21,8 @@ const firebaseConfig = {
   measurementId: FIREBASE_MEASUREMENT_ID
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 export const auth = initializeAuth(app);
-export const database = getDatabase(app)
+export const phoneProvider = new PhoneAuthProvider(auth);
+export const database = getDatabase(app);
