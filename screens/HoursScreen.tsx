@@ -1,10 +1,11 @@
-import {  ScrollView } from 'react-native';
+import {  ScrollView, Platform, Linking, Button, Alert, StyleSheet } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Map from '../components/Map'
 // import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import MobileOrderButton from '../components/MobileOrderButton';
+import MapOpenButton from '../components/MapOpenButton';
 import { database } from '../firebaseConfig';
 import { onValue, ref, get } from 'firebase/database';
 import { styles } from '../styles/HoursScreenStyle';
@@ -60,8 +61,10 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
         <Text style={[styles.parentText, styles.addressText]}>
           1914 University Blvd, {'\n'}
           Tuscaloosa, AL 35401 {'\n'}
-          205-331-4542
+          205-331-4542 {'\n'}
         </Text>  
+        {/* {OpenMaps(33.21192, -87.56202, 'Ajian Sushi')} */}
+        {MapOpenButton(33.21192, -87.56202, 'Ajian Sushi')}
       </Text>
       
       <View style={[styles.containerParent, styles.dayContainer]}>
@@ -73,6 +76,8 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
     </ScrollView>
   );
 }
+
+
 
 function Hours(dayHours : Array<OpenHours>) {
   // console.log('Entered Hours')
