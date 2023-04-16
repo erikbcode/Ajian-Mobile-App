@@ -10,7 +10,7 @@ function getSocialURL(which: string) {
     }
 
     else if (which == "insta") {
-        const url = `https://www.instagram.com/ajiansush`;
+        const url = `https://www.instagram.com/ajiansushi`;
 
         return url
     }
@@ -37,7 +37,7 @@ export default function SocialOpenButton(which: string) {
           }
           onPress={socialURL}
         >
-          {({pressed}) => <Text style={styles.text}>Open in Maps</Text>}
+          {({pressed}) => <Text style={styles.text}>Follow us on {which}!</Text>}
         </Pressable>
       );
 }
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     generalStructure: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 5,
+        paddingVertical: 2,
         paddingHorizontal: 32,
         borderRadius: 35,
         elevation: 3,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgb(145, 145, 145)',
     },
     text: {
-        fontSize: 16,
+        fontSize: 10,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,

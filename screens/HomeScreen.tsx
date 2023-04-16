@@ -43,7 +43,9 @@ const HomeScreen = () => {
       >
         <View style={styles.shadow}>
           <Text style={styles.welcomeText}>Ajian</Text>
+          {SocialOpenButton("twitter")}
           {SocialOpenButton("insta")}
+
         </View>
       </Animated.View>
       <Animated.View 
