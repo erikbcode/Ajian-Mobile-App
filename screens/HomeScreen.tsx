@@ -2,6 +2,8 @@ import {useState, useEffect, useContext } from 'react';
 import React from 'react';
 import { View, Image, Text, Animated } from 'react-native';
 import MobileOrderButton from '../components/MobileOrderButton';
+import SocialOpenButton from '../components/SocialOpenButton';
+
 import { useHomeStyles } from '../styles/HomeScreenStyles';
 
 const HomeScreen = () => {
@@ -41,6 +43,7 @@ const HomeScreen = () => {
       >
         <View style={styles.shadow}>
           <Text style={styles.welcomeText}>Ajian</Text>
+          {SocialOpenButton("insta")}
         </View>
       </Animated.View>
       <Animated.View 
