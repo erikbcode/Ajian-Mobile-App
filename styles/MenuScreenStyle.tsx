@@ -102,45 +102,33 @@ export const styles = StyleSheet.create({
       paddingBottom: 10,
     },
     headerText: {
-      // fontFamily: 'Ubuntu',
-      // color: 'white',
       fontWeight: 'bold',
       fontSize: 40,
       paddingTop: StatusBar.currentHeight + 50,
       paddingBottom: 35,
     },
-    shadow: {
-      shadowOffset: { width: -2, height: 5 },
-      shadowColor: 'black',
-      shadowOpacity: 0.5,
-      elevation: 3,
-      // background color must be set
-      backgroundColor : "#0000" // invisible color
-    },
+    // shadow: {
+    //   shadowOffset: { width: -2, height: 5 },
+    //   shadowColor: 'black',
+    //   shadowOpacity: 0.5,
+    //   elevation: 3,
+    //   // background color must be set
+    //   backgroundColor : "#0000" // invisible color
+    // },
     menuTitle: {
       fontWeight: 'bold',
       fontSize: 24,
       paddingBottom: 10,
     },
     itemItemText: {
-      // fontFamily: 'Ubuntu',
-      // margin: 'auto',
-      // fontSize: 18,
       fontWeight: 'bold',
       textAlign: 'center',
     },
     itemDescriptionText: {
-      // fontFamily: 'Ubuntu',
-      // margin: 'auto',
-      // fontWeight: 'normal',
-      // textAlign: 'center',
       fontSize: 12,
       maxWidth: 300,
     },
     itemPriceText: {
-      // fontFamily: 'Ubuntu',
-      // margin: 'auto',
-      // textAlign: 'center',
       fontWeight: 'bold',
       fontSize: 12,
     },
