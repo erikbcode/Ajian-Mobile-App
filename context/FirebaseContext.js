@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { Alert } from 'react-native';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, updateEmail} from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile } from 'firebase/auth';
 import { ref, get, set, child, remove} from 'firebase/database';
 import { auth, database } from '../firebaseConfig';
 import { encode } from 'base-64';
@@ -36,8 +36,10 @@ export function FirebaseProvider({children}) {
                 // Create a new user with email and password
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const newUser = userCredential.user;
+
                 // Update auth profile information for name and phone
                 await updateProfile(newUser, { displayName: name, phoneNumber: phoneNumber });
+                
                 // Check if user has signed up with this email or phone number before 
                 const encodedEmail = encode(email);
                 const usedEmailRef = ref(database, `usedEmails/${encodedEmail}`);
@@ -94,7 +96,7 @@ export function FirebaseProvider({children}) {
             if (error.code == 'auth/email-already-in-use') {
                 Alert.alert('Sign Up Failed', 'This email is already in use. Please enter a different email address.');
             } else {
-                Alert.alert('Sign Up Failed', error.code);
+                Alert.alert('Sign Up Failed', error.message);
             }
         }
     }
