@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, TextInput, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
+import { View, TextInput, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
@@ -21,18 +21,21 @@ const SignUpScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [code, setCode] = useState('');
   const [verificationId, setVerificationId] = useState(null);
+  const [verificiationSent, setVerificationSent] = useState(false);
   const recaptchaVerifier = useRef(null);
 
   const navigation = useNavigation();
 
-  const sendVerification = () => {
+  const sendVerification = async () => {
     try {
       if (!validatePhoneNumber(phoneNumber)) {
-        Alert.alert('Could Not Send Verification', 'Please enter a valid 10-digit phone number');
+        Alert.alert('Could Not Send Verification', 'Please enter a valid 10-digit phone number that is not in use.');
         return;
       }
 
-      phoneProvider.verifyPhoneNumber('+1'.concat(phoneNumber), recaptchaVerifier.current).then(setVerificationId);
+      const verId = await phoneProvider.verifyPhoneNumber('+1'.concat(phoneNumber), recaptchaVerifier.current)
+      setVerificationId(verId);
+      setVerificationSent(true);  
     } catch (error) {
       Alert.alert('failed', error.message);
       console.log(error.message);
@@ -55,6 +58,7 @@ const SignUpScreen = () => {
       console.log(error.code);
     }
   }
+
 
   // Async function to sign a user in. Checks for valid input formats and then creates calls FirebaseContext method to attempt to sign up user.
   async function handleSignUp() {
@@ -120,96 +124,118 @@ const SignUpScreen = () => {
       </View>
     );
   }
-  return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-            <FirebaseRecaptchaVerifierModal 
+  if (verificiationSent) {
+    return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+              <FirebaseRecaptchaVerifierModal 
                 ref={recaptchaVerifier}
                 firebaseConfig={firebaseConfig}
               />
-            <Text style={[styles.titleText, styles.shadow]}>Create an Account</Text>
-            <View style={styles.signUpContainer}>
-                <TextInput
-                    style={styles.longInput}
-                    placeholder="Phone Number (10 digits)"
-                    placeholderTextColor="grey" 
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
-                />
-                <Pressable style={({pressed}) => [
-                pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
-                ]}
-                onPress={sendVerification}>
-                {({pressed}) => (
-                    <Text style={styles.text}>Send Verification Code</Text>
-                )}
-                </Pressable>
-                <View style={styles.sideBySide}>
-                    <TextInput
-                        style={styles.shortInput}
-                        placeholder="First name"
-                        placeholderTextColor="grey" 
-                        value={firstName}
-                        onChangeText={setFirstName}
-                    />
-                    <TextInput
-                        style={styles.shortInput}
-                        placeholder="Last name"
-                        placeholderTextColor="grey" 
-                        value={lastName}
-                        onChangeText={setLastName}
-                    />
-                </View>
-                <TextInput
-                    style={styles.longInput}
-                    placeholder="Email"
-                    placeholderTextColor="grey" 
-                    value={email}
-                    onChangeText={setEmail}
-                />
-                <TextInput
-                    style={styles.longInput}
-                    placeholder="Text Verification Code"
-                    placeholderTextColor="grey" 
-                    value={code}
-                    onChangeText={setCode}
-                />
-                <TextInput
-                    style={styles.longInput}
-                    placeholder="Password"
-                    placeholderTextColor="grey"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
-                <TextInput
-                    style={styles.longInput}
-                    placeholder="Confirm Password"
-                    placeholderTextColor="grey"
-                    value={passwordConfirm}
-                    onChangeText={setPasswordConfirm}
-                    secureTextEntry
-                />
-                <Pressable style={({pressed}) => [
-                  pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
-                  ]}
-                  onPress={confirmCode}>
-                  {({pressed}) => (
-                      <Text style={styles.text}>Create Account</Text>
-                  )}
-                </Pressable>
-        </View>
+              <Text style={[styles.titleText, styles.shadow]}>Create an Account</Text>
+              <View style={styles.signUpContainer}>
+                  <View style={styles.sideBySide}>
+                      <TextInput
+                          style={styles.shortInput}
+                          placeholder="First name"
+                          placeholderTextColor="grey" 
+                          value={firstName}
+                          onChangeText={setFirstName}
+                      />
+                      <TextInput
+                          style={styles.shortInput}
+                          placeholder="Last name"
+                          placeholderTextColor="grey" 
+                          value={lastName}
+                          onChangeText={setLastName}
+                      />
+                  </View>
+                  <TextInput
+                      style={styles.longInput}
+                      placeholder="Email"
+                      placeholderTextColor="grey" 
+                      value={email}
+                      onChangeText={setEmail}
+                  />
+                  <TextInput
+                      style={styles.longInput}
+                      placeholder="Text Verification Code"
+                      placeholderTextColor="grey" 
+                      value={code}
+                      onChangeText={setCode}
+                  />
+                  <TextInput
+                      style={styles.longInput}
+                      placeholder="Password"
+                      placeholderTextColor="grey"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry
+                  />
+                  <TextInput
+                      style={styles.longInput}
+                      placeholder="Confirm Password"
+                      placeholderTextColor="grey"
+                      value={passwordConfirm}
+                      onChangeText={setPasswordConfirm}
+                      secureTextEntry
+                  />
+                  <Pressable style={({pressed}) => [
+                    pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
+                    ]}
+                    onPress={confirmCode}>
+                    {({pressed}) => (
+                        <Text style={styles.text}>Create Account</Text>
+                    )}
+                  </Pressable>
+          </View>
+          <Pressable style={({pressed}) => [
+              pressed ? [styles.shadow, styles.altButton, styles.buttonPressed] : [styles.shadow, styles.altButton, styles.buttonUnpressed],
+              ]}
+              onPress={() => navigation.goBack()}>
+              {({pressed}) => (
+                  <Text style={styles.altButtonText}>Back to Sign In</Text>
+              )}
+          </Pressable>
+          </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+  return (
+    <View style={styles.container}>
+      <Text style={styles.bodyText}>Enter your phone number to receive a verification code</Text>
+      <View style={styles.signUpContainer}>
+        <FirebaseRecaptchaVerifierModal 
+          ref={recaptchaVerifier}
+          firebaseConfig={firebaseConfig}
+        />
+        <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            placeholderTextColor="grey" 
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+        />
         <Pressable style={({pressed}) => [
-            pressed ? [styles.shadow, styles.altButton, styles.buttonPressed] : [styles.shadow, styles.altButton, styles.buttonUnpressed],
-            ]}
-            onPress={() => navigation.goBack()}>
-            {({pressed}) => (
-                <Text style={styles.altButtonText}>Back to Sign In</Text>
-            )}
+          pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
+          ]}
+          onPress={sendVerification}>
+          {({pressed}) => (
+              <Text style={styles.altButtonText}>Send Verification Code</Text>
+          )}
         </Pressable>
-        </View>
-    </TouchableWithoutFeedback>
+        <Pressable style={({pressed}) => [
+          pressed ? [styles.shadow, styles.altButton, styles.buttonPressed] : [styles.shadow, styles.altButton, styles.buttonUnpressed],
+          ]}
+          onPress={() => navigation.goBack()}>
+          {({pressed}) => (
+              <Text style={styles.altButtonText}>Back to Sign In</Text>
+          )}
+        </Pressable>
+      </View>
+    </View>
   );
+  
 };
 
 export default SignUpScreen;
