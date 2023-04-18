@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Button, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, TextInput, Alert, Pressable, Text, Keyboard, TouchableWithoutFeedback} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
+import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
+import { firebaseConfig, phoneProvider, auth } from '../firebaseConfig';
+import { signInWithCredential, PhoneAuthProvider } from 'firebase/auth';
 
 const SignUpScreen = () => {
+
   const firebaseContext = useFirebase();
   const styles = useAccountStyles();
 
@@ -15,8 +19,42 @@ const SignUpScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState('');
+  const [verificationId, setVerificationId] = useState(null);
+  const recaptchaVerifier = useRef(null);
 
   const navigation = useNavigation();
+
+  const sendVerification = () => {
+    try {
+      if (!validatePhoneNumber(phoneNumber)) {
+        Alert.alert('Could Not Send Verification', 'Please enter a valid 10-digit phone number');
+        return;
+      }
+
+      phoneProvider.verifyPhoneNumber('+1'.concat(phoneNumber), recaptchaVerifier.current).then(setVerificationId);
+    } catch (error) {
+      Alert.alert('failed', error.message);
+      console.log(error.message);
+      console.log(error.code);
+    }
+  }
+
+  const confirmCode = async () => {
+    try {
+      const credential = PhoneAuthProvider.credential(verificationId, code);
+
+      await signInWithCredential(auth, credential);
+      setCode('');
+      const currentPhoneUser = auth.currentUser;
+      await currentPhoneUser.delete(); // Delete the phone number account that was created, it won't be used. 
+      handleSignUp();
+    } catch (error) {
+      Alert.alert('Invalid code', 'Please enter a valid code from the text you received.');
+      console.log(error.message);
+      console.log(error.code);
+    }
+  }
 
   // Async function to sign a user in. Checks for valid input formats and then creates calls FirebaseContext method to attempt to sign up user.
   async function handleSignUp() {
@@ -55,19 +93,19 @@ const SignUpScreen = () => {
       await firebaseContext.signUp(email, password, name, phoneNumber);
       setIsLoading(false);
       navigation.goBack();
-    } catch (error: any) {
+    } catch (error) {
         Alert.alert('Sign Up Failed', 'Sign up failed. Please enter valid info and try again.')
     }
   };
 
   // Function to validate email (Contains valid @ and .X format)
-  const validateEmail = (email: string) => {
+  const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email.toLowerCase());
   }
 
   // Function to validate phone number (exists and is 10 digits)
-  const validatePhoneNumber = (phoneNumber: string) => {
+  const validatePhoneNumber = (phoneNumber) => {
     if (!phoneNumber || phoneNumber.length == 0) {
       return false;
     }
@@ -85,8 +123,27 @@ const SignUpScreen = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
+            <FirebaseRecaptchaVerifierModal 
+                ref={recaptchaVerifier}
+                firebaseConfig={firebaseConfig}
+              />
             <Text style={[styles.titleText, styles.shadow]}>Create an Account</Text>
             <View style={styles.signUpContainer}>
+                <TextInput
+                    style={styles.longInput}
+                    placeholder="Phone Number (10 digits)"
+                    placeholderTextColor="grey" 
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                />
+                <Pressable style={({pressed}) => [
+                pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
+                ]}
+                onPress={sendVerification}>
+                {({pressed}) => (
+                    <Text style={styles.text}>Send Verification Code</Text>
+                )}
+                </Pressable>
                 <View style={styles.sideBySide}>
                     <TextInput
                         style={styles.shortInput}
@@ -112,11 +169,10 @@ const SignUpScreen = () => {
                 />
                 <TextInput
                     style={styles.longInput}
-                    placeholder="Phone Number"
-                    keyboardType="phone-pad"
+                    placeholder="Text Verification Code"
                     placeholderTextColor="grey" 
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
+                    value={code}
+                    onChangeText={setCode}
                 />
                 <TextInput
                     style={styles.longInput}
@@ -135,12 +191,12 @@ const SignUpScreen = () => {
                     secureTextEntry
                 />
                 <Pressable style={({pressed}) => [
-                pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
-                ]}
-                onPress={handleSignUp}>
-                {({pressed}) => (
-                    <Text style={styles.text}>Create Account</Text>
-                )}
+                  pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
+                  ]}
+                  onPress={confirmCode}>
+                  {({pressed}) => (
+                      <Text style={styles.text}>Create Account</Text>
+                  )}
                 </Pressable>
         </View>
         <Pressable style={({pressed}) => [
