@@ -115,17 +115,17 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
   };
 
   // Component that displays a modal to update the user's phone number
-  const UpdatePhoneModal = ({ onClose, currentPhone, updatePhone}) => {
+  const UpdatePhoneModal = ({ onClose, updatePhone, oldPhone}) => {
     const accountStyles = useAccountStyles();
 
-    const [phone, setPhone] = useState(currentPhone);
+    const [phone, setPhone] = useState(oldPhone);
     
     onSubmit = async () => {
       if (phone.length != 10) {
         Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number');
         onClose();
       } else {
-        await updatePhone(phone, currentPhone);
+        await updatePhone(phone, oldPhone);
         onClose();
       }
     }
@@ -225,6 +225,11 @@ const UpdateAccountScreen = () => {
           await set(phoneRef, { fullName: fullName, userEmail: userData.userEmail, userId: user.uid });
           setFirstName(firstName);
           setLastName(lastName);
+
+          setUserData({
+            ...userData,
+            fullName: fullName
+          })
           Alert.alert("Name successfully updated");
       } catch (error) {
           Alert.alert('Name Update Failed', 'Please try again later');
@@ -233,7 +238,7 @@ const UpdateAccountScreen = () => {
 
   // Updates the users email in both their auth profile and realtime database
   async function updateUserEmail(email) {
-    email = email.toLowerCase();
+    email = email.toLowerCase().trim();
 
     try {
         // Update user's email in their auth profile
@@ -248,15 +253,20 @@ const UpdateAccountScreen = () => {
         await set(userRef, email);
 
         // Update local state data
-        refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
+        //refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
         setEmail(email);
-
+        setUserData({
+          ...userData,
+          userEmail: email
+        })
         Alert.alert('Email successfully updated');
     } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
             Alert.alert('Email Update Failed', 'Please enter a valid email that is not already in use');
         } else {
             Alert.alert('Email Update Failed', error.code);
+            console.log(error);
+            console.log(error.code, error.message);
         }
     }
   }
@@ -291,8 +301,12 @@ const UpdateAccountScreen = () => {
         });
 
         // Update local state data
-        refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone);
+        //refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone);
         setPhoneNumber(newPhone);
+        setUserData({
+          ...userData,
+          phoneNumber: newPhone
+        })
         Alert.alert('Phone number successfully updated');
       }
     } catch (error) {
@@ -330,7 +344,7 @@ const UpdateAccountScreen = () => {
         </Pressable>
         {modalType === 'name' && <UpdateNameModal onClose={handleCloseModal} updateName={updateUserName} currentFirstName={firstName} currentLastName={lastName}/>}
         {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateUserEmail} currentEmail={email} emailSetter = {setEmail}/>}
-        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updateUserPhone} currentPhone={phoneNumber}/>}
+        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updateUserPhone} oldPhone={phoneNumber}/>}
       </View>
     </TouchableWithoutFeedback>
   );
