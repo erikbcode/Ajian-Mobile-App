@@ -4,7 +4,7 @@ import { Pressable, Alert, StyleSheet, Text, View, Linking, Platform } from 'rea
 function getMapURL(latitude: number, longitude: number, label: string) {
     // Add the start of the Map URL depending on the OS being used
     // Android only included for debugging
-    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+    const scheme = Platform.select({ ios: 'http://maps.apple.com/?q=', android: 'geo:0,0?q=' });
     // Custom latitude and longitude string for URL
     const latLng = `${latitude},${longitude}`;
     // Choose which platform to render based on device viewing the map
@@ -40,14 +40,15 @@ export default function MapOpenButton(latitude: number, longitude: number, label
     */
     return (
         <Pressable
-            style={({pressed}) =>
+            style={({pressed}) => [
             pressed
                 ? [styles.generalStructure, styles.buttonPressed]
                 : [styles.generalStructure, styles.buttonUnpressed]
-            }
-            onPress={mapURL}
-        >
-          <Text style={styles.text}>Open in Maps</Text>
+            ]}
+            onPress={mapURL}>
+        {({pressed}) => (
+            <Text style={styles.text}>Open in Maps</Text>
+        )}
         </Pressable>
     );
 }
