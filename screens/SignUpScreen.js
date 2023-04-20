@@ -4,8 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
-import { firebaseConfig, phoneProvider, auth } from '../firebaseConfig';
+import { firebaseConfig, phoneProvider, auth, database } from '../firebaseConfig';
 import { signInWithCredential, PhoneAuthProvider } from 'firebase/auth';
+import { get, ref } from 'firebase/database';
 
 const SignUpScreen = () => {
 
@@ -109,12 +110,29 @@ const SignUpScreen = () => {
   }
 
   // Function to validate phone number (exists and is 10 digits)
-  const validatePhoneNumber = (phoneNumber) => {
-    if (!phoneNumber || phoneNumber.length == 0) {
+  const validatePhoneNumber = async (phoneNumber) => {
+    try {
+      if (!phoneNumber || phoneNumber.length != 10) {
+        return false;
+      }
+  
+      const phoneRef = ref(database, `phoneNumbers/${phoneNumber}`);
+      const snapshot = await get(phoneRef);
+      // Phone number already in database, so cancel sign up
+      if (snapshot.exists()) {
+          return false;
+      }
+  
+      return /^\d{10}$/.test(phoneNumber);
+    } catch (error) {
+      if (error.code == 'auth/invalid-phone-number') {
+        Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number that is not in use.');
+      } else {
+        Alert.alert('Error', 'An error occurred. Please try again later.');
+      }
+      console.log(error.message);
       return false;
     }
-
-    return /^\d{10}$/.test(phoneNumber);
   }
 
   if (isLoading) {
