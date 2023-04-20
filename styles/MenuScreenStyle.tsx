@@ -104,7 +104,7 @@ export const styles = StyleSheet.create({
     headerText: {
       fontWeight: 'bold',
       fontSize: 40,
-      paddingTop: StatusBar.currentHeight + 50,
+      paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 50 : 50,
       paddingBottom: 35,
     },
     // shadow: {
@@ -135,7 +135,7 @@ export const styles = StyleSheet.create({
     loadingText: {
       paddingTop: 30,
       fontWeight: 'bold',
-      fontsize: 18,
+      fontSize: 18,
     },
 
     separator: {

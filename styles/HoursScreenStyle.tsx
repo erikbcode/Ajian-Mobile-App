@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 40,
-    marginTop: StatusBar.currentHeight + 50,
+    marginTop: StatusBar.currentHeight ? StatusBar.currentHeight + 50 : 50,
     marginBottom: 400,
   },
   addressText: {
@@ -66,7 +66,6 @@ export const styles = StyleSheet.create({
     paddingTop: 30,
     fontWeight: 'bold',
     fontSize: 18,
-    color: 'white',
   },
   separator: {
     marginVertical: 5,

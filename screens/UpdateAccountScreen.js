@@ -115,17 +115,17 @@ const UpdateNameModal = ({ onClose, updateName, currentFirstName, currentLastNam
   };
 
   // Component that displays a modal to update the user's phone number
-  const UpdatePhoneModal = ({ onClose, currentPhone, updatePhone}) => {
+  const UpdatePhoneModal = ({ onClose, updatePhone, oldPhone}) => {
     const accountStyles = useAccountStyles();
 
-    const [phone, setPhone] = useState(currentPhone);
+    const [phone, setPhone] = useState(oldPhone);
     
     onSubmit = async () => {
       if (phone.length != 10) {
         Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number');
         onClose();
       } else {
-        await updatePhone(phone, currentPhone);
+        await updatePhone(phone, oldPhone);
         onClose();
       }
     }
@@ -201,99 +201,117 @@ const UpdateAccountScreen = () => {
 
   // Updates the user's auth profile displayName field and name data in users and phoneNumbers databases
   async function updateUserName(firstName, lastName) {
-      let fullName = String(firstName).trim().concat(' ', String(lastName).trim())
-      // Update displayName in the user's auth profile
-      updateProfile(user, {displayName: fullName}).then(() => {
+      try {
+          let fullName = String(firstName).trim().concat(' ', String(lastName).trim());
+          // Update displayName in the user's auth profile
+          await updateProfile(user, { displayName: fullName });
           // Set user and userData state
           setUser(user);
           setUserData({
               ...userData,
               fullName: fullName
-          })
-          // Update user's data in the users databasse
-          const userRef = ref(database, `users/${user.uid}`)
-          set(userRef, {
+          });
+          // Update user's data in the users database
+          const userRef = ref(database, `users/${user.uid}`);
+          await set(userRef, {
               fullName: fullName,
               hasSignUpReward: userData.hasSignUpReward,
               phoneNumber: userData.phoneNumber,
               rewardsPoints: userData.rewardsPoints,
               userEmail: userData.userEmail
-          }).then(() => {
-              // Update user's data in the phoneNumbers database
-              const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`)
-              set(phoneRef, {fullName: fullName, userEmail: userData.userEmail, userId: user.uid}).then(() => {
-                  setFirstName(firstName);
-                  setLastName(lastName);
-                  Alert.alert("Name successfully updated");
-              });
+          });
+          // Update user's data in the phoneNumbers database
+          const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}`);
+          await set(phoneRef, { fullName: fullName, userEmail: userData.userEmail, userId: user.uid });
+          setFirstName(firstName);
+          setLastName(lastName);
+
+          setUserData({
+            ...userData,
+            fullName: fullName
           })
-      }).catch((error) => {
+          Alert.alert("Name successfully updated");
+      } catch (error) {
           Alert.alert('Name Update Failed', 'Please try again later');
-      })
+      }
   }
 
   // Updates the users email in both their auth profile and realtime database
   async function updateUserEmail(email) {
-    email = email.toLowerCase();
+    email = email.toLowerCase().trim();
 
-    // Update user's email in their auth profile
-    updateEmail(user, email).then(() => {
+    try {
+        // Update user's email in their auth profile
+        await updateEmail(user, email);
+
         // Update user's email in the phoneNumbers database
         const phoneRef = ref(database, `phoneNumbers/${userData.phoneNumber}/userEmail`);
-        set(phoneRef, email).then(() => {
-            // Update user's email in the users database
-            const userRef = ref(database, `users/${user.uid}/userEmail`)
-            set(userRef, email).then(() => {
-                // Update local state data
-                refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
-                setEmail(email);
-                Alert.alert('Email successfully updated');
-            });
+        await set(phoneRef, email);
+
+        // Update user's email in the users database
+        const userRef = ref(database, `users/${user.uid}/userEmail`);
+        await set(userRef, email);
+
+        // Update local state data
+        //refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, email, userData.phoneNumber);
+        setEmail(email);
+        setUserData({
+          ...userData,
+          userEmail: email
         })
-    }).catch((error) => {
-      if (error.code == 'auth/email-already-in-use') {
-        Alert.alert('Email Update Failed', 'Please enter a valid email that is not already in use');
-      } else {
-        Alert.alert('Email Update Failed', error.code);
-      }
-    });
+        Alert.alert('Email successfully updated');
+    } catch (error) {
+        if (error.code === 'auth/email-already-in-use') {
+            Alert.alert('Email Update Failed', 'Please enter a valid email that is not already in use');
+        } else {
+            Alert.alert('Email Update Failed', error.code);
+            console.log(error);
+            console.log(error.code, error.message);
+        }
+    }
   }
 
   // Updates the user's phone number in realtime database 
   async function updateUserPhone(newPhone, oldPhone) {
-    const oldPhoneRef = ref(database, `phoneNumbers/${oldPhone}`)
+    const oldPhoneRef = ref(database, `phoneNumbers/${oldPhone}`);
     const phoneRef = ref(database, `phoneNumbers/${newPhone}`);
-    get(phoneRef).then((snapshot) => {
-        if (snapshot.exists()) {
-            Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use');
-            return;
-        } else {
-            // Begin by removing old realtime database entry for the phone number
-            remove(oldPhoneRef).then(() => {
-                console.log('Old phone entry deleted successfully');
-                // Add new phone number entry to the phoneNumbers database
-                set(phoneRef, {
-                    fullName: userData.fullName,
-                    userEmail: userData.userEmail,
-                    userId: user.uid
-                }).then(() => {
-                    // Update user's phone number in the users database
-                    const userRef = ref(database, `users/${user.uid}`);
-                    set(userRef, {
-                        ...userData,
-                        phoneNumber: newPhone
-                    }).then(() => {
-                        // Update local state data
-                        refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone);
-                        setPhoneNumber(newPhone);
-                        Alert.alert('Phone number successfully updated');
-                    })
-                })
-            })
-        }
-    }).catch((error) => {
-        Alert.alert('Phone Number Update Failed', error.message);
-    })
+
+    try {
+      const snapshot = await get(phoneRef);
+      if (snapshot.exists()) {
+        Alert.alert('Phone Number In Use', 'Please enter a valid 10-digit phone number that is not in use');
+        return;
+      } else {
+        // Begin by removing old realtime database entry for the phone number
+        await remove(oldPhoneRef);
+        console.log('Old phone entry deleted successfully');
+
+        // Add new phone number entry to the phoneNumbers database
+        await set(phoneRef, {
+          fullName: userData.fullName,
+          userEmail: userData.userEmail,
+          userId: user.uid
+        });
+
+        // Update user's phone number in the users database
+        const userRef = ref(database, `users/${user.uid}`);
+        await set(userRef, {
+          ...userData,
+          phoneNumber: newPhone
+        });
+
+        // Update local state data
+        //refreshUserData(userData.fullName, userData.rewardsPoints, userData.hasSignUpReward, userData.userEmail, newPhone);
+        setPhoneNumber(newPhone);
+        setUserData({
+          ...userData,
+          phoneNumber: newPhone
+        })
+        Alert.alert('Phone number successfully updated');
+      }
+    } catch (error) {
+      Alert.alert('Phone Number Update Failed', error.message);
+    }
   }
 
   return (
@@ -326,7 +344,7 @@ const UpdateAccountScreen = () => {
         </Pressable>
         {modalType === 'name' && <UpdateNameModal onClose={handleCloseModal} updateName={updateUserName} currentFirstName={firstName} currentLastName={lastName}/>}
         {modalType === 'email' && <UpdateEmailModal onClose={handleCloseModal} updateEmail={updateUserEmail} currentEmail={email} emailSetter = {setEmail}/>}
-        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updateUserPhone} currentPhone={phoneNumber}/>}
+        {modalType === 'phone' && <UpdatePhoneModal onClose={handleCloseModal} updatePhone={updateUserPhone} oldPhone={phoneNumber}/>}
       </View>
     </TouchableWithoutFeedback>
   );
