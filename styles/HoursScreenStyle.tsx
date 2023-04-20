@@ -1,13 +1,15 @@
 import { StyleSheet, StatusBar } from "react-native";
 
+const ajianRed : string = 'rgb(135, 31, 31)';
+
 export const styles = StyleSheet.create({
   containerParent: {
-    backgroundColor: 'rgb(135, 31, 31)',
+    backgroundColor: ajianRed,
     alignItems: 'center',
     justifyContent: 'center',
   },
   scrollContainer: {
-    backgroundColor: 'rgb(135, 31, 31)',
+    backgroundColor: ajianRed,
     marginBottom: 0,
   },
   dayContainer: {
@@ -21,16 +23,16 @@ export const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 10,
   },
-  shadow: {
-    shadowOffset: { width: -2, height: 5 },
-    shadowColor: 'black',
-    shadowOpacity: 0.5,
-    elevation: 3,
-    // background color must be set
-    backgroundColor : "#0000" // invisible color
-  },
+  // shadow: {
+  //   shadowOffset: { width: -2, height: 5 },
+  //   shadowColor: 'black',
+  //   shadowOpacity: 0.5,
+  //   elevation: 3,
+  //   // background color must be set
+  //   backgroundColor : "#0000" // invisible color
+  // },
   parentText: {
-    backgroundColor: 'rgb(135, 31, 31)',
+    backgroundColor: ajianRed,
     fontFamily: 'Ubuntu',
     color: 'white',
     textAlign: 'center',
@@ -42,52 +44,40 @@ export const styles = StyleSheet.create({
     marginBottom: 400,
   },
   addressText: {
-    // fontFamily: 'Ubuntu',
-    // color: 'white',
-    // fontWeight: 'bold',
     fontSize: 20,
     marginTop: 50,
   },
-  // title: {
-  //   // fontFamily: 'Ubuntu',
-  //   // color: 'white',
-  //   // textAlign: 'center',
-  //   // fontWeight: 'bold',
-  //   fontSize: 20,
-  //   paddingBottom: 15,
-  // },
   dayText: {
-    // fontFamily: 'Ubuntu',
-    // color: 'white',
-    // textAlign: 'center',
-    // fontWeight: 'bold',
     fontSize: 18,
   },
   hoursText: {
-    // fontFamily: 'Ubuntu',
-    // color: 'white',
-    // textAlign: 'center',
     fontWeight: 'normal',
     fontSize: 16,
     marginTop: 5,
+  },
+  loadingView: {
+    flex: 1,
+    backgroundColor: ajianRed,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingText: {
     paddingTop: 30,
     fontWeight: 'bold',
     fontSize: 18,
   },
-
   separator: {
     marginVertical: 5,
     height: 2,
     width: '80%',
   },
   dayMargin: {
-    backgroundColor: 'rgb(135, 31, 31)',
+    backgroundColor: ajianRed,
     marginBottom: 14,
   },
   mobileButton: {
-    backgroundColor:'rgb(135, 31, 31)',
+    backgroundColor: ajianRed,
     marginBottom: 50, 
     marginTop: 30,
   },
