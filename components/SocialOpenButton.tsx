@@ -72,7 +72,6 @@ export default function SocialOpenButton(which: string) {
         source={socialIcon} 
         style={styles.instagramIcon} 
       />
-      <Text style={styles.instagramText}>Follow us on {which}</Text>
     </TouchableOpacity>);
       
 }
