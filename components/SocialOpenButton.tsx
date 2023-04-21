@@ -61,70 +61,36 @@ export default function SocialOpenButton(which: string) {
 
       const socialIcon = whichIcon(which);
 
-     return( <TouchableOpacity 
-      onPress={() => { 
-        // Replace the link below with your own Instagram link
-        Linking.openURL(getSocialURL(which)); 
-      }}
-      style={styles.instagramButton}
-    >
-      <Image 
-        source={socialIcon} 
-        style={styles.instagramIcon} 
-      />
-    </TouchableOpacity>);
+     return( 
+  <TouchableOpacity 
+    onPress={() => { 
+      // Replace the link below with your own Instagram link
+      Linking.openURL(getSocialURL(which)); 
+    }}
+    style={styles.instagramButton}
+  >
+    <Image 
+      source={socialIcon} 
+      style={styles.instagramIcon} 
+    />
+  </TouchableOpacity>
+     );
       
 }
 
 const styles = StyleSheet.create({
-    generalStructure: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 2,
-        paddingHorizontal: 32,
-        borderRadius: 35,
-        elevation: 3,
-        borderWidth: 0,
-        width: 200,
-        height: 30,
-        marginTop: 40,
-        marginBottom: 20,
-    },
-    buttonUnpressed: {
-        backgroundColor: 'white',
-    },
-    buttonPressed: {
-        backgroundColor: 'rgb(145, 145, 145)',
-    },
-    text: {
-        fontSize: 10,
-        lineHeight: 21,
-        fontWeight: 'bold',
-        letterSpacing: 0.25,
-        color: 'rgb(135, 31, 31)',
-        fontFamily: 'UbuntuBold',
-    },
-
-    instagramButton: {
-        backgroundColor: '#DD2A7B',
-        borderRadius: 20,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 20,
-      },
-      instagramIcon: {
-        width: 20,
-        height: 20,
-        marginRight: 10,
-      },
-      instagramText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 16,
-      }
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  instagramButton: {
+    padding: 0,
+  },
+  instagramIcon: {
+    width: 100,
+    height: 100,
+  },
 });
 
 

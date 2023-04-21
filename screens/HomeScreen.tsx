@@ -44,12 +44,13 @@ const HomeScreen = () => {
         <View style={styles.shadow}>
           <Text style={styles.welcomeText}>Ajian</Text>
         </View>
-        <View>
+
+      </Animated.View>
+      <View style = {styles.socialButtonContainer}>
         {SocialOpenButton("twitter")}
         {SocialOpenButton("insta")}
 
         </View>
-      </Animated.View>
       <Animated.View 
         style={{
           opacity: fadeAnim,
