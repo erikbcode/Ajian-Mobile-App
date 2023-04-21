@@ -3,11 +3,11 @@ import { View, TextInput, Text, Alert, Pressable, TouchableWithoutFeedback, Keyb
 import { useNavigation, useIsFocused} from '@react-navigation/native';
 import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
+import { update, ref } from 'firebase/database';
 
 const AccountScreen = () => {
-  const { user, userData, logIn, logOut, redeemReward, deleteAccount} = useFirebase();
+  const { user, userData, setUserData, database, logIn, logOut, deleteAccount, isLoading, setIsLoading} = useFirebase();
   const accountStyles = useAccountStyles();
-  const isFocused = useIsFocused();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,62 +21,31 @@ const AccountScreen = () => {
   async function handleSignIn() {
     try {
       await logIn(email, password);
-      setEmail('')
-      setPassword('')
     } catch (error) {
-      if (error.code == 'auth/user-not-found') {
-        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
-      } else if (error.code == 'auth/invalid-email') {
-        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
-      } else if (error.code == 'auth/wrong-password') {
-        Alert.alert('Login Failed', 'Please enter a valid email/password combination');
-      } else if (error.code == 'auth/internal-error') {
-        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
-      } else {
-        Alert.alert('Login Failed', 'Please try again using a valid email/password combination. If the problem persists, try again later');
-      }
+      console.log('Error when signing up:', error);
+    } finally {
+      setEmail('');
+      setPassword('');
     }
   };
 
-  // Function for handling user sign-out with Firebase Authentication
-  const handleSignOut = async () => {
-    try {
-      await logOut();
-    } catch (error) {
-      Alert.alert('Failed to log out', 'Error when logging out. Please try again.');
-      console.log(error);
-    }
-  }
 
-  // Sign-up handler for AccountScreen takes the user to the SignUpScreen.
-  const handleSignUp = () => {
-    navigation.navigate('SignUp');
-  };
-  
-  // Navigate to the password reset screen
-  const handlePasswordReset = () => {
-    navigation.navigate('PasswordReset');
-  };
-
-  const handleUpdateAccountNavigate = () => {
-    navigation.navigate('UpdateAccount');
-  }
-
-  // When reward is redeemed, show the confirmation modal
-  const handleRedeemReward = () => {
-    setShowRedeemConfirmation(true);
-  };
-
-  // Function to update the user's data in the realtime db upon confirmation of redemption
-  const handleConfirmRedeem = () => {
+  // Redeems a user's sign-up reward by updating their database field to false 
+  const redeemReward = async () => {
     // Update database to reflect that the reward has been used
-    redeemReward();
+    if (user) {
+        // Update the reward status in realtime database
+        await update(ref(database, `users/${user.uid}`), {
+            hasSignUpReward: false
+        });
+        // Update the reward status in local state
+        setIsLoading(true);
+        setUserData({
+            ...userData, // spready operator to copy all existing userData fields
+            hasSignUpReward: false
+        });
+    }
     setShowRedeemConfirmation(false);
-  };
-
-  // Function to toggle confirmation for user account deletion
-  const handleDeleteAccount = () => {
-    setShowDeleteConfirmation(true);
   }
 
   // Wrapper function to delete a user's account and info associated with it 
@@ -91,6 +60,13 @@ const AccountScreen = () => {
     }
   }
 
+  if (isLoading) {
+    return (
+      <View style={accountStyles.container}>
+        <Text style={[accountStyles.titleText, accountStyles.shadow]}>Loading...</Text>
+      </View>
+    )
+  }
   // If a user is logged in, display account info. Otherwise, display sign-in/sign-up
   if (user) {
     return (
@@ -101,10 +77,8 @@ const AccountScreen = () => {
           <Pressable style={({pressed}) => [
             pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleRedeemReward}>
-          {({pressed}) => (
-              <Text style={accountStyles.text}>Redeem your free roll!</Text>
-          )}
+          onPress={() => setShowRedeemConfirmation(true)}>
+          <Text style={accountStyles.text}>Redeem your free roll!</Text>
           </Pressable>
         )}
         <Modal visible={showRedeemConfirmation}>
@@ -113,7 +87,7 @@ const AccountScreen = () => {
             <Pressable style={({pressed}) => [
                 pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
               ]}
-                onPress={handleConfirmRedeem}>
+                onPress={redeemReward}>
               {({pressed}) => (
                   <Text style={accountStyles.altButtonText}>Confirm</Text>
               )}
@@ -152,7 +126,7 @@ const AccountScreen = () => {
         <Pressable style={({pressed}) => [
               pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleUpdateAccountNavigate}>
+          onPress={() => navigation.navigate('UpdateAccount')}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Update Account Information</Text>
           )}
@@ -160,15 +134,15 @@ const AccountScreen = () => {
         <Pressable style={({pressed}) => [
               pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
           ]}
-          onPress={handleDeleteAccount}>
+          onPress={() => setShowDeleteConfirmation(true)}>
           {({pressed}) => (
               <Text style={accountStyles.text}>Delete Account</Text>
           )}
         </Pressable>
         <Pressable style={({pressed}) => [
-              pressed ? [accountStyles.transparentButton, accountStyles.shadow, accountStyles.transparentButtonPressed] : [accountStyles.transparentButton, accountStyles.shadow],
+              pressed ? [accountStyles.shadow, accountStyles.transparentButton, accountStyles.transparentButtonPressed] : [accountStyles.shadow, accountStyles.transparentButton, accountStyles.transparentButtonUnpressed],
           ]}
-          onPress={handleSignOut}>
+          onPress={() => logOut()}>
           {({pressed}) => (
               <Text style={accountStyles.transparentText}>Log Out</Text>
           )}
@@ -207,7 +181,7 @@ const AccountScreen = () => {
             <Pressable style={({pressed}) => [
                 pressed ? [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.altButton, accountStyles.buttonUnpressed],
             ]}
-            onPress={handlePasswordReset}>
+            onPress={() => navigation.navigate('PasswordReset')}>
             {({pressed}) => (
                 <Text style={accountStyles.altButtonText}>Reset Password</Text>
             )}
@@ -218,7 +192,7 @@ const AccountScreen = () => {
             <Pressable style={({pressed}) => [
                 pressed ? [accountStyles.shadow, accountStyles.button, accountStyles.buttonPressed] : [accountStyles.shadow, accountStyles.button, accountStyles.buttonUnpressed],
             ]}
-            onPress={handleSignUp}>
+            onPress={() => navigation.navigate('SignUp')}>
             {({pressed}) => (
                 <Text style={accountStyles.text}>Create an Account</Text>
             )}
