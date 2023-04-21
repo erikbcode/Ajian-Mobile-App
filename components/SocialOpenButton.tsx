@@ -3,16 +3,25 @@ import { Pressable, Alert, StyleSheet, Text, View, Linking, Platform, TouchableO
 
 function getSocialURL(which: string) {
 
-    if (which == "twitter") {
-        const url = `https://twitter.com/ajiansushi`;
+
+    if (which == "insta") {
+        const url = `https://www.instagram.com/ajiansushi`;
 
         return url
     }
 
-    else if (which == "insta") {
-        const url = `https://www.instagram.com/ajiansushi`;
+    else if (which == "twitter") {
+      const url = `https://twitter.com/ajiansushi`;
 
-        return url
+      return url
+    }
+
+
+    else if (which == "facebook") {
+      const url = `https://www.facebook.com/AjianSushi/`;
+
+      return url
+
     }
 
     return '';
@@ -27,9 +36,15 @@ function whichIcon(which: string) {
     }
 
     else if (which == "twitter") {
-        const url = require("../assets/images/twitter.png");
+        const icon = require("../assets/images/twitter.png");
 
-        return url
+        return icon;
+    }
+
+    else if (which == "facebook") {
+      const icon = require("../assets/images/facebook.png")
+
+      return icon;
     }
 
     return '';
@@ -67,11 +82,11 @@ export default function SocialOpenButton(which: string) {
       // Replace the link below with your own Instagram link
       Linking.openURL(getSocialURL(which)); 
     }}
-    style={styles.instagramButton}
+    style={styles.socialButton}
   >
     <Image 
       source={socialIcon} 
-      style={styles.instagramIcon} 
+      style={styles.socialIcon} 
     />
   </TouchableOpacity>
      );
@@ -84,11 +99,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  instagramButton: {
+  socialButton: {
     padding: 0,
     backgroundColor:"#0000"
   },
-  instagramIcon: {
+  socialIcon: {
     width: 100,
     height: 100,
   },

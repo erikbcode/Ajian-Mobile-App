@@ -49,6 +49,8 @@ const HomeScreen = () => {
       <View style = {styles.socialButtonContainer}>
         {SocialOpenButton("twitter")}
         {SocialOpenButton("insta")}
+        {SocialOpenButton("facebook")}
+
         </View>
       <Animated.View 
         style={{
