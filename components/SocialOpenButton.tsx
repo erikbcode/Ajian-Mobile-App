@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
   },
   instagramButton: {
     padding: 0,
+    backgroundColor:"#0000"
   },
   instagramIcon: {
     width: 100,
