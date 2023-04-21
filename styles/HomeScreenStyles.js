@@ -42,6 +42,16 @@ export const useHomeStyles = () => {
         welcomeText: {
           fontFamily: fontsLoaded ? 'Aboreto' : 'System',
           fontSize: 60,
+
         },
+
+        socialButtonContainer: {
+          width: 150,
+          height: 60,
+          flexDirection: 'row', 
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginVertical: 10,
+        }
       });
 }
