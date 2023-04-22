@@ -29,7 +29,8 @@ const SignUpScreen = () => {
 
   const sendVerification = async () => {
     try {
-      if (!validatePhoneNumber(phoneNumber)) {
+      const isPhoneValid = await validatePhoneNumber(phoneNumber)
+      if (!isPhoneValid) {
         Alert.alert('Could Not Send Verification', 'Please enter a valid 10-digit phone number that is not in use.');
         return;
       }
@@ -38,7 +39,7 @@ const SignUpScreen = () => {
       setVerificationId(verId);
       setVerificationSent(true);  
     } catch (error) {
-      Alert.alert('failed', error.message);
+      Alert.alert('Failed', error.message);
       console.log(error.message);
       console.log(error.code);
     }
