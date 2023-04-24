@@ -8,6 +8,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  headerContainerParent: {
+    backgroundColor: ajianRed,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 400, // this controls map height
+    marginTop: StatusBar.currentHeight + 50,
+  },
   scrollContainer: {
     backgroundColor: ajianRed,
     marginBottom: 0,
@@ -15,22 +22,11 @@ export const styles = StyleSheet.create({
   dayContainer: {
     flex: 1,
     elevation: 3,
-    // zIndex: 1,
     paddingTop: 40,
   },
   hoursContainer: {
     flex: 1,
-    marginTop: 50,
-    marginBottom: 10,
   },
-  // shadow: {
-  //   shadowOffset: { width: -2, height: 5 },
-  //   shadowColor: 'black',
-  //   shadowOpacity: 0.5,
-  //   elevation: 3,
-  //   // background color must be set
-  //   backgroundColor : "#0000" // invisible color
-  // },
   parentText: {
     backgroundColor: ajianRed,
     fontFamily: 'Ubuntu',
@@ -40,12 +36,14 @@ export const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 40,
-    marginTop: StatusBar.currentHeight + 50,
-    marginBottom: 400,
+    marginBottom: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 5,
   },
   addressText: {
     fontSize: 20,
-    marginTop: 50,
+    marginBottom: 30,
   },
   dayText: {
     fontSize: 18,
