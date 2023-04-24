@@ -64,7 +64,6 @@ export const styles = StyleSheet.create({
     paddingTop: 30,
     fontWeight: 'bold',
     fontSize: 18,
-    color: 'white',
   },
   separator: {
     marginVertical: 5,

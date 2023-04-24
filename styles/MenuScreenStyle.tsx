@@ -137,7 +137,7 @@ export const styles = StyleSheet.create({
     loadingText: {
       paddingTop: 30,
       fontWeight: 'bold',
-      fontsize: 18,
+      fontSize: 18,
     },
 
     separator: {
