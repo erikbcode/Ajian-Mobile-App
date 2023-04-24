@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         width: 200,
         height: 30,
-        marginTop: 40,
+        // marginTop: 40,
         marginBottom: 20,
     },
     buttonUnpressed: {

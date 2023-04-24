@@ -1,5 +1,7 @@
 import { StyleSheet, Dimensions, StatusBar } from "react-native";
 
+const ajianRed : string = 'rgb(135, 31, 31)';
+
 export const banner_styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -8,7 +10,7 @@ export const banner_styles = StyleSheet.create({
       width: '100%',
       justifyContent: 'flex-start',
       alignItems: 'center',
-      backgroundColor: 'rgb(135, 31, 31)',
+      backgroundColor: ajianRed,
       marginTop: 34,
       paddingTop: 10,
       zIndex: 2,
@@ -27,8 +29,11 @@ export const styles = StyleSheet.create({
     smallMargin: {
         marginTop: 20,
     },
+    scrollView: {
+      backgroundColor: ajianRed,
+    },
     container: {
-      backgroundColor: 'rgb(135, 31, 31)',
+      backgroundColor: ajianRed,
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
@@ -37,7 +42,7 @@ export const styles = StyleSheet.create({
       width: Dimensions.get('window').width,
     },
     menuContainer: {
-      backgroundColor: 'rgb(135, 31, 31)',
+      backgroundColor: ajianRed,
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
@@ -45,12 +50,18 @@ export const styles = StyleSheet.create({
       paddingBottom: 10,
     },
     tabContainer: {
-      backgroundColor: 'rgb(135, 31, 31)',
+      backgroundColor: ajianRed,
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
       paddingTop: 10,
       columnGap: 20,
+    },
+    headerContainerParent: {
+      backgroundColor: ajianRed,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: StatusBar.currentHeight + 50,
     },
     tabStyle: {
       backgroundColor: 'white',
@@ -72,13 +83,10 @@ export const styles = StyleSheet.create({
       paddingTop: 8,
       paddingBottom: 8,
     },
-    scrollView: {
-      backgroundColor: 'rgb(135, 31, 31)',
-      paddingTop: StatusBar.currentHeight,
-    },
+    
 
     textParent: {
-      backgroundColor: 'rgb(135, 31, 31)',
+      backgroundColor: ajianRed,
       fontFamily: 'Ubuntu',
       fontWeight: 'normal',
       textAlign: 'center',
@@ -89,7 +97,7 @@ export const styles = StyleSheet.create({
     tabTextUnselected: {
       backgroundColor: 'white',
       fontWeight: 'bold',
-      color: 'rgb(135, 31, 31)',
+      color: ajianRed,
     },
     tabTextSelected: {
       backgroundColor: 'white',
@@ -104,17 +112,11 @@ export const styles = StyleSheet.create({
     headerText: {
       fontWeight: 'bold',
       fontSize: 40,
-      paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 50 : 50,
       paddingBottom: 35,
+      textShadowColor: 'rgba(0, 0, 0, 0.5)',
+      textShadowOffset: { width: 2, height: 2 },
+      textShadowRadius: 5,
     },
-    // shadow: {
-    //   shadowOffset: { width: -2, height: 5 },
-    //   shadowColor: 'black',
-    //   shadowOpacity: 0.5,
-    //   elevation: 3,
-    //   // background color must be set
-    //   backgroundColor : "#0000" // invisible color
-    // },
     menuTitle: {
       fontWeight: 'bold',
       fontSize: 24,

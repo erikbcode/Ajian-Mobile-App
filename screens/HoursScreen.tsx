@@ -87,15 +87,17 @@ export default function HoursScreen({ navigation }: RootTabScreenProps<'Hours'>)
     <ScrollView style={styles.scrollContainer}>
       {/* <Map /> */}
       {Map(latitude, longitude)}
-      <Text style={[styles.parentText, styles.headerText]}>
-        Hours & Location {'\n'} {'\n'}
+      <View style={[styles.headerContainerParent]}>
+        <Text style={[styles.parentText, styles.headerText]}>
+          Hours & Location
+        </Text>
         <Text style={[styles.parentText, styles.addressText]}>
           1914 University Blvd, {'\n'}
           Tuscaloosa, AL 35401 {'\n'}
-          205-331-4542 {'\n'}
+          205-331-4542
         </Text>  
-        {MapOpenButton(latitude, longitude, 'Ajian Sushi')}
-      </Text>
+        {MapOpenButton(latitude, longitude, 'Ajian Sushi')}      
+      </View>        
       
       <View style={[styles.containerParent, styles.dayContainer]}>
         {Hours(dayHours)}

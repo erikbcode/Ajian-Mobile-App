@@ -24,9 +24,11 @@ export default function MenuScreen() {
     // ScrollView necessary for page to scroll down with a variable height
     <ScrollView style={styles.scrollView}>
       {/* Menu header element */}
-      <Text style={[styles.textParent, styles.headerText]}>
-        Menu
-      </Text>
+      <View style={[styles.headerContainerParent]}>
+        <Text style={[styles.textParent, styles.headerText]}>
+          Menu
+        </Text>
+      </View>
       {/* Tabs() renders all menu items in 6 different tabs */}
       <Tabs />
     </ScrollView>
@@ -110,7 +112,9 @@ function MenuItems(sectionTitle: string, items: Array<MenuEntry>) {
   */
   return (
     <View style={styles.menuContainer}>
-      <Text style={[styles.textParent, styles.menuTitle]}>{sectionTitle}</Text>
+      <Text style={[styles.textParent, styles.menuTitle]}>
+        {sectionTitle}
+      </Text>
       {items.map((item, index) => (
         <View key={index} style={styles.smallMargin}>        
           {item.item ? <Text style={[styles.textParent, styles.itemItemText]}>{item.item}</Text> : null}
