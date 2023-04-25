@@ -49,12 +49,9 @@ plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
 
-
 header_pages: 
   - home.md
-  - sprint1.md
-  - sprint2.md
-  - sprint3.md
+  - video.md
 
 
 # Exclude from processing.
