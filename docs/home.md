@@ -6,7 +6,7 @@ permalink: /
 
 ## Goals
 1. Build Presentable app with information from client's website
-- Test
+
 2. Build a backend to allow users and simple modification of app data
 
 3. Deploy the app to the iOS App Store
@@ -36,6 +36,7 @@ Alternatively, the user could navigate to the account page and log in to their a
 - Home Page
     - Simple UI with Ajian logo and text
     - Mobile ordering button to open the restaurant's existing ordering URL in-app
+    - Social media icons to open Ajian's Facebook, Twitter, and Instagram profiles
 - Menu Page
     - Contains all menu and nutritional information for food offered by Ajian
     - Various pages including:
@@ -53,11 +54,14 @@ Alternatively, the user could navigate to the account page and log in to their a
             - Nutrition information for various ingredients offered by the restaurant
 - Hours Page
     - Interactive map displaying the location of the restaurant
+    - Button to open directions to Ajian in maps app
     - List of Ajian's current hours by day of week
 - Announcements Page
-    - Lists current announcements that can be updated by the restaurant owner
+    - Lists current announcements that can be updated by the restaurant owner via the separate admin dashboard site
 - Account Page
     - Allows the user to create an account to receive a free sushi roll of their choice
+    - Users must verify their phone number prior to creating an account to receive the reward
+        - This verification is done using Firebase reCAPTCHA
     - User can update their account information including Name, Email, Phone Number
     - Additional rewards functionality TODO
 
