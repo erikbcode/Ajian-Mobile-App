@@ -5,7 +5,7 @@ import { useFirebase } from '../context/FirebaseContext';
 import { useAccountStyles } from '../styles/AccountScreenStyles';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import { firebaseConfig, phoneProvider, auth, database } from '../firebaseConfig';
-import { signInWithCredential, PhoneAuthProvider } from 'firebase/auth';
+import { signInWithCredential, PhoneAuthProvider, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { get, ref } from 'firebase/database';
 
 const SignUpScreen = () => {
@@ -39,24 +39,11 @@ const SignUpScreen = () => {
       setVerificationId(verId);
       setVerificationSent(true);  
     } catch (error) {
-      Alert.alert('Failed', error.message);
-      console.log(error.message);
-      console.log(error.code);
-    }
-  }
-
-  const confirmCode = async () => {
-    try {
-      const credential = PhoneAuthProvider.credential(verificationId, code);
-
-      await signInWithCredential(auth, credential);
-      setCode('');
-      const currentPhoneUser = auth.currentUser;
-      await currentPhoneUser.delete(); // Delete the phone number account that was created, it won't be used. 
-      handleSignUp();
-    } catch (error) {
-      Alert.alert('Invalid code', 'Please enter a valid code from the text you received.');
-      console.log(error.message);
+      if (error.code == 'ERR_FIREBASE_RECAPTCHA_CANCEL') {
+        console.log(error);
+      } else {
+        Alert.alert('Failed', error.message);
+      }
       console.log(error.code);
     }
   }
@@ -66,14 +53,16 @@ const SignUpScreen = () => {
   async function handleSignUp() {
     
     try {
+      setEmail(email.toLowerCase());
       // Check for valid inputs before attempting to call signUp()
       if (firstName.length == 0 || lastName.length == 0) {
         Alert.alert("Sign Up Failed", "Please enter a valid first and last name");
         return;
       }
 
-      if (!validateEmail(email)) {
-        Alert.alert('Sign Up Failed', 'Please enter a valid email address');
+      const emailValid = await validateEmail(email);
+      if (!emailValid) {
+        Alert.alert('Sign Up Failed', 'Please enter a valid email address that is not in use');
         return;
       }
 
@@ -92,6 +81,13 @@ const SignUpScreen = () => {
         return;
       }
 
+      const credential = PhoneAuthProvider.credential(verificationId, code);
+
+      await signInWithCredential(auth, credential);
+      setCode('');
+      const currentPhoneUser = auth.currentUser;
+      await currentPhoneUser.delete(); // Delete the phone number account that was created, it won't be used.
+
       let name = firstName.trim().concat(' ', lastName.trim());
 
       // Call method to handle sign up and navigate back to account screen
@@ -100,14 +96,32 @@ const SignUpScreen = () => {
       setIsLoading(false);
       navigation.goBack();
     } catch (error) {
+        console.log(error)
+        console.log(error.message);
+        console.log(error.code);
         Alert.alert('Sign Up Failed', 'Sign up failed. Please enter valid info and try again.')
     }
   };
 
   // Function to validate email (Contains valid @ and .X format)
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.toLowerCase());
+  const validateEmail = async (email) => {
+    try {
+      let valid = true;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.toLowerCase())) {
+        valid = false;
+      }
+
+      const existingList = await fetchSignInMethodsForEmail(auth, email);
+      if (existingList.length > 0) {
+        valid = false;
+      }
+
+      return valid;
+    } catch (error) {
+      console.log('Error when validating email', error.message);
+      return false;
+    }
   }
 
   // Function to validate phone number (exists and is 10 digits)
@@ -202,7 +216,7 @@ const SignUpScreen = () => {
                   <Pressable style={({pressed}) => [
                     pressed ? [styles.shadow, styles.button, styles.buttonPressed] : [styles.shadow, styles.button, styles.buttonUnpressed],
                     ]}
-                    onPress={confirmCode}>
+                    onPress={handleSignUp}>
                     {({pressed}) => (
                         <Text style={styles.text}>Create Account</Text>
                     )}
