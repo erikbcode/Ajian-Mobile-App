@@ -52,8 +52,9 @@ const App = () => {
             <Routes>
               {/* Pages */}
               <Route path="/Announcements" element={<Announcements />} />
-              <Route path="/Menu" element={<Menu />} />
-              <Route path="/Hours" element={<Hours />} />
+              {/* <Route path="/Menu" element={<Menu />} />
+              <Route path="/Hours" element={<Hours />} />*/}
+              
             </Routes>
           </div>
           </div>

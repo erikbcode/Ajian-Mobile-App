@@ -11,14 +11,14 @@ export const links = [
           name: 'Announcements',
           icon: <BiBell />,
         },
-        {
-          name: 'Menu',
-          icon: <BiFoodMenu />,
-        },
-        {
-          name: 'Hours',
-          icon: <AiFillClockCircle />,
-        },
+        // {
+        //   name: 'Menu',
+        //   icon: <BiFoodMenu />,
+        // },
+        // {
+        //   name: 'Hours',
+        //   icon: <AiFillClockCircle />,
+        // },
       ],
     },
   ];
