@@ -28,3 +28,6 @@ cd Ajian-Mobile-App/admin
 ## Built With
 - JavaScript
 - React Native
+
+# Future
+Admin website currently only has the capabilities to update the announcements, updates for menu and hours pages are needed to help protect Firebase database.
