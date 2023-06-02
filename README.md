@@ -6,9 +6,24 @@ Ajian Sushi Admin website allows the owner of Ajian Sushi to make updates to the
 ## Prerequisites
 To run the app, you will need to have the following installed on your system:
 
-- 
+- Node.js (version 14 or later)
+- Expo CLI
 
 ## Getting Started
+
+To get the website up and running on your device, follow these steps:
+
+1. Clone the repository:
+git clone https://github.com/ebuinevicius/Ajian-Mobile-App.git
+
+2. Navigate to the admin directory:
+cd Ajian-Mobile-App/admin
+
+3. npm install
+4. npm run compile
+5. npm start
+6. Open http://localhost:3000/ 
+
 
 ## Built With
 - JavaScript
